@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">Relsib@Health</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Очистить список</string>
+
+    <string name="menu_calendar">Календарь</string>
+    <string name="menu_charts">Графики</string>
+    <string name="menu_thermometers">Термометры</string>
+    <string name="menu_alarms">Напоминания</string>
+    <string name="menu_my_devices">Мои устроства</string>
+    <string name="menu_settings">Настройки</string>
+
+    <string name="ble_not_supported">Bluetooth low energy не подддерживается</string>
+    <string name="label_data">Данные:</string>
+    <string name="label_device_address">Адрес устройства:</string>
+    <string name="label_state">Состояниеe:</string>
+    <string name="no_data"></string>
+    <string name="connected">Подключен</string>
+    <string name="disconnected">Отключен</string>
+    <string name="title_devices">Smart-термометр</string>
+    <string name="error_bluetooth_not_supported">Bluetooth не поддерживается данным устройством.</string>
+
+    <string name="unknown_device">Unknown device</string>
+    <string name="unknown_characteristic">Unknown characteristic</string>
+    <string name="unknown_service">Unknown service</string>
+
+    <!-- Menu items -->
+    <string name="menu_connect">Подключить</string>
+    <string name="menu_disconnect">Отключить</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_stop">Stop</string>
+    <!-- control buttons -->
+    <string name="button_turnoff">Выключить</string>
+    <string name="button_get_predict_temp">Предполагаемая температура</string>
+    <string name="button_get_temp">Измерить температуру</string>
+    <string name="predict_temp">Предполагаемая температура</string>
+    <string name="title_activity_default">Relsib@Здоровье</string>
+
+    <string name="title_section1">Профиль</string>
+    <string name="title_section2">Календарь</string>
+    <string name="title_section3">Графики</string>
+    <string name="title_section4">Термометры</string>
+    <string name="title_section5">Уведомления</string>
+    <string name="title_section6">Настройки</string>
+
+
+    <string name="action_example">Example action</string>
+
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+</resources>

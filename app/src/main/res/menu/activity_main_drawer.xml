@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Представление">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_calendar"
+                    android:icon="@drawable/ic_menu_calendar"
+                    android:title="@string/menu_my_devices" />
+                <!--<item-->
+                <!--android:id="@+id/nav_charts"-->
+                <!--android:icon="@drawable/ic_menu_charts"-->
+                <!--android:title="@string/menu_charts" />-->
+                <!--<item-->
+                <!--android:id="@+id/nav_list"-->
+                <!--android:icon="@drawable/ic_menu_list"-->
+                <!--android:title="Список" />-->
+            </group>
+        </menu>
+    </item>
+
+
+    <item android:title="Управление">
+        <menu>
+            <group android:checkableBehavior="single">
+                <!--<item-->
+                <!--android:id="@+id/nav_alarms"-->
+                <!--android:icon="@drawable/ic_menu_alarms"-->
+                <!--android:title="@string/menu_alarms" />-->
+
+                <item
+                    android:id="@+id/nav_thermometers"
+                    android:icon="@drawable/ic_menu_thermometers"
+                    android:title="@string/menu_thermometers" />
+                <!--<item-->
+                <!--android:id="@+id/nav_settings"-->
+                <!--android:icon="@drawable/ic_menu_settings"-->
+                <!--android:title="@string/menu_settings" />-->
+            </group>
+        </menu>
+    </item>
+</menu>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+    <CheckBox
+        android:id="@+id/device_selected"
+        style="@style/Base.Widget.AppCompat.CompoundButton.CheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="false"
+        android:layout_alignWithParentIfMissing="false"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="0dp"
+        android:checked="false" />
+
+    <TextView
+        android:id="@+id/device_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_weight="1"
+        android:text="4000"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/device_serial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentStart="false"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/device_name"
+        android:layout_weight="1"
+        android:text="70700"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/device_rssi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/device_mac"
+        android:layout_gravity="right"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/device_mac"
+        android:text="New Text"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/device_mac"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/device_name"
+        android:text="MAC"
+        android:textSize="24sp" />
+
+</RelativeLayout>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!--<item name="android:spinnerStyle">@style/SpinnerTheme</item>-->
+        <!--<item name="android:dropDownSpinnerStyle">@style/SpinnerTheme.DropDown</item>-->
+        <!--<item name="android:spinnerDropDownItemStyle">@style/DropDownItemSpinnerTheme</item>-->
+        <!--<item name="android:listViewStyle">@style/ListViewSpinnerTheme</item>-->
+        <!--<item name="android:listViewWhiteStyle">@style/ListViewSpinnerTheme.White</item>-->
+        <!--<item name="android:spinnerItemStyle">@style/SpinnerItemTheme</item>-->
+        <item name="colorPrimary">@color/colorPrimary</item>
+
+        <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
+        <!--<item name="colorAccent">@color/colorAccent</item>-->
+
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!--<item name="android:spinnerStyle">@style/SpinnerTheme</item>-->
+        <!--<item name="android:dropDownSpinnerStyle">@style/SpinnerTheme.DropDown</item>-->
+        <!--<item name="android:spinnerDropDownItemStyle">@style/DropDownItemSpinnerTheme</item>-->
+        <!--<item name="android:listViewStyle">@style/ListViewSpinnerTheme</item>-->
+        <!--<item name="android:listViewWhiteStyle">@style/ListViewSpinnerTheme.White</item>-->
+        <!--<item name="android:spinnerItemStyle">@style/SpinnerItemTheme</item>-->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <!--<item name="android:dropDownListViewStyle">@style/mySpinnerStyle</item>-->
+
+
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+</resources>
