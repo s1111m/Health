@@ -60,6 +60,22 @@ public class BLEService extends Service {
     private static DbModel db;
     private final IBinder mBinder = new LocalBinder();
 
+    /**
+     * Initializes a reference to the local Bluetooth adapter.
+     *
+     * @return Return true if the initialization is successful.
+     */
+    public static void clear() {
+
+        for (int i = 0; i < thermometers.size(); i++) {
+            thermometers.get(i).close();
+        }
+        thermometers.clear();
+        tableThermometers.clear();
+        final Intent intent = new Intent(BLEService.ACTION_GATT_DISCONNECTED);
+        BLEService.mServiceContext.sendBroadcast(intent);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -94,19 +110,6 @@ public class BLEService extends Service {
         super.onRebind(intent);
     }
 
-    /**
-     * Initializes a reference to the local Bluetooth adapter.
-     *
-     * @return Return true if the initialization is successful.
-     */
-    public static void clear (){
-
-        for (int i = 0; i < thermometers.size(); i++) {
-            thermometers.get(i).close();
-        }
-        thermometers.clear();
-        tableThermometers.clear();
-    }
     public boolean initialize() {
         // For API level 18 and above, get a reference to BluetoothAdapter through
         // BluetoothManager.
@@ -152,13 +155,14 @@ public class BLEService extends Service {
     }
 
     public void pushUnknownToMyDevices() {
+        SmartThermometer tempThermometer;
         for (int i = 0; i < unknownThermometers.size(); i++) {
-            SmartThermometer tempThermometer = unknownThermometers.get(i);
+            tempThermometer = unknownThermometers.get(i);
             if (tempThermometer.selected && !thermometers.contains(tempThermometer)) {
-                // tempThermometer.connect(true);
-                thermometers.add(tempThermometer);
-                tableThermometers.save(tempThermometer);
 
+                //tempThermometer.connect(true);
+                new ConnectThread(tempThermometer).start();
+                thermometers.add(tempThermometer);
             }
         }
         unknownThermometers.clear();
@@ -167,6 +171,19 @@ public class BLEService extends Service {
     public class LocalBinder extends Binder {
         BLEService getService() {
             return BLEService.this;
+        }
+    }
+
+    class ConnectThread extends Thread {
+        SmartThermometer thermometer;
+
+        public ConnectThread(SmartThermometer thermometer) {
+            //super(thermometer);
+            this.thermometer = thermometer;
+        }
+
+        public void run() {
+            thermometer.connect(true);
         }
     }
 }

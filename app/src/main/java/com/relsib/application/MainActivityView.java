@@ -70,10 +70,10 @@ public class MainActivityView extends AppCompatActivity
             public void onClick(View view) {
                 mBLEService.pushUnknownToMyDevices();
                 getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
-                for (int i = 0; i < BLEService.thermometers.size(); i++) {
-                    BLEService.thermometers.get(i).connect(true);
+                //    for (int i = 0; i < BLEService.thermometers.size(); i++) {
+                //   BLEService.thermometers.get(i).connect(true);
                     //   mBLEService.thermometers.get(i).getTemperatureByNotify(true);
-                }
+                // }
             }
         });
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -126,7 +126,7 @@ public class MainActivityView extends AppCompatActivity
         int id = item.getItemId();
         if (id == R.id.action_settings) {
 
-            mBLEService.clear();
+            BLEService.clear();
 
 
             return true;
@@ -152,7 +152,7 @@ public class MainActivityView extends AppCompatActivity
 //                fragmentClass = MeasureListView.class;
 //                break;
             case R.id.nav_thermometers:
-                fragmentClass = LEDevicesView.class;
+                fragmentClass = BLEDevicesView.class;
                 break;
 //            case R.id.nav_alarms:
 //                fragmentClass = AlarmsView.class;

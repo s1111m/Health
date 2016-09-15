@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,8 +33,7 @@ public class MyDevicesView extends Fragment {
                 updateConnectionState(R.string.connected);
                 //invalidateOptionsMenu();
             } else if (BLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                mConnected = false;
-                updateConnectionState(R.string.disconnected);
+                adapter.notifyDataSetChanged();
                 //invalidateOptionsMenu();
                 //clearUI();
             } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) {
@@ -45,11 +43,9 @@ public class MyDevicesView extends Fragment {
             }
         }
     };
-    private SwipeRefreshLayout swipeRefreshLayout;
 
     public MyDevicesView() {
-        //this.data=data;
-        // Required empty public constructor
+
     }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
@@ -59,10 +55,6 @@ public class MyDevicesView extends Fragment {
         intentFilter.addAction(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BLEService.ACTION_DATA_AVAILABLE);
         return intentFilter;
-    }
-
-    public static void setCallbackService(BLEService mService) {
-        MyDevicesView.service = mService;
     }
 
     public static MyDevicesView newInstance(String param1, String param2) {
@@ -87,7 +79,6 @@ public class MyDevicesView extends Fragment {
             // data =(ArrayList<com.relsib.application.BLEService.SmartThermometer>)getArguments().getSerializable(ARG_PARAM1);
         }
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -110,7 +101,6 @@ public class MyDevicesView extends Fragment {
 
         return rootView;
     }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -130,22 +120,15 @@ public class MyDevicesView extends Fragment {
 
     public void onDestroy() {
         super.onDestroy();
-//        getActivity().unregisterReceiver(mGattUpdateReceiver);
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        //adapter=null;
-        //OnFragmentInteractionListener mListener = null;
-    }
 
+    }
     private void updateConnectionState(final int resourceId) {
-//          getActivity().runOnUiThread(new Runnable() {
-//         @Override
-//          public void run() {
-//         // mConnectionState.setText(resourceId);
-//           }
-//          });
+
     }
 }

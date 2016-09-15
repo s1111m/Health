@@ -13,7 +13,10 @@ import android.util.Log;
 import com.relsib.bluetooth.RelsibBluetoothProfile;
 import com.relsib.dao.DbModel;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.UUID;
+
 
 /**
  * Created by S1M on 11.09.2016.
@@ -37,18 +40,20 @@ public class SmartThermometer {
     public int mConnectionState = BLEService.STATE_DISCONNECTED;
     private BluetoothGatt mBluetoothGatt;
     private boolean isNotifyEnabled = false;
+    private Queue<BluetoothGattDescriptor> descriptorWriteQueue = new LinkedList<BluetoothGattDescriptor>();
+    private Queue<BluetoothGattCharacteristic> characteristicReadQueue = new LinkedList<BluetoothGattCharacteristic>();
+
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                intentAction = BLEService.ACTION_GATT_CONNECTED;
+                // intentAction = BLEService.ACTION_GATT_CONNECTED;
                 mConnectionState = BLEService.STATE_CONNECTED;
-                broadcastUpdate(intentAction);
+                // broadcastUpdate(intentAction);
                 Log.e(TAG, "Connected to GATT server.");
                 // Attempts to discover services after successful connection.
-                Log.e(TAG, "Attempting to start service discovery:" +
-                        mBluetoothGatt.discoverServices());
+                Log.e(TAG, "Attempting to start service discovery:" + mBluetoothGatt.discoverServices());
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = BLEService.ACTION_GATT_DISCONNECTED;
@@ -64,10 +69,8 @@ public class SmartThermometer {
                 Log.v(TAG, "Services discovered");
                 broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
                     if (mDeviceSerialNumber == null) {
-                        //readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE,RelsibBluetoothProfile.SERIAL_NUMBER_UUID);
                         readInfoTypes();
-                }
-
+                    } else getTemperatureByNotify(true);
             } else {
                 Log.e(TAG, "onServicesDiscovered received: " + status);
             }
@@ -77,36 +80,50 @@ public class SmartThermometer {
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
+            characteristicReadQueue.remove();
 
-            Log.e(TAG, characteristic.getStringValue(0));
+
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 UUID uuid = characteristic.getUuid();
                 if (uuid.equals(RelsibBluetoothProfile.SERIAL_NUMBER_UUID)) {
                     setmDeviceSerialNumber(characteristic.getStringValue(0).substring(0, 12));
-                    return;
+                    Log.e(TAG, "Device serial + " + mDeviceSerialNumber);
+                    // return;
                 }
-                if (uuid.equals(RelsibBluetoothProfile.FIRMWARE_REVISION_UUID)) {
-                    mDeviceFirmwareRevisionNumber = characteristic.getStringValue(0);
-                    return;
-                }
-                if (uuid.equals(RelsibBluetoothProfile.HARDWARE_REVISION_UUID)) {
-                    mDeviceHardwareRevisionNumber = characteristic.getStringValue(0);
-                    return;
-                }
+//                if (uuid.equals(RelsibBluetoothProfile.FIRMWARE_REVISION_UUID)) {
+//                    mDeviceFirmwareRevisionNumber = characteristic.getStringValue(0);
+//                  //  return;
+//                }
+//                if (uuid.equals(RelsibBluetoothProfile.HARDWARE_REVISION_UUID)) {
+//                    mDeviceHardwareRevisionNumber = characteristic.getStringValue(0);
+//                  //  return;
+//                }
                 if (uuid.equals(RelsibBluetoothProfile.MANUFACTURER_NAME_UUID)) {
-                    mDeviceManufacturer = characteristic.getStringValue(0);
-                    return;
+                    mDeviceManufacturer = characteristic.getStringValue(0).substring(0, 10);
+                    Log.e(TAG, "Device Manufacturer + " + mDeviceManufacturer);
+                    // return;
                 }
-                if (uuid.equals(RelsibBluetoothProfile.SOFTWARE_REVISION_UUID)) {
-                    mDeviceSoftwareRevisionNumber = characteristic.getStringValue(0);
-                    return;
-                }
+//                if (uuid.equals(RelsibBluetoothProfile.SOFTWARE_REVISION_UUID)) {
+//                    mDeviceSoftwareRevisionNumber = characteristic.getStringValue(0);
+//                   // return;
+//                }
                 if (uuid.equals(RelsibBluetoothProfile.MODEL_NUMBER_UUID)) {
-                    mDeviceModelNumber = characteristic.getStringValue(0);
-                    return;
+                    mDeviceModelNumber = characteristic.getStringValue(0).substring(0, 10);
+                    Log.e(TAG, "Device model + " + mDeviceModelNumber);
+                    //   return;
                 }
-                //getTemperatureByNotify(true);
+                if (uuid.equals(RelsibBluetoothProfile.BATTERY_LEVEL)) {
+                    mDeviceBatteryLevel = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+                    Log.e(TAG, "Battery level + " + mDeviceBatteryLevel);
+                    //   return;
+                }
                 broadcastUpdate(BLEService.ACTION_DATA_AVAILABLE, characteristic);
+                if (characteristicReadQueue.size() > 0)
+                    mBluetoothGatt.readCharacteristic(characteristicReadQueue.element());
+                if (characteristicReadQueue.size() == 0)
+
+                    getTemperatureByNotify(true);
+
             }
         }
         @Override
@@ -122,6 +139,8 @@ public class SmartThermometer {
             }
             if (uuid.equals(RelsibBluetoothProfile.BATTERY_LEVEL)) {
                 mDeviceBatteryLevel = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+                Log.e(TAG, "Battery level + " + mDeviceBatteryLevel);
+                //mDeviceBatteryLevel=Integer.valueOf(characteristic.getStringValue(0));
             }
 
         }
@@ -169,14 +188,14 @@ public class SmartThermometer {
         final Intent intent = new Intent(action);
         //final float temperature = characteristic.getFloatValue(BluetoothGattCharacteristic.FORMAT_FLOAT, 1);
 //        String temp = String.valueOf(temperature);
-//        intent.putExtra(BLEService.EXTRA_DATA, temp);
+        //intent.putExtra(BLEService.EXTRA_DATA);
         BLEService.mServiceContext.sendBroadcast(intent);
 
     }
 
     //
     public String getmDeviceSerialNumber() {
-//        if (mDeviceSerialNumber==null){
+//        if (mDeviceSerialNumber==null && mConnectionState==BLEService.STATE_CONNECTED){
 //            readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE,RelsibBluetoothProfile.SERIAL_NUMBER_UUID);
 //        }
         return mDeviceSerialNumber;
@@ -261,34 +280,28 @@ public class SmartThermometer {
     }
 
     public void readCharacteristic(UUID serviceUUID, UUID characteristicUUID) {
-        if (isNotifyEnabled) {
-            getTemperatureByNotify(false);
-        }
-        Log.e(TAG, "READING CHARACTERISTIC " + mDeviceMacAddress);
-
-        if (BLEService.mBluetoothAdapter == null) {
-            Log.e(TAG, "BluetoothAdapter not initialized");
-            return;
-        }
-        /*check if the service is available on the device*/
-        if (mBluetoothGatt == null) {
-            Log.e(TAG, "READ_SERIAL_GATT_NULL");
+//        if (isNotifyEnabled) {
+//            getTemperatureByNotify(false);
+//        }
+        if (BLEService.mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.e(TAG, "BluetoothAdapter not initialized or gatt null");
             return;
         }
 
         BluetoothGattService mCustomService = mBluetoothGatt.getService(serviceUUID);
+        BluetoothGattCharacteristic mReadCharacteristic = mCustomService.getCharacteristic(characteristicUUID);
 
-        if (mCustomService == null) {
-            Log.e(TAG, "READ_SERIAL_SERVICE_NULL" + mDeviceMacAddress);
-            return;
-        }
-        BluetoothGattCharacteristic mWriteCharacteristic = mCustomService.getCharacteristic(characteristicUUID);
-        if (mWriteCharacteristic == null) {
+        if (mReadCharacteristic == null) {
             Log.e(TAG, "READ_CHAR_NULL" + mDeviceMacAddress);
             return;
         }
-        Log.e(TAG, "READ OK CALLING onREAD" + mDeviceMacAddress);
-        mBluetoothGatt.readCharacteristic(mWriteCharacteristic);
+        characteristicReadQueue.add(mReadCharacteristic);
+
+        //if there is only 1 item in the queue, then read it.  If more than 1, we handle asynchronously in the callback above
+        //GIVE PRECEDENCE to descriptor writes.  They must all finish first.
+        if ((characteristicReadQueue.size() == 1) && (descriptorWriteQueue.size() == 0))
+            mBluetoothGatt.readCharacteristic(mReadCharacteristic);
+
 
     }
 
@@ -314,24 +327,35 @@ public class SmartThermometer {
 
     public boolean getTemperatureByNotify(boolean enabled) {
 
-        Log.e(TAG, "NOTIFY_CUSTOM " + mDeviceMacAddress);
-        if (BLEService.mBluetoothAdapter == null) {
-            Log.e(TAG, "BluetoothAdapter not initialized");
-            return false;
-        }
-        /*check if the service is available on the device*/
-        if (mBluetoothGatt == null) {
-            Log.e(TAG, "GATT FAILED");
-            return false;
-        }
-
-        BluetoothGattService mCustomService = mBluetoothGatt.getService(RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE);
-        if (mCustomService == null) {
-            Log.e(TAG, "NOTIFY_FAILED " + mDeviceMacAddress);
-            return false;
-        }
-        BluetoothGattCharacteristic characteristic = mCustomService.getCharacteristic(RelsibBluetoothProfile.INTERMEDIATE_TEMPERATURE);
-        setCharacteristicNotification(characteristic, enabled);
+        setCharacteristicNotify(RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE, RelsibBluetoothProfile.INTERMEDIATE_TEMPERATURE, enabled);
+//        BLEService.tableThermometers.save(this);
+//        Log.e(TAG, "NOTIFY_CUSTOM " + mDeviceMacAddress);
+//        if (BLEService.mBluetoothAdapter == null) {
+//            Log.e(TAG, "BluetoothAdapter not initialized");
+//            return false;
+//        }
+//        /*check if the service is available on the device*/
+//        if (mBluetoothGatt == null) {
+//            Log.e(TAG, "GATT FAILED");
+//            return false;
+//        }
+//
+//        BluetoothGattService mCustomService = mBluetoothGatt.getService(RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE);
+//        if (mCustomService == null) {
+//            Log.e(TAG, "NOTIFY_FAILED " + mDeviceMacAddress);
+//            return false;
+//        }
+//        BluetoothGattCharacteristic characteristic = mCustomService.getCharacteristic(RelsibBluetoothProfile.INTERMEDIATE_TEMPERATURE);
+//        mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
+//        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
+//                RelsibBluetoothProfile.CLIENT_CHARACTERISTIC_CONFIG);
+//        if (enabled) {
+//            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+//        } else {
+//            descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+//        }
+//        isNotifyEnabled = enabled;
+//        mBluetoothGatt.writeDescriptor(descriptor);
         return true;
     }
     public boolean setCharacteristicNotify(UUID mServiceName, UUID mCharacteristicName, boolean enabled) {
@@ -353,7 +377,17 @@ public class SmartThermometer {
             return false;
         }
         BluetoothGattCharacteristic characteristic = mCustomService.getCharacteristic(mCharacteristicName);
-        setCharacteristicNotification(characteristic, enabled);
+        mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
+        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
+                RelsibBluetoothProfile.CLIENT_CHARACTERISTIC_CONFIG);
+        if (enabled) {
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+        } else {
+            descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+        }
+        isNotifyEnabled = enabled;
+        mBluetoothGatt.writeDescriptor(descriptor);
+
         return true;
     }
     public void readInfoTypes() {
@@ -361,12 +395,11 @@ public class SmartThermometer {
         readCharacteristic(RelsibBluetoothProfile.GENERIC_ACCESS_SERVICE, RelsibBluetoothProfile.DEVICE_NAME);
         readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.MODEL_NUMBER_UUID);
         readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.SERIAL_NUMBER_UUID);
-//        readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.FIRMWARE_REVISION_UUID);
-//        readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.HARDWARE_REVISION_UUID);
-//        readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.SOFTWARE_REVISION_UUID);
-//        readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.MANUFACTURER_NAME_UUID);
-//        readCharacteristic(RelsibBluetoothProfile.BATTERY_SERVICE, RelsibBluetoothProfile.BATTERY_LEVEL);
-
+        //readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.FIRMWARE_REVISION_UUID);
+        //readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.HARDWARE_REVISION_UUID);
+        //readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.SOFTWARE_REVISION_UUID);
+        readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.MANUFACTURER_NAME_UUID);
+        readCharacteristic(RelsibBluetoothProfile.BATTERY_SERVICE, RelsibBluetoothProfile.BATTERY_LEVEL);
     }
 
     public Long getId() {

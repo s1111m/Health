@@ -59,12 +59,11 @@ public class TableThermometers implements BaseColumns {
         contentValues.put(COLUMN_DEVICE_SOFTWARE, thermometer.mDeviceSoftwareRevisionNumber);
         contentValues.put(COLUMN_DEVICE_MANUFACTURER, thermometer.mDeviceManufacturer);
         contentValues.put(COLUMN_DEVICE_BATTERY, thermometer.mDeviceBatteryLevel);
-        Log.e(TAG, "pre_insert");
+
         if (thermometer._ID == DbModel.UNSAVED_ID) {
-            Log.e(TAG, "insert");
             thermometer.setId(db.insert(TABLE_NAME, null, contentValues));
         } else
-            db.update(TABLE_NAME, contentValues, "id = ? ", new String[]{thermometer.getId().toString()});
+            db.update(TABLE_NAME, contentValues, _ID + " = ? ", new String[]{thermometer.getId().toString()});
     }
 
     public void createTable() {
@@ -76,7 +75,7 @@ public class TableThermometers implements BaseColumns {
     }
 
     public boolean deleteRecord(SmartThermometer toDelete) {
-        int result = db.delete(TABLE_NAME, "id = ? ", new String[]{toDelete.getId().toString()});
+        int result = db.delete(TABLE_NAME, _ID + " = ? ", new String[]{toDelete.getId().toString()});
         return (result != 0);
     }
 
@@ -111,7 +110,7 @@ public class TableThermometers implements BaseColumns {
         Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
         res.moveToFirst();
         while (res.isAfterLast() == false) {
-            Log.e(TAG, res.getLong(res.getColumnIndex(_ID)) + res.getString(res.getColumnIndex(COLUMN_DEVICE_NAME)));
+            Log.e(TAG, res.getLong(res.getColumnIndex(_ID)) + res.getString(res.getColumnIndex(COLUMN_DEVICE_SERIAL)));
             array_list.add(SmartThermometer.SmartThermometerFactory(
                     res.getLong(res.getColumnIndex(_ID)),
                     res.getString(res.getColumnIndex(COLUMN_DEVICE_NAME)),

@@ -2,6 +2,7 @@ package com.relsib.adapters;
 
 import android.bluetooth.BluetoothDevice;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ public class BLEDevicesViewAdapter extends RecyclerView.Adapter<BLEDevicesViewAd
     }
 
     public void addDevice(BluetoothDevice device, int rssi) {
+        Log.e("BLEADAPTER", "find  " + device.getAddress());
         this.service.addUnknownSmartThermometer(device, rssi);
 
     }

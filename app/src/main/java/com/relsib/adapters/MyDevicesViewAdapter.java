@@ -1,7 +1,6 @@
 package com.relsib.adapters;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +11,6 @@ import android.widget.TextView;
 import com.relsib.application.BLEService;
 import com.relsib.application.R;
 import com.relsib.application.SmartThermometer;
-import com.relsib.helper.ItemTouchHelperAdapter;
-import com.relsib.helper.OnStartDragListener;
 
 
 public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdapter.MyViewHolder>
@@ -26,7 +23,7 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
 
     public MyDevicesViewAdapter(BLEService service) {
         this.service = service;
-//        Log.e("MYADAPTER","created " + service.thermometers.size());
+
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -48,7 +45,6 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
         tempThermometer = BLEService.thermometers.get(listPosition);
         holder.textViewName.setText(tempThermometer.mDeviceName);
         holder.textViewVersion.setText(tempThermometer.mDeviceMacAddress);
-        Log.e("BLE", tempThermometer.mDeviceMacAddress);
         holder.imageViewIcon.setImageResource(R.drawable.ic_launcher);
         holder.battery_level.setProgress(tempThermometer.mDeviceBatteryLevel);
         holder.textDeviceSerial.setText("SN: " + tempThermometer.getmDeviceSerialNumber());
