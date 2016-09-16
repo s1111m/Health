@@ -50,6 +50,7 @@ public class BLEService extends Service {
     public static final int STATE_DISCONNECTED = 0;
     public static final int STATE_CONNECTING = 1;
     public static final int STATE_CONNECTED = 2;
+    private final static Integer UNKNOWN_THERMOMETER = -1;
     private final static String TAG = BLEService.class.getSimpleName();
     public static BluetoothAdapter mBluetoothAdapter;
     public static Context mServiceContext;
@@ -155,14 +156,12 @@ public class BLEService extends Service {
     }
 
     public void pushUnknownToMyDevices() {
+
         SmartThermometer tempThermometer;
         for (int i = 0; i < unknownThermometers.size(); i++) {
             tempThermometer = unknownThermometers.get(i);
-            if (tempThermometer.selected && !thermometers.contains(tempThermometer)) {
-
-                //tempThermometer.connect(true);
+            if (tempThermometer.selected) {
                 new ConnectThread(tempThermometer).start();
-                thermometers.add(tempThermometer);
             }
         }
         unknownThermometers.clear();
@@ -183,7 +182,16 @@ public class BLEService extends Service {
         }
 
         public void run() {
-            thermometer.connect(true);
+            Integer index = thermometers.indexOf(thermometer);
+            Log.e(TAG, index.toString());
+            if (index != UNKNOWN_THERMOMETER) {
+                thermometers.get(index).connect(true);
+            } else {
+                thermometer.connect(true);
+                thermometers.add(thermometer);
+                tableThermometers.save(thermometer);
+            }
+
         }
     }
 }

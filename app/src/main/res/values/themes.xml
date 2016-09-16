@@ -12,6 +12,7 @@
         <!--<item name="android:spinnerItemStyle">@style/SpinnerItemTheme</item>-->
         <item name="colorPrimary">@color/colorPrimary</item>
 
+        <item name="android:typeface">serif</item>
         <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
         <!--<item name="colorAccent">@color/colorAccent</item>-->
 
@@ -26,6 +27,7 @@
         <!--<item name="android:listViewStyle">@style/ListViewSpinnerTheme</item>-->
         <!--<item name="android:listViewWhiteStyle">@style/ListViewSpinnerTheme.White</item>-->
         <!--<item name="android:spinnerItemStyle">@style/SpinnerItemTheme</item>-->
+        <item name="android:typeface">serif</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>

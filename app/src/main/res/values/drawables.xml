@@ -3,8 +3,10 @@
     <item name="ic_menu_charts" type="drawable">@android:drawable/ic_menu_sort_by_size</item>
     <item name="ic_menu_list" type="drawable">@android:drawable/ic_menu_agenda</item>
 
-    <item name="ic_menu_thermometers" type="drawable">@android:drawable/ic_menu_edit</item>
+    <item name="ic_menu_thermometers" type="drawable">@android:drawable/ic_menu_add</item>
+
     <item name="ic_menu_alarms" type="drawable">@android:drawable/ic_lock_idle_alarm</item>
     <item name="ic_menu_settings" type="drawable">@android:drawable/ic_menu_preferences</item>
-    <item name="ic_menu_share" type="drawable">@android:drawable/ic_menu_share</item>
+    <item name="ic_menu_share" type="drawable">@android:drawable/stat_sys_data_bluetooth</item>
 </resources>
+

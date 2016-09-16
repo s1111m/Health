@@ -19,6 +19,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.relsib.helper.FontsOverride;
+
 
 public class MainActivityView extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -51,7 +53,11 @@ public class MainActivityView extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        FontsOverride.setDefaultFont(this, "SERIF", "fonts/Roboto-Bold.ttf");
+
         setContentView(R.layout.activity_main);
+
         //register service
         Log.e(TAG, "APP_START");
         new Thread(new Runnable() {

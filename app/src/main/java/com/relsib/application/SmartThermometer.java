@@ -33,7 +33,7 @@ public class SmartThermometer {
     public String mDeviceHardwareRevisionNumber;
     public String mDeviceSoftwareRevisionNumber;
     public String mDeviceManufacturer;
-    public int mDeviceBatteryLevel = 80;
+    public int mDeviceBatteryLevel;
     public Float intermediateTemperature;
     public Float maxTemperature = -200F;
     public boolean selected = false;
