@@ -31,6 +31,7 @@
             android:layout_alignParentStart="false"
             android:layout_alignTop="@+id/textLabelMaximum"
             android:layout_gravity="center_horizontal"
+            android:fontFamily="sans-serif"
             android:text="Android Name"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 

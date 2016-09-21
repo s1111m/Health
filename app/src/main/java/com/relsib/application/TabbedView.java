@@ -64,7 +64,7 @@ public class TabbedView extends Fragment {
         TabHost tabHost = (TabHost) rootView.findViewById(R.id.tabHost);
         tabHost.setup();
         TabHost.TabSpec tabSpec = tabHost.newTabSpec("tag1");
-        tabSpec.setContent(R.id.linearLayout);
+        tabSpec.setContent(R.id.smartview);
         tabSpec.setIndicator("Общее");
         tabHost.addTab(tabSpec);
         tabSpec = tabHost.newTabSpec("tag2");
