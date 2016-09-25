@@ -39,6 +39,17 @@ public class MyDevicesView extends Fragment {
             } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) {
                 //startProgress();
                 // displayData(intent.getStringExtra(BLEService.EXTRA_DATA));
+
+
+                // Float minTemp = intent.getFloatExtra(SmartThermometer.TEMP_MIN,0);
+                // Float currTemp = intent.getFloatExtra(SmartThermometer.TEMP_CURR,0);
+//                View itemView = recyclerView.getLayoutManager().findViewByPosition((int) intent.getLongExtra(SmartThermometer.ADAPTER_POSITION,0));
+//
+//                if (itemView!=null) {
+//                        ((TextView) itemView.findViewById(R.id.intermediateTemperature)).setText(String.valueOf(intent.getFloatExtra(SmartThermometer.TEMP_CURR, 0)));
+//                        ((TextView) itemView.findViewById(R.id.MaximumTemperature)).setText(String.valueOf(intent.getFloatExtra(SmartThermometer.TEMP_MAX, 0)));
+//                }
+                //((TextView)itemView.findViewById(R.id.intermediateTemperature)).setText(currTemp.toString());
                 adapter.notifyDataSetChanged();
             }
         }
@@ -90,7 +101,7 @@ public class MyDevicesView extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
-        //adapter.notifyDataSetChanged();
+
         adapter.setOnItemClickListener(new MyDevicesViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(String macAddress) {

@@ -1,7 +1,9 @@
 package com.relsib.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -33,8 +35,10 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent,
                                            int viewType) {
+        //тут можно изменить создание холдера
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.f_mydevices_view_item, parent, false);
+
 
         return new MyViewHolder(view);
     }
@@ -43,26 +47,59 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
     public void onBindViewHolder(final MyViewHolder holder, final int listPosition) {
 
         tempThermometer = BLEService.thermometers.get(listPosition);
-        holder.textViewName.setText(tempThermometer.mDeviceName);
+        //holder.textViewName.setText(tempThermometer.mDeviceName);
         holder.textViewVersion.setText(tempThermometer.mDeviceMacAddress);
         holder.imageViewIcon.setImageResource(R.drawable.ic_launcher);
         holder.battery_level.setProgress(tempThermometer.mDeviceBatteryLevel);
+
         holder.textDeviceSerial.setText("SN: " + tempThermometer.getmDeviceSerialNumber());
 
+        holder.topToolBar.setTitle(tempThermometer.mDeviceName);// + " SN:" + tempThermometer.mDeviceSerialNumber);
+        tempThermometer.setAdapterPosition(holder.getAdapterPosition());
 
         if (tempThermometer.intermediateTemperature != null)
-            holder.textViewIntermediateTemperature.setText(String.valueOf(tempThermometer.intermediateTemperature));
+            holder.textViewIntermediateTemperature.setText(tempThermometer.intermediateTemperature.toString());
+        else holder.textViewIntermediateTemperature.setText("-,-");
 
-        if (tempThermometer.maxTemperature != -200F)
-            holder.textViewMaximumTemperature.setText(String.valueOf(tempThermometer.maxTemperature));
+        if (tempThermometer.maxTemperature != -200f)
+            holder.textViewMaximumTemperature.setText(tempThermometer.maxTemperature.toString());
+        else holder.textViewMaximumTemperature.setText("-,-");
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+
+        holder.topToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
-            public void onClick(View view) {
-                if (mListener != null)
-                    mListener.onItemClick(tempThermometer.mDeviceMacAddress);
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                switch (id) {
+                    case R.id.action_connect:
+                        BLEService.thermometers.get(listPosition).connect(true);
+                        break;
+                    case R.id.action_disconnect:
+                        BLEService.thermometers.get(listPosition).disconnect();
+                        break;
+                    case R.id.action_reset:
+                        BLEService.thermometers.get(listPosition).setMaxTemperature(-200f);
+                        holder.textViewMaximumTemperature.setText("-,-");
+                        holder.textViewIntermediateTemperature.setText("-,-");
+                        break;
+                    case R.id.action_autoconnect:
+                        //tempThermometer.autoconnect
+                        BLEService.thermometers.get(listPosition).autoconnect = true;
+                        break;
+                    default:
+
+                        break;
+                }
+                return true;
             }
         });
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (mListener != null)
+//                    mListener.onItemClick(tempThermometer.mDeviceMacAddress);
+//            }
+//        });
     }
 
     @Override
@@ -85,6 +122,7 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
         ImageView imageViewIcon;
         ProgressBar battery_level;
         TextView textDeviceSerial;
+        Toolbar topToolBar;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -95,7 +133,11 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
             this.imageViewIcon = (ImageView) itemView.findViewById(R.id.imageView);
             this.battery_level = (ProgressBar) itemView.findViewById(R.id.device_battery);
             this.textDeviceSerial = (TextView) itemView.findViewById(R.id.device_serial);
-
+            this.topToolBar = (Toolbar) itemView.findViewById(R.id.card_toolbar);
+            //if (topToolBar != null) {
+            // inflate your menu
+            topToolBar.inflateMenu(R.menu.card_toolbar_menu);
+            //}
 
         }
 

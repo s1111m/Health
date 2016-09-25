@@ -1,13 +1,182 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.relsib.application.SettingsView">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="5dp">
 
 
     <TextView
+        android:id="@+id/textview2v"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:text="Настройки" />
 
-</FrameLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="10dp"
+            android:alpha="0.12"
+            android:background="@android:color/black" />
+
+        <TextView
+            android:id="@+id/s_device_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="false"
+            android:layout_below="@+id/divider"
+            android:layout_centerInParent="false"
+            android:layout_centerVertical="true"
+            android:text="@string/settings_device_name" />
+
+        <TextView
+            android:id="@+id/s_device_name_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/imageButton2"
+            android:text="" />
+
+        <ImageButton
+            android:id="@+id/imageButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:baselineAlignBottom="false"
+            app:srcCompat="@drawable/ic_menu_send" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="false"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="20dp"
+            android:alpha="0.12"
+            android:background="@android:color/black"
+            android:paddingBottom="10dp" />
+
+        <TextView
+            android:id="@+id/s_device_color_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="false"
+            android:layout_centerInParent="false"
+            android:layout_centerVertical="true"
+            android:text="@string/settings_device_color_label" />
+
+
+        <ImageButton
+            android:id="@+id/s_device_color_label_ac"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:baselineAlignBottom="false"
+            app:srcCompat="@drawable/ic_menu_send" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="20dp"
+            android:alpha="0.12"
+            android:background="@android:color/black"
+            android:paddingBottom="10dp" />
+
+        <TextView
+            android:id="@+id/s_device_color_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="false"
+            android:layout_centerInParent="false"
+            android:layout_centerVertical="true"
+            android:text="@string/settings_device_color_background" />
+
+
+        <ImageButton
+            android:id="@+id/s_device_color_background_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:baselineAlignBottom="false"
+            app:srcCompat="@drawable/ic_menu_send" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="20dp"
+            android:alpha="0.12"
+            android:background="@android:color/black"
+            android:paddingBottom="10dp" />
+
+        <TextView
+            android:id="@+id/s_device_alarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="false"
+            android:layout_centerInParent="false"
+            android:layout_centerVertical="true"
+            android:text="@string/settings_device_alarms" />
+
+
+        <ImageButton
+            android:id="@+id/s_device_alarm_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:baselineAlignBottom="false"
+            app:srcCompat="@drawable/ic_menu_send" />
+
+    </RelativeLayout>
+</LinearLayout>

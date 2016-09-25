@@ -52,5 +52,10 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <!--SettingsScreen-->
+    <string name="settings_device_name">Имя устройства</string>
+    <string name="settings_device_color_label">Цветовая метка</string>
+    <string name="settings_device_color_background">Фон экрана</string>
+    <string name="settings_device_alarms">Оповещения</string>
 
 </resources>
