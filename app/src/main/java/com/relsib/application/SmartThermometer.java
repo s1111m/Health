@@ -26,7 +26,7 @@ public class SmartThermometer {
     public static final String TEMP_MAX = "TEMP_MAX";
     public static final String TEMP_MIN = "TEMP_MIN";
     public static final String TEMP_CURR = "TEMP_CURR";
-    private final String TAG = SmartThermometer.class.getSimpleName();
+    private static final String TAG = SmartThermometer.class.getSimpleName();
     public long _ID = DbModel.UNSAVED_ID;
     public int mDeviceRssi;
     public String mDeviceMacAddress;
@@ -51,6 +51,7 @@ public class SmartThermometer {
     private boolean isNotifyEnabled = false;
     private Queue<BluetoothGattDescriptor> descriptorWriteQueue = new LinkedList<BluetoothGattDescriptor>();
     private Queue<BluetoothGattCharacteristic> characteristicReadQueue = new LinkedList<BluetoothGattCharacteristic>();
+
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -125,11 +126,11 @@ public class SmartThermometer {
                     Log.e(TAG, "Battery level + " + mDeviceBatteryLevel);
                     //   return;
                 }
-                broadcastUpdate(BLEService.ACTION_DATA_AVAILABLE);
                 if (characteristicReadQueue.size() > 0)
                     mBluetoothGatt.readCharacteristic(characteristicReadQueue.element());
                 if (characteristicReadQueue.size() == 0)
-
+                    broadcastUpdate(BLEService.EXTRA_DATA);
+                BLEService.tableThermometers.save(SmartThermometer.this);
                     getTemperatureByNotify(true);
 
             }
@@ -178,7 +179,9 @@ public class SmartThermometer {
         SmartThermometer thermomether = new SmartThermometer(mDeviceMac, mDeviceName);
         thermomether._ID = _ID;
         thermomether.mDeviceModelNumber = mDeviceModelNumber;
+
         thermomether.mDeviceSerialNumber = mDeviceSerialNumber;
+        Log.e(TAG, "Setting S/N" + mDeviceSerialNumber);
         thermomether.mDeviceFirmwareRevisionNumber = mDeviceFirmwareRevisionNumber;
         thermomether.mDeviceHardwareRevisionNumber = mDeviceHardwareRevisionNumber;
         thermomether.mDeviceSoftwareRevisionNumber = mDeviceSoftwareRevisionNumber;
@@ -301,7 +304,7 @@ public class SmartThermometer {
             Log.e(TAG, "BluetoothAdapter not initialized");
             return;
         }
-        broadcastUpdate(BLEService.ACTION_DATA_AVAILABLE);
+        broadcastUpdate(BLEService.ACTION_GATT_DISCONNECTED);
         mBluetoothGatt.disconnect();
     }
 
@@ -335,9 +338,10 @@ public class SmartThermometer {
 
         //if there is only 1 item in the queue, then read it.  If more than 1, we handle asynchronously in the callback above
         //GIVE PRECEDENCE to descriptor writes.  They must all finish first.
-        if ((characteristicReadQueue.size() == 1) && (descriptorWriteQueue.size() == 0))
+        if ((characteristicReadQueue.size() == 1) && (descriptorWriteQueue.size() == 0)) {
             mBluetoothGatt.readCharacteristic(mReadCharacteristic);
 
+        }
 
     }
 

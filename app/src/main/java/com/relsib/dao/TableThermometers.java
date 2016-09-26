@@ -59,7 +59,7 @@ public class TableThermometers implements BaseColumns {
         contentValues.put(COLUMN_DEVICE_SOFTWARE, thermometer.mDeviceSoftwareRevisionNumber);
         contentValues.put(COLUMN_DEVICE_MANUFACTURER, thermometer.mDeviceManufacturer);
         contentValues.put(COLUMN_DEVICE_BATTERY, thermometer.mDeviceBatteryLevel);
-
+        Log.e(TAG, "Serial " + thermometer.mDeviceSerialNumber);
         if (thermometer._ID == DbModel.UNSAVED_ID) {
             thermometer.setId(db.insert(TABLE_NAME, null, contentValues));
         } else

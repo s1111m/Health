@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.relsib.adapters.MyDevicesViewAdapter;
 
@@ -31,26 +32,22 @@ public class MyDevicesView extends Fragment {
             if (BLEService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
                 updateConnectionState(R.string.connected);
+                adapter.notifyDataSetChanged();
                 //invalidateOptionsMenu();
             } else if (BLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 adapter.notifyDataSetChanged();
                 //invalidateOptionsMenu();
                 //clearUI();
-            } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) {
-                //startProgress();
-                // displayData(intent.getStringExtra(BLEService.EXTRA_DATA));
-
-
-                // Float minTemp = intent.getFloatExtra(SmartThermometer.TEMP_MIN,0);
-                // Float currTemp = intent.getFloatExtra(SmartThermometer.TEMP_CURR,0);
-//                View itemView = recyclerView.getLayoutManager().findViewByPosition((int) intent.getLongExtra(SmartThermometer.ADAPTER_POSITION,0));
-//
-//                if (itemView!=null) {
-//                        ((TextView) itemView.findViewById(R.id.intermediateTemperature)).setText(String.valueOf(intent.getFloatExtra(SmartThermometer.TEMP_CURR, 0)));
-//                        ((TextView) itemView.findViewById(R.id.MaximumTemperature)).setText(String.valueOf(intent.getFloatExtra(SmartThermometer.TEMP_MAX, 0)));
-//                }
-                //((TextView)itemView.findViewById(R.id.intermediateTemperature)).setText(currTemp.toString());
+            } else if (BLEService.EXTRA_DATA.equals(action)) {
                 adapter.notifyDataSetChanged();
+            } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) {
+                View itemView = recyclerView.getLayoutManager().findViewByPosition((int) intent.getLongExtra(SmartThermometer.ADAPTER_POSITION, 0));
+
+                if (itemView != null) {
+                    ((TextView) itemView.findViewById(R.id.intermediateTemperature)).setText(String.valueOf(intent.getFloatExtra(SmartThermometer.TEMP_CURR, 0)));
+                    ((TextView) itemView.findViewById(R.id.MaximumTemperature)).setText(String.valueOf(intent.getFloatExtra(SmartThermometer.TEMP_MAX, 0)));
+                }
+                // adapter.notifyDataSetChanged();
             }
         }
     };
@@ -65,6 +62,7 @@ public class MyDevicesView extends Fragment {
         intentFilter.addAction(BLEService.ACTION_GATT_DISCONNECTED);
         intentFilter.addAction(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
         intentFilter.addAction(BLEService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(BLEService.EXTRA_DATA);
         return intentFilter;
     }
 

@@ -189,7 +189,6 @@ public class BLEService extends Service {
             } else {
                 thermometer.connect(true);
                 thermometers.add(thermometer);
-                tableThermometers.save(thermometer);
             }
 
         }

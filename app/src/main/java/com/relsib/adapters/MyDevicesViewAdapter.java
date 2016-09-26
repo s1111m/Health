@@ -76,6 +76,8 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
                         break;
                     case R.id.action_disconnect:
                         BLEService.thermometers.get(listPosition).disconnect();
+                        holder.textViewMaximumTemperature.setText("-,-");
+                        holder.textViewIntermediateTemperature.setText("-,-");
                         break;
                     case R.id.action_reset:
                         BLEService.thermometers.get(listPosition).setMaxTemperature(-200f);
