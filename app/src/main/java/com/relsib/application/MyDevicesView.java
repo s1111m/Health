@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
 import android.widget.TextView;
 
 import com.relsib.adapters.MyDevicesViewAdapter;
@@ -35,22 +37,29 @@ public class MyDevicesView extends Fragment {
                 adapter.notifyDataSetChanged();
                 //invalidateOptionsMenu();
             } else if (BLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                adapter.notifyDataSetChanged();
+                //    adapter.notifyDataSetChanged();
                 //invalidateOptionsMenu();
                 //clearUI();
             } else if (BLEService.EXTRA_DATA.equals(action)) {
                 adapter.notifyDataSetChanged();
+
+            } else if (BLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
+                View itemView = recyclerView.getLayoutManager().findViewByPosition((int) intent.getLongExtra(SmartThermometer.ADAPTER_POSITION, 0));
+                ((Chronometer) itemView.findViewById(R.id.chronometer)).setBase(SystemClock.elapsedRealtime());
+
             } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) {
                 View itemView = recyclerView.getLayoutManager().findViewByPosition((int) intent.getLongExtra(SmartThermometer.ADAPTER_POSITION, 0));
-
                 if (itemView != null) {
+                    ((Chronometer) itemView.findViewById(R.id.chronometer)).start();
                     ((TextView) itemView.findViewById(R.id.intermediateTemperature)).setText(String.valueOf(intent.getFloatExtra(SmartThermometer.TEMP_CURR, 0)));
                     ((TextView) itemView.findViewById(R.id.MaximumTemperature)).setText(String.valueOf(intent.getFloatExtra(SmartThermometer.TEMP_MAX, 0)));
+                    ((TextView) itemView.findViewById(R.id.minimumTemperature)).setText(String.valueOf(intent.getFloatExtra(SmartThermometer.TEMP_MIN, 0)));
                 }
                 // adapter.notifyDataSetChanged();
             }
         }
     };
+    private Chronometer mChronometer;
 
     public MyDevicesView() {
 
@@ -99,7 +108,6 @@ public class MyDevicesView extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
-
         adapter.setOnItemClickListener(new MyDevicesViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(String macAddress) {

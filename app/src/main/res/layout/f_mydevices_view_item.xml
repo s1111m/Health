@@ -2,8 +2,9 @@
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="180dp"
+    android:layout_height="200dp"
     card_view:cardCornerRadius="5dp"
     card_view:cardUseCompatPadding="true">
 
@@ -30,27 +31,8 @@
             android:layout_height="50dp"
             android:layout_alignParentBottom="true">
 
-            <ImageButton
-                android:id="@+id/imageButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="40dp"
-                android:background="@null"
-                card_view:srcCompat="@android:drawable/ic_menu_preferences" />
         </android.support.v7.widget.Toolbar>
 
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="false"
-            android:layout_weight="1"
-            android:contentDescription="img"
-            android:src="@drawable/ic_launcher"
-            android:tag="image_tag" />
 
         <TextView
             android:id="@+id/textViewName"
@@ -58,44 +40,45 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentStart="false"
-            android:layout_alignTop="@+id/textLabelMaximum"
+            android:layout_below="@+id/textLabelMaximum"
             android:layout_gravity="center_horizontal"
             android:fontFamily="sans-serif"
-            android:text="Android Name"
+            android:text="name"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
-            android:id="@+id/textViewVersion"
+            android:id="@+id/textViewMac"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_below="@+id/imageView"
+            android:layout_below="@+id/textViewName"
             android:layout_gravity="center_horizontal"
             android:layout_toEndOf="@+id/textLabelCurrent"
             android:gravity="right"
-            android:text="Android Version"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="14sp"
+            tools:text="mac" />
 
         <TextView
             android:id="@+id/textLabelCurrent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/imageView"
-            android:layout_toRightOf="@+id/imageView"
             android:gravity="center"
-            android:text="Текущая" />
+            android:text="Текущая"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/intermediateTemperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/MaximumTemperature"
             android:layout_alignTop="@+id/imageView"
             android:layout_gravity="bottom"
             android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@+id/textLabelCurrent"
             android:gravity="center"
             android:singleLine="true"
-            android:text="-,-" />
+            android:text="-,-"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/textLabelMaximum"
@@ -104,7 +87,8 @@
             android:layout_alignLeft="@+id/textLabelCurrent"
             android:layout_below="@+id/textLabelCurrent"
             android:gravity="center"
-            android:text="Максимальная" />
+            android:text="Максимальная"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/MaximumTemperature"
@@ -113,16 +97,28 @@
             android:layout_alignTop="@+id/textLabelMaximum"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/textLabelMaximum"
-            android:text="-,-" />
+            android:text="-,-"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/minimumTemperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/textLabelMinimum"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/textLabelMaximum"
+            android:text="-,-"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/device_serial"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_below="@+id/textViewVersion"
-            android:text="New Text"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:layout_below="@+id/textViewMac"
+            android:text="serial"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="14sp" />
         <ProgressBar
 
             android:id="@+id/device_battery"
@@ -132,6 +128,33 @@
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/textLabelCurrent"
             android:indeterminate="false" />
+
+        <Chronometer
+            android:id="@+id/chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/time"
+            android:layout_toRightOf="@+id/time"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/textLabelMinimum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textLabelMaximum"
+            android:layout_below="@+id/textLabelMaximum"
+            android:layout_toStartOf="@+id/textViewName"
+            android:text="Минимальная"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/textLabelMinimum"
+            android:text="t="
+            android:textSize="24sp" />
 
 
     </RelativeLayout>

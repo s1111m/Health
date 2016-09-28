@@ -1,12 +1,13 @@
 package com.relsib.adapters;
 
+import android.os.SystemClock;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.Chronometer;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -47,14 +48,15 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
     public void onBindViewHolder(final MyViewHolder holder, final int listPosition) {
 
         tempThermometer = BLEService.thermometers.get(listPosition);
-        //holder.textViewName.setText(tempThermometer.mDeviceName);
-        holder.textViewVersion.setText(tempThermometer.mDeviceMacAddress);
-        holder.imageViewIcon.setImageResource(R.drawable.ic_launcher);
+        holder.textViewName.setText(tempThermometer.mDeviceName);
+        holder.textViewMac.setText(tempThermometer.mDeviceMacAddress);
+
         holder.battery_level.setProgress(tempThermometer.mDeviceBatteryLevel);
 
         holder.textDeviceSerial.setText("SN: " + tempThermometer.getmDeviceSerialNumber());
 
         holder.topToolBar.setTitle(tempThermometer.mDeviceName);// + " SN:" + tempThermometer.mDeviceSerialNumber);
+
         tempThermometer.setAdapterPosition(holder.getAdapterPosition());
 
         if (tempThermometer.intermediateTemperature != null)
@@ -65,28 +67,35 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
             holder.textViewMaximumTemperature.setText(tempThermometer.maxTemperature.toString());
         else holder.textViewMaximumTemperature.setText("-,-");
 
+        if (tempThermometer.minTemperature != 200f)
+            holder.textViewMinimumTemperature.setText(tempThermometer.minTemperature.toString());
+        else holder.textViewMaximumTemperature.setText("-,-");
+
 
         holder.topToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 int id = menuItem.getItemId();
                 switch (id) {
-                    case R.id.action_connect:
-                        BLEService.thermometers.get(listPosition).connect(true);
-                        break;
                     case R.id.action_disconnect:
-                        BLEService.thermometers.get(listPosition).disconnect();
+                        BLEService.thermometers.get(listPosition).close();
                         holder.textViewMaximumTemperature.setText("-,-");
-                        holder.textViewIntermediateTemperature.setText("-,-");
+                        //holder.textViewIntermediateTemperature.setText("-,-");
+                        holder.chronometer.setBase(SystemClock.elapsedRealtime());
+                        holder.chronometer.stop();
                         break;
                     case R.id.action_reset:
-                        BLEService.thermometers.get(listPosition).setMaxTemperature(-200f);
+                        //BLEService.thermometers.get(listPosition).setMaxTemperature(-200f);
+                        BLEService.thermometers.get(listPosition).resetValues();
                         holder.textViewMaximumTemperature.setText("-,-");
                         holder.textViewIntermediateTemperature.setText("-,-");
+                        holder.textViewMinimumTemperature.setText("-,-");
+                        holder.chronometer.setBase(SystemClock.elapsedRealtime());
                         break;
-                    case R.id.action_autoconnect:
+                    case R.id.action_settings:
                         //tempThermometer.autoconnect
-                        BLEService.thermometers.get(listPosition).autoconnect = true;
+                        //BLEService.thermometers.get(listPosition).autoconnect = true;
+                        BLEService.thermometers.get(listPosition).connect(false);
                         break;
                     default:
 
@@ -115,27 +124,30 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
         void onItemClick(String macAddress);
     }
 
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         TextView textViewName;
-        TextView textViewVersion;
+        TextView textViewMac;
         TextView textViewIntermediateTemperature;
         TextView textViewMaximumTemperature;
-        ImageView imageViewIcon;
+        TextView textViewMinimumTemperature;
         ProgressBar battery_level;
         TextView textDeviceSerial;
         Toolbar topToolBar;
+        Chronometer chronometer;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             this.textViewName = (TextView) itemView.findViewById(R.id.textViewName);
-            this.textViewVersion = (TextView) itemView.findViewById(R.id.textViewVersion);
+            this.textViewMac = (TextView) itemView.findViewById(R.id.textViewMac);
             this.textViewIntermediateTemperature = (TextView) itemView.findViewById(R.id.intermediateTemperature);
             this.textViewMaximumTemperature = (TextView) itemView.findViewById(R.id.MaximumTemperature);
-            this.imageViewIcon = (ImageView) itemView.findViewById(R.id.imageView);
+            this.textViewMinimumTemperature = (TextView) itemView.findViewById(R.id.minimumTemperature);
             this.battery_level = (ProgressBar) itemView.findViewById(R.id.device_battery);
             this.textDeviceSerial = (TextView) itemView.findViewById(R.id.device_serial);
             this.topToolBar = (Toolbar) itemView.findViewById(R.id.card_toolbar);
+            this.chronometer = (Chronometer) itemView.findViewById(R.id.chronometer);
             //if (topToolBar != null) {
             // inflate your menu
             topToolBar.inflateMenu(R.menu.card_toolbar_menu);

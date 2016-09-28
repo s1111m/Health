@@ -79,7 +79,10 @@ public class SmartThermometer {
                 broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
                     if (mDeviceSerialNumber == null) {
                         readInfoTypes();
-                    } else getTemperatureByNotify(true);
+                    } else {
+                        broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
+                        getTemperatureByNotify(true);
+                    }
             } else {
                 Log.e(TAG, "onServicesDiscovered received: " + status);
             }
@@ -147,6 +150,9 @@ public class SmartThermometer {
                 if (maxTemperature <= intermediateTemperature) {
                     setMaxTemperature(intermediateTemperature);
                 }
+                if (minTemperature >= intermediateTemperature) {
+                    minTemperature = intermediateTemperature;
+                }
                 broadcastUpdate(BLEService.ACTION_DATA_AVAILABLE, characteristic);
 
             }
@@ -205,13 +211,13 @@ public class SmartThermometer {
 
     public void resetValues() {
         setMaxTemperature(-200F);
-        // minTemperature=200F;
+        minTemperature = 200F;
         //intermediateTemperature=0f;
     }
 
     private void broadcastUpdate(final String action) {
         final Intent intent = new Intent(action);
-        //intent.putExtra(ADAPTER_POSITION,adapterPosition);
+        intent.putExtra(ADAPTER_POSITION, adapterPosition);
         //intent.putExtra(TEMP_CURR,intermediateTemperature);
         //intent.putExtra(TEMP_MAX,maxTemperature);
         // intent.putExtra(TEMP_MIN,minTemperature);
@@ -227,7 +233,7 @@ public class SmartThermometer {
         intent.putExtra(ADAPTER_POSITION, adapterPosition);
         intent.putExtra(TEMP_CURR, intermediateTemperature);
         intent.putExtra(TEMP_MAX, maxTemperature);
-//        intent.putExtra(TEMP_MIN,minTemperature);
+        intent.putExtra(TEMP_MIN, minTemperature);
         BLEService.mServiceContext.sendBroadcast(intent);
 
     }

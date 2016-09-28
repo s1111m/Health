@@ -2,27 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_connect"
+        android:id="@+id/action_reset"
         android:orderInCategory="100"
-        android:title="Подключить"
+        android:title="Сброс"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_disconnect"
         android:orderInCategory="100"
         android:title="Отключить"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
     <item
-        android:id="@+id/action_autoconnect"
-        android:checkable="true"
-        android:checked="true"
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_menu_settings"
         android:orderInCategory="100"
-        android:title="Автоподключение"
-        app:showAsAction="never">
-
-    </item>
-    <item
-        android:id="@+id/action_reset"
-        android:orderInCategory="100"
-        android:title="Сбросить"
+        android:title=""
         app:showAsAction="always" />
 </menu>
