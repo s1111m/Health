@@ -4,6 +4,7 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
         <!--<item name="android:spinnerStyle">@style/SpinnerTheme</item>-->
         <!--<item name="android:dropDownSpinnerStyle">@style/SpinnerTheme.DropDown</item>-->
         <!--<item name="android:spinnerDropDownItemStyle">@style/DropDownItemSpinnerTheme</item>-->
@@ -31,6 +32,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="preferenceTheme">@style/Theme.WtfPreference</item>
+
         <!--<item name="android:dropDownListViewStyle">@style/mySpinnerStyle</item>-->
 
 

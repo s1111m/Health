@@ -96,6 +96,9 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
                         //tempThermometer.autoconnect
                         //BLEService.thermometers.get(listPosition).autoconnect = true;
                         BLEService.thermometers.get(listPosition).connect(false);
+                        // SettingsView test = new SettingsView();
+                        //(BLEService.mServiceContext).getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsView.newInstance("1","1")).commit();
+
                         break;
                     default:
 

@@ -57,5 +57,17 @@
     <string name="settings_device_color_label">Цветовая метка</string>
     <string name="settings_device_color_background">Фон экрана</string>
     <string name="settings_device_alarms">Оповещения</string>
+    <string name="hello">Hello World, MainActivity!</string>
+
+    <string-array name="entries">
+        <item>one</item>
+        <item>two</item>
+        <item>three</item>
+    </string-array>
+    <string-array name="entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
 
 </resources>

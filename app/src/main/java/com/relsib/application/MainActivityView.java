@@ -69,8 +69,8 @@ public class MainActivityView extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -78,11 +78,13 @@ public class MainActivityView extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 mBLEService.pushUnknownToMyDevices();
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
+                // getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
                 //    for (int i = 0; i < BLEService.thermometers.size(); i++) {
                 //   BLEService.thermometers.get(i).connect(true);
                     //   mBLEService.thermometers.get(i).getTemperatureByNotify(true);
                 // }
+                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsView.newInstance("1", "1")).commit();
+                // getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, new SettingsView()).commit();
             }
         });
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
