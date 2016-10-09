@@ -340,6 +340,7 @@ public class SmartThermometer {
             return;
         }
         // mConnectionState=BLEService.STATE_DISCONNECTED;
+        shutdown();
         disconnect();
         mBluetoothGatt.close();
         mBluetoothGatt = null;
@@ -371,26 +372,6 @@ public class SmartThermometer {
 
         }
 
-    }
-
-    public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic,
-                                              boolean enabled) {
-        if (BLEService.mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.e(TAG, "BluetoothAdapter not initialized");
-            return;
-        }
-
-        mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
-
-        BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
-                RelsibBluetoothProfile.CLIENT_CHARACTERISTIC_CONFIG);
-        if (enabled) {
-            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-        } else {
-            descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
-        }
-        isNotifyEnabled = enabled;
-        mBluetoothGatt.writeDescriptor(descriptor);
     }
 
     public boolean getTemperatureByNotify(boolean enabled) {
@@ -449,5 +430,23 @@ public class SmartThermometer {
 
     public void setId(Long _ID) {
         this._ID = _ID;
+    }
+
+    public void shutdown() {
+        if (mBluetoothGatt == null) {
+            Log.w(TAG, "BluetoothAdapter not initialized");
+            return;
+        }
+        /*check if the service is available on the device*/
+        BluetoothGattService mCustomService = mBluetoothGatt.getService(RelsibBluetoothProfile.RELSIBPROFILE_SERV);
+        if (mCustomService == null) {
+            Log.w(TAG, "Custom BLE Service not found");
+            return;
+        }
+        BluetoothGattCharacteristic mWriteCharacteristic = mCustomService.getCharacteristic(RelsibBluetoothProfile.RELSIBPROFILE_SHUTDOWN);
+        mWriteCharacteristic.setValue(RelsibBluetoothProfile.SHUTDOWN_THERMOMETER, android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+        if (!mBluetoothGatt.writeCharacteristic(mWriteCharacteristic)) {
+            Log.w(TAG, "Failed to write characteristic");
+        }
     }
 }
