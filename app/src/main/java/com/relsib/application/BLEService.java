@@ -16,6 +16,7 @@
 
 package com.relsib.application;
 
+import android.app.Activity;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -25,11 +26,14 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.relsib.dao.DbModel;
 import com.relsib.dao.TableThermometers;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Service for managing connection and data communication with a GATT server hosted on a
@@ -53,13 +57,17 @@ public class BLEService extends Service {
     private final static Integer UNKNOWN_THERMOMETER = -1;
     private final static String TAG = BLEService.class.getSimpleName();
     public static BluetoothAdapter mBluetoothAdapter;
+    public static Activity mActivityContext;
     public static Context mServiceContext;
     public static ArrayList<SmartThermometer> thermometers = new ArrayList<>();
     public static ArrayList<SmartThermometer> unknownThermometers = new ArrayList<>();
     public static TableThermometers tableThermometers;
+    public static int MAX_BLE_DEVICES = 1;
     private static BluetoothManager mBluetoothManager;
     private static DbModel db;
+    private static int thermometersActiveCount = 0;
     private final IBinder mBinder = new LocalBinder();
+    private Timer myTimer = new Timer(); // Создаем таймер
 
     /**
      * Initializes a reference to the local Bluetooth adapter.
@@ -74,7 +82,7 @@ public class BLEService extends Service {
         thermometers.clear();
         tableThermometers.clear();
         final Intent intent = new Intent(BLEService.ACTION_GATT_DISCONNECTED);
-        BLEService.mServiceContext.sendBroadcast(intent);
+        mServiceContext.sendBroadcast(intent);
     }
 
     @Override
@@ -93,10 +101,6 @@ public class BLEService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent) {
-        // After using a given device, you should make sure that BluetoothGatt.close() is called
-        // such that resources are cleaned up properly.  In this particular example, close() is
-        // invoked when the UI is disconnected from the Service.
-        //close();
         for (int i = 0; i < thermometers.size(); i++) {
             thermometers.get(i).disconnect();
         }
@@ -111,10 +115,12 @@ public class BLEService extends Service {
         super.onRebind(intent);
     }
 
-    public boolean initialize() {
+    public boolean initialize(Activity mContext) {
         // For API level 18 and above, get a reference to BluetoothAdapter through
         // BluetoothManager.
         if (BLEService.mBluetoothManager == null) {
+            // BLEService.mActivityContext = getApplicationContext();
+            BLEService.mActivityContext = mContext;
             BLEService.mServiceContext = getApplicationContext();
             mBluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
             if (BLEService.mBluetoothManager == null) {
@@ -133,14 +139,30 @@ public class BLEService extends Service {
             startActivity(enableBtIntent);
         }
 
-        db = new DbModel(BLEService.mServiceContext);
+        db = new DbModel(mServiceContext);
         tableThermometers = new TableThermometers(db.getWritableDatabase());
         return true;
     }
 
+
     public void loadMyThermometers() {
         Log.e(TAG, "LOADING");
         thermometers = tableThermometers.getAllRecordsAsObjects();
+        myTimer.schedule(new TimerTask() { // Определяем задачу
+            @Override
+            public void run() {
+                for (int i = 0; i < thermometers.size(); i++) {
+                    SmartThermometer tempThermometer = thermometers.get(i);
+                    if (tempThermometer.mConnectionState == BLEService.STATE_DISCONNECTED) {
+                        Log.e(TAG, "try to connect");
+                        tempThermometer.connect(true);
+                        // new ConnectThread(thermometers.get(i));
+                    }
+                }
+            }
+
+            ;
+        }, 0L, 60L * 100); // интервал - 60000 миллисекунд, 0 миллисекунд до первого запуска.
     }
 
     public void addSmartThermometer(String mDeviceAddress, String deviceName) {
@@ -148,7 +170,7 @@ public class BLEService extends Service {
     }
 
     public void addUnknownSmartThermometer(BluetoothDevice device, int rssi) {
-        SmartThermometer tempDevice = new SmartThermometer(device);
+        SmartThermometer tempDevice = new SmartThermometer(device.getAddress(), device.getName());
         if (!unknownThermometers.contains(tempDevice)) {
             unknownThermometers.add(tempDevice);
             tempDevice.mDeviceRssi = rssi;
@@ -161,10 +183,30 @@ public class BLEService extends Service {
         for (int i = 0; i < unknownThermometers.size(); i++) {
             tempThermometer = unknownThermometers.get(i);
             if (tempThermometer.selected) {
-                new ConnectThread(tempThermometer).start();
+                if (thermometers.size() < MAX_BLE_DEVICES) {
+                    Log.e(TAG, String.valueOf(thermometers.size()));
+                    tempThermometer.connect(true);
+                    thermometers.add(tempThermometer);
+                } else {
+                    Toast.makeText(mActivityContext, "Протокол BLE не поддерживает больше " + MAX_BLE_DEVICES + " устройств", Toast.LENGTH_LONG);
+                }
+
+
             }
         }
         unknownThermometers.clear();
+    }
+
+    public SmartThermometer findThermometerBySerial(String serial) {
+        Log.e(TAG, "therm size " + thermometers.size());
+        for (int i = 0; i < thermometers.size(); i++) {
+            SmartThermometer tempThermometer = thermometers.get(i);
+            if (tempThermometer.getmDeviceSerialNumber().equals(serial))
+                Log.e(TAG, "findThermometerBySerial return: " + thermometers.get(i).mDeviceSerialNumber);
+            return tempThermometer;
+
+        }
+        return null;
     }
 
     public class LocalBinder extends Binder {
@@ -173,24 +215,30 @@ public class BLEService extends Service {
         }
     }
 
-    class ConnectThread extends Thread {
-        SmartThermometer thermometer;
+//    static class ConnectThread extends Thread {
+//        SmartThermometer thermometer;
+//
+//        public ConnectThread(SmartThermometer thermometer2) {
+//            Log.e(TAG,thermometer2.mDeviceName);
+//            thermometer = thermometer2;
+//            Log.e(TAG,thermometer.mDeviceName);
+//        }
+//
+//
+//        public void run() {
+////            Integer index = thermometers.indexOf(thermometer);
+////            if (index != UNKNOWN_THERMOMETER) {
+////                thermometers.get(index).connect(true);
+////                Log.e(TAG,"thread_connect");
+////            } else {
+//                if (thermometers.size()<MAX_BLE_DEVICES) {
+//                    thermometer.connect(true);
+//                   // thermometers.add(thermometer);
+//                } else {
+//                    Toast.makeText(mActivityContext,"Протокол BLE не поддерживает больше "+ MAX_BLE_DEVICES +" устройств",Toast.LENGTH_LONG);
+//                }
+//            }
 
-        public ConnectThread(SmartThermometer thermometer) {
-            //super(thermometer);
-            this.thermometer = thermometer;
-        }
-
-        public void run() {
-            Integer index = thermometers.indexOf(thermometer);
-            Log.e(TAG, index.toString());
-            if (index != UNKNOWN_THERMOMETER) {
-                thermometers.get(index).connect(true);
-            } else {
-                thermometer.connect(true);
-                thermometers.add(thermometer);
-            }
-
-        }
-    }
+//        }
+    //   }
 }

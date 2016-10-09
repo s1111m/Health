@@ -1,19 +1,15 @@
 package com.relsib.application;
 
 
+import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TabHost;
+
+//import android.support.v4.app.Fragment;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link TabbedView#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class TabbedView extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -61,21 +57,21 @@ public class TabbedView extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.f_tabbed_view, container, false);
-        TabHost tabHost = (TabHost) rootView.findViewById(R.id.tabHost);
-        tabHost.setup();
-        TabHost.TabSpec tabSpec = tabHost.newTabSpec("tag1");
-        tabSpec.setContent(R.id.smartview);
-        tabSpec.setIndicator("Общее");
-        tabHost.addTab(tabSpec);
-        tabSpec = tabHost.newTabSpec("tag2");
-        tabSpec.setContent(R.id.linearLayout2);
-        tabSpec.setIndicator("График");
-        tabHost.addTab(tabSpec);
-        tabSpec = tabHost.newTabSpec("tag3");
-        tabSpec.setContent(R.id.linearLayout3);
-        tabSpec.setIndicator("Инфо");
-        tabHost.addTab(tabSpec);
-        tabHost.setCurrentTab(0);
+//        TabHost tabHost = (TabHost) rootView.findViewById(R.id.tabHost);
+//        tabHost.setup();
+//        TabHost.TabSpec tabSpec = tabHost.newTabSpec("tag1");
+//        tabSpec.setContent(R.id.smartview);
+//        tabSpec.setIndicator("Общее");
+//        tabHost.addTab(tabSpec);
+//        tabSpec = tabHost.newTabSpec("tag2");
+//        tabSpec.setContent(R.id.linearLayout2);
+//        tabSpec.setIndicator("График");
+//        tabHost.addTab(tabSpec);
+//        tabSpec = tabHost.newTabSpec("tag3");
+//        tabSpec.setContent(R.id.linearLayout3);
+//        tabSpec.setIndicator("Инфо");
+//        tabHost.addTab(tabSpec);
+//        tabHost.setCurrentTab(0);
         return rootView;
     }
 

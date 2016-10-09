@@ -1,6 +1,7 @@
 package com.relsib.application;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -8,7 +9,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -31,7 +31,7 @@ public class MainActivityView extends AppCompatActivity
         public void onServiceConnected(ComponentName componentName, IBinder service) {
 
             mBLEService = ((BLEService.LocalBinder) service).getService();
-            if (!mBLEService.initialize()) {
+            if (!mBLEService.initialize(MainActivityView.this)) {
                 Log.e(TAG, "Unable to initialize Bluetooth");
             }
 
@@ -69,22 +69,22 @@ public class MainActivityView extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
+        getFragmentManager().beginTransaction().replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mBLEService.pushUnknownToMyDevices();
-                // getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
+                getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
                 //    for (int i = 0; i < BLEService.thermometers.size(); i++) {
                 //   BLEService.thermometers.get(i).connect(true);
                     //   mBLEService.thermometers.get(i).getTemperatureByNotify(true);
                 // }
-                getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsView.newInstance("1", "1")).commit();
-                // getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, new SettingsView()).commit();
+
+
             }
         });
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -163,7 +163,7 @@ public class MainActivityView extends AppCompatActivity
 //                fragmentClass = MeasureListView.class;
 //                break;
             case R.id.nav_thermometers:
-                fragmentClass = BLEDevicesView.class;
+                fragmentClass = DeviceSearchView.class;
                 break;
 //            case R.id.nav_alarms:
 //                fragmentClass = AlarmsView.class;
@@ -181,9 +181,9 @@ public class MainActivityView extends AppCompatActivity
             e.printStackTrace();
         }
         if (id == R.id.nav_calendar) {
-            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
+            getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
         } else {
-            getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, currentFragment).commit();
+            getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, currentFragment).commit();
         }
         navigationView.setCheckedItem(id);
         drawer.closeDrawer(GravityCompat.START);

@@ -32,11 +32,6 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="preferenceTheme">@style/Theme.WtfPreference</item>
-
-        <!--<item name="android:dropDownListViewStyle">@style/mySpinnerStyle</item>-->
-
-
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

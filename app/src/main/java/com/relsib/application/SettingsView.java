@@ -2,253 +2,232 @@ package com.relsib.application;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.preference.ListPreference;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceFragmentCompat;
-import android.support.v7.preference.PreferenceScreen;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
+import android.preference.ListPreference;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
+import android.preference.RingtonePreference;
+import android.util.TypedValue;
 
+import static android.text.TextUtils.split;
 
-public class SettingsView extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
+//import android.support.v14.preference.PreferenceFragment;
+//import android.support.v7.preference.CheckBoxPreference;
+//import android.support.v7.preference.EditTextPreference;
+//import android.support.v7.preference.PreferenceCategory;
+//
+//import android.support.v7.preference.PreferenceFragmentCompat;
+//import android.support.v7.preference.PreferenceScreen;
+//import android.support.v7.preference.*;
+//import android.support.v7.view.ContextThemeWrapper;
+//import com.rarepebble.colorpicker.ColorPreference;
+
+public class SettingsView extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
+    public static final String KEY_NAME = "_name";
+    public static final String KEY_AUTOCONNECT = "_autoconnect";
+    public static final String KEY_COLOR_LABEL = "_colorlabel";
+    public static final String KEY_BACKGROUND_COLOR = "_backgroundcolor";
+    public static final String KEY_ALARMS = "_alarms";
+    public static final String KEY_ALARMS_SCREEN = "_alarmsscreen";
+    public static final String KEY_ALARMS_MIN_VIBRATE = "_alarmsminvibrate";
+    public static final String KEY_ALARMS_MIN_VALUE = "_alarmsminvalue";
+
+    public static final String KEY_ALARMS_MIN_SOUND = "_alarmsminsound";
+
+    public static final String KEY_ALARMS_MAX_VALUE = "_alarmmaxvalue";
+    public static final String KEY_ALARMS_MAX_VIBRATE = "_alarmsmaxvibrate";
+    public static final String KEY_ALARMS_MAX_SOUND = "_alarmmaxsound";
+    public static final String KEY_MEASURE_UNITS = "_units";
+    public static final String FILE_NAME = "set_filename";
+    private static final String TAG = "param1";
+    SharedPreferences.OnSharedPreferenceChangeListener listener;
+    String idTag;
+    EditTextPreference thermometer_name;
+    ListPreference list;
 
     public SettingsView() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to MeasurmentFactory a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SettingsView.
-     */
-
-    public static SettingsView newInstance(String param1, String param2) {
+    public static SettingsView newInstance(String param1) {
         SettingsView fragment = new SettingsView();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(TAG, param1);
         fragment.setArguments(args);
         return fragment;
     }
 
-    private static void bindPreferenceSummaryToValue(Preference preference) {
-        // Set the listener to watch for value changes.
-//        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-//
-//        // Trigger the listener immediately with the preference's
-//        // current value.
-//
-//
-//        if (preference instanceof CheckBoxPreference) {
-//            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, PreferenceManager.
-//                    getDefaultSharedPreferences(preference.getContext()).
-//                    getBoolean(preference.getKey(),false));
-//
-//        } else {
-//            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, PreferenceManager.
-//                    getDefaultSharedPreferences(preference.getContext()).
-//                    getString(preference.getKey(),""));
-//        }
-
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
-//        if (getArguments() != null) {
-//            String mParam1 = getArguments().getString(ARG_PARAM1);
-//            String mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
+        if (getArguments() != null) {
+            idTag = getArguments().getString(TAG);
+
+
+        }
         super.onCreate(savedInstanceState);
-        // создаем экран
-        PreferenceScreen p = createPreferences();
-        this.setPreferenceScreen(p);//Set the PreferenceScreen as the current one on this fragment
-
-    }
-
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-
-    }
-
-    private PreferenceScreen createPreferences() {
-        PreferenceScreen p =
-                getPreferenceManager().createPreferenceScreen(getActivity());
-
-        ListPreference listPref = new ListPreference(getActivity());
-
-        listPref.setKey("some_key"); //Refer to get the pref value
-        CharSequence[] csEntries = new String[]{"Item1", "Item2"};
-        CharSequence[] csValues = new String[]{"1", "2"};
-        listPref.setDefaultValue("-1");
-        listPref.setEntries(csEntries); //Entries(how you display them)
-        listPref.setEntryValues(csValues);//actual values
-        listPref.setDialogTitle("Dialog title");
-        listPref.setTitle("Title");
-        listPref.setSummary("Some summary");
-
-        p.addPreference(listPref);
-
-        return p;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.f_settings_view, container, false);
 
 
-        //now bind values, notice we use p.findPreference which means whe look into the preferenceScreen Associated with the PreferenceFragment/Activity
-        //  bindPreferenceSummaryToValue(p.findPreference("some_key"));
-        //   PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(getLayoutInflater(savedInstanceState).getContext());
-        //PreferenceScreen rootScreen = getLayoutInflater(savedInstanceState)
-//        // говорим Activity, что rootScreen - корневой
-        // setPreferenceScreen(rootScreen);
-//        // даллее создаем элементы, присваиваем атрибуты и формируем иерархию
-//        CheckBoxPreference chb1 = new CheckBoxPreference(getActivity());
-//        chb1.setKey("chb1");
-//        chb1.setTitle("CheckBox 1");
-//        chb1.setSummaryOn("Description of checkbox 1 on");
-//        chb1.setSummaryOff("Description of checkbox 1 off");
-//
-//        rootScreen.addPreference(chb1);
+        Context activityContext = getActivity();
+        TypedValue themeTypedValue = new TypedValue();
+        activityContext.getTheme().resolveAttribute(R.attr.preferenceTheme, themeTypedValue, true);
 
-//
-//        ListPreference list = new ListPreference(getActivity());
-//        list.setKey("list");
-//        list.setTitle("List");
-//        list.setSummary("Description of list");
-//        list.setEntries(R.array.entries);
-//        list.setEntryValues(R.array.entry_values);
-//
-//        rootScreen.addPreference(list);
-//
-//
-//        CheckBoxPreference chb2 = new CheckBoxPreference(getActivity());
-//        chb2.setKey("chb2");
-//        chb2.setTitle("CheckBox 2");
-//        chb2.setSummary("Description of checkbox 2");
-//
-//        rootScreen.addPreference(chb2);
-//
-//
-//        PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(getActivity());
-//        screen.setKey("screen");
-//        screen.setTitle("Screen");
-//        screen.setSummary("Description of screen");
-//
-//
-//        final CheckBoxPreference chb3 = new CheckBoxPreference(getActivity());
-//        chb3.setKey("chb3");
-//        chb3.setTitle("CheckBox 3");
-//        chb3.setSummary("Description of checkbox 3");
-//
-//        screen.addPreference(chb3);
-//
-//
-//        PreferenceCategory categ1 = new PreferenceCategory(getActivity());
-//        categ1.setKey("categ1");
-//        categ1.setTitle("Category 1");
-//        categ1.setSummary("Description of category 1");
-//
-//        screen.addPreference(categ1);
-//
-//        CheckBoxPreference chb4 = new CheckBoxPreference(getActivity());
-//        chb4.setKey("chb4");
-//        chb4.setTitle("CheckBox 4");
-//        chb4.setSummary("Description of checkbox 4");
-//
-//        categ1.addPreference(chb4);
-//
-//
-//        final PreferenceCategory categ2 = new PreferenceCategory(getActivity());
-//        categ2.setKey("categ2");
-//        categ2.setTitle("Category 2");
-//        categ2.setSummary("Description of category 2");
-//
-//        screen.addPreference(categ2);
-//
-//
-//        CheckBoxPreference chb5 = new CheckBoxPreference(getActivity());
-//        chb5.setKey("chb5");
-//        chb5.setTitle("CheckBox 5");
-//        chb5.setSummary("Description of checkbox 5");
-//
-//        categ2.addPreference(chb5);
-//
-//
-//        CheckBoxPreference chb6 = new CheckBoxPreference(getActivity());
-//        chb6.setKey("chb6");
-//        chb6.setTitle("CheckBox 6");
-//        chb6.setSummary("Description of checkbox 6");
-//
-//        categ2.addPreference(chb6);
-//
-//        rootScreen.addPreference(screen);
-//
-//        list.setDependency("chb1");
-//        screen.setDependency("chb2");
+        getPreferenceManager().setSharedPreferencesName(idTag + FILE_NAME);
+        final PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(activityContext);
+        setPreferenceScreen(rootScreen);
+        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
-//        // код из прошлого урока для связи активности categ2 и значения chb3
-//        categ2.setEnabled(chb3.isChecked());
-//        chb3.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        //создаем категорию и добавляем в экран
+        final PreferenceCategory rootCategory = new PreferenceCategory(activityContext);
+        rootCategory.setTitle("Настройки");
+        rootScreen.addPreference(rootCategory);
+
+        thermometer_name = new EditTextPreference(activityContext);
+        thermometer_name.setKey(idTag + KEY_NAME);
+        thermometer_name.setTitle("Имя термометра");
+        thermometer_name.setSummary(getPreferenceManager().getSharedPreferences().getString(idTag + KEY_NAME, "WT-50"));
+        thermometer_name.setDialogTitle("Введите новое имя термометра");
+        rootCategory.addPreference(thermometer_name);
+
+        final com.kizitonwose.colorpreference.ColorPreference thermometer_color_label = new com.kizitonwose.colorpreference.ColorPreference(BLEService.mActivityContext);
+        thermometer_color_label.setKey(idTag + KEY_COLOR_LABEL);
+        thermometer_color_label.setTitle("Цветовая метка");
+        thermometer_color_label.setSummary("Установить цветовую метку в программе");
+        rootCategory.addPreference(thermometer_color_label);
+
+        final com.rarepebble.colorpicker.ColorPreference thermometer_background_color = new com.rarepebble.colorpicker.ColorPreference(BLEService.mActivityContext);
+        thermometer_background_color.setKey(idTag + KEY_BACKGROUND_COLOR);
+        thermometer_background_color.setTitle("Цвет фона");
+        thermometer_background_color.setSummary("Установить цвет фона");
+        rootCategory.addPreference(thermometer_background_color);
+
+    /* вложенный экран настроек */
+        final PreferenceScreen thermometer_alarms_screen = getPreferenceManager().createPreferenceScreen(activityContext);
+        thermometer_alarms_screen.setTitle("Настройка уведомлений");
+        thermometer_alarms_screen.setSummary("Установка режимов уведомлений");
+        thermometer_alarms_screen.setKey(idTag + KEY_ALARMS_SCREEN);
+        thermometer_alarms_screen.setFragment(SettingsView.class.getName());
+//        thermometer_alarms_screen.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//            @Override
 //            public boolean onPreferenceClick(Preference preference) {
-//                categ2.setEnabled(chb3.isChecked());
-//                return false;
+//            //    Log.e(TAG,"clicked " + this.getClass().getSimpleName());
+//               setPreferenceScreen(thermometer_alarms_screen);
+//                return true;
 //            }
 //        });
-        return rootView;
-    }
+        rootCategory.addPreference(thermometer_alarms_screen);
+
+        final PreferenceCategory rootCategory2 = new PreferenceCategory(activityContext);
+        rootCategory2.setTitle("Уведомлять о минимальной температуре");
+        thermometer_alarms_screen.addPreference(rootCategory2);
 
 
-    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
+        final EditTextPreference thermometer_alarms_min_treshold = new EditTextPreference(activityContext);
+
+        thermometer_alarms_min_treshold.setKey(idTag + KEY_ALARMS_MIN_VALUE);
+        thermometer_alarms_min_treshold.setTitle("Установить порог");
+        rootCategory2.addPreference(thermometer_alarms_min_treshold);
+
+        final CheckBoxPreference thermometer_alarms_min_vibrate = new CheckBoxPreference(activityContext);
+        thermometer_alarms_min_vibrate.setTitle("Вибрация");
+        thermometer_alarms_min_vibrate.setSummary("Отключено");
+        thermometer_alarms_min_vibrate.setDefaultValue(false);
+        thermometer_alarms_min_vibrate.setKey(idTag + KEY_ALARMS_MIN_VIBRATE);
+
+        thermometer_alarms_min_vibrate.setChecked(false);
+        rootCategory2.addPreference(thermometer_alarms_min_vibrate);
+
+        final RingtonePreference thermometer_alarms_min_sound = new RingtonePreference(activityContext);
+        thermometer_alarms_min_sound.setKey(idTag + KEY_ALARMS_MIN_SOUND);
+        thermometer_alarms_min_sound.setTitle("Выбрать мелодию");
+        rootCategory2.addPreference(thermometer_alarms_min_sound);
+
+        final PreferenceCategory rootCategory3 = new PreferenceCategory(activityContext);
+        rootCategory3.setTitle("Уведомлять о максимальной температуре");
+        thermometer_alarms_screen.addPreference(rootCategory3);
+
+        final EditTextPreference thermometer_alarms_max_treshold = new EditTextPreference(activityContext);
+        thermometer_alarms_max_treshold.setKey(idTag + KEY_ALARMS_MIN_VALUE);
+        thermometer_alarms_max_treshold.setTitle("Установить порог");
+        thermometer_alarms_max_treshold.setDefaultValue("1");
+        rootCategory3.addPreference(thermometer_alarms_max_treshold);
+
+        final CheckBoxPreference thermometer_alarms_max_vibrate = new CheckBoxPreference(activityContext);
+        thermometer_alarms_max_vibrate.setTitle("Вибрация");
+        thermometer_alarms_max_vibrate.setSummary("Отключено");
+        thermometer_alarms_max_vibrate.setKey(idTag + KEY_ALARMS_MAX_VIBRATE);
+        thermometer_alarms_max_vibrate.setDefaultValue(false);
+        rootCategory3.addPreference(thermometer_alarms_max_vibrate);
+
+        final RingtonePreference thermometer_alarms_max_sound = new RingtonePreference(activityContext);
+        thermometer_alarms_max_sound.setKey(idTag + KEY_ALARMS_MAX_SOUND);
+        thermometer_alarms_max_sound.setTitle("Выбрать мелодию");
+        rootCategory3.addPreference(thermometer_alarms_max_sound);
+
+      /* ---- вложенный экран настроек */
+        list = new ListPreference(activityContext);
+        list.setKey(idTag + KEY_MEASURE_UNITS);
+        list.setTitle("Единицы измерения");
+        //list.setSummary("Description of list");
+        list.setSummary(getPreferenceManager().getSharedPreferences().getString(idTag + KEY_MEASURE_UNITS, "°C"));
+        list.setEntries(R.array.entries);
+        list.setEntryValues(R.array.entries);
+        rootScreen.addPreference(list);
+
+        final CheckBoxPreference thermometer_autoconnect = new CheckBoxPreference(activityContext);
+        thermometer_autoconnect.setTitle("Автоподключение");
+        thermometer_autoconnect.setSummary("Обнаруживать и производить подключение к термометру");
+        thermometer_autoconnect.setKey(idTag + KEY_AUTOCONNECT);
+        //thermometer_autoconnect.setChecked(true);
+        rootCategory.addPreference(thermometer_autoconnect);
+
+
+
+
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        // mListener = null;
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        String[] changes = split(s, "_");
+        SmartThermometer whoChanged = MainActivityView.mBLEService.findThermometerBySerial(changes[0]);
 
+        if (whoChanged != null) {
+            switch ("_" + changes[1]) {
+                case SettingsView.KEY_NAME:
+                    String mDeviceName = sharedPreferences.getString(s, "WT-50");
+                    whoChanged.setmDeviceName(mDeviceName);
+                    thermometer_name.setSummary(mDeviceName);
+                    break;
+                case SettingsView.KEY_COLOR_LABEL:
+                    whoChanged.setmDeviceColorLabel(sharedPreferences.getInt(s, Color.WHITE));
+                    break;
+                case SettingsView.KEY_BACKGROUND_COLOR:
+                    whoChanged.setmDeviceBackgroundColor(sharedPreferences.getInt(s, Color.WHITE));
+                    break;
+                case SettingsView.KEY_ALARMS:
+                    break;
+                case SettingsView.KEY_MEASURE_UNITS:
+                    list.setSummary(sharedPreferences.getString(s, "°C"));
+                    break;
+                default:
+                    break;
+            }
+        }
     }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-
 }

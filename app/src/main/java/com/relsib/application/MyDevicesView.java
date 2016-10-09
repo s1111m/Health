@@ -1,12 +1,11 @@
 package com.relsib.application;
 
+import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +16,8 @@ import android.widget.Chronometer;
 import android.widget.TextView;
 
 import com.relsib.adapters.MyDevicesViewAdapter;
+
+//import android.support.v4.app.Fragment;
 
 public class MyDevicesView extends Fragment {
     private final static String TAG = MyDevicesView.class.getSimpleName();
@@ -37,6 +38,9 @@ public class MyDevicesView extends Fragment {
                 adapter.notifyDataSetChanged();
                 //invalidateOptionsMenu();
             } else if (BLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
+                View itemView = recyclerView.getLayoutManager().findViewByPosition((int) intent.getLongExtra(SmartThermometer.ADAPTER_POSITION, 0));
+                ((Chronometer) itemView.findViewById(R.id.chronometer)).stop();
+                ((TextView) itemView.findViewById(R.id.intermediateTemperature)).setText("-,-");
                 //    adapter.notifyDataSetChanged();
                 //invalidateOptionsMenu();
                 //clearUI();
@@ -44,9 +48,8 @@ public class MyDevicesView extends Fragment {
                 adapter.notifyDataSetChanged();
 
             } else if (BLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                View itemView = recyclerView.getLayoutManager().findViewByPosition((int) intent.getLongExtra(SmartThermometer.ADAPTER_POSITION, 0));
-                ((Chronometer) itemView.findViewById(R.id.chronometer)).setBase(SystemClock.elapsedRealtime());
-
+                //View itemView = recyclerView.getLayoutManager().findViewByPosition((int) intent.getLongExtra(SmartThermometer.ADAPTER_POSITION, 0));
+                //((Chronometer) itemView.findViewById(R.id.chronometer)).stop();
             } else if (BLEService.ACTION_DATA_AVAILABLE.equals(action)) {
                 View itemView = recyclerView.getLayoutManager().findViewByPosition((int) intent.getLongExtra(SmartThermometer.ADAPTER_POSITION, 0));
                 if (itemView != null) {
@@ -111,7 +114,7 @@ public class MyDevicesView extends Fragment {
         adapter.setOnItemClickListener(new MyDevicesViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(String macAddress) {
-                getActivity().getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, TabbedView.newInstance(macAddress, macAddress)).commit();
+                getActivity().getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, TabbedView.newInstance(macAddress, macAddress)).commit();
             }
         });
 

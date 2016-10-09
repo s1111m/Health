@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
+    android:layout_height="wrap_content"
     card_view:cardCornerRadius="5dp"
     card_view:cardUseCompatPadding="true">
 
@@ -27,9 +28,18 @@
 
         <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/card_toolbar"
+            style="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_alignParentBottom="true">
+            android:layout_height="28dp"
+            android:layout_alignParentBottom="false"
+            android:layout_below="@+id/chronometer"
+            android:layout_centerVertical="false"
+            android:elevation="0dp"
+            android:minHeight="1dp"
+            card_view:buttonGravity="top|bottom"
+            card_view:contentInsetStart="1dp"
+            card_view:subtitleTextAppearance="@style/TextAppearance.AppCompat.Small"
+            card_view:titleTextAppearance="@android:style/TextAppearance.DeviceDefault.Widget.ActionMode.Title">
 
         </android.support.v7.widget.Toolbar>
 
@@ -72,11 +82,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignRight="@+id/MaximumTemperature"
-            android:layout_alignTop="@+id/imageView"
             android:layout_gravity="bottom"
             android:layout_marginLeft="5dp"
             android:gravity="center"
-            android:singleLine="true"
             android:text="-,-"
             android:textSize="24sp" />
 
@@ -110,23 +118,15 @@
             android:text="-,-"
             android:textSize="24sp" />
 
-        <TextView
-            android:id="@+id/device_serial"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@+id/textViewMac"
-            android:text="serial"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="14sp" />
         <ProgressBar
 
             android:id="@+id/device_battery"
             style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="40dp"
+            android:layout_width="35dp"
             android:layout_height="15dp"
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/textLabelCurrent"
+            android:layout_marginTop="1dp"
             android:indeterminate="false" />
 
         <Chronometer
@@ -155,6 +155,38 @@
             android:layout_below="@+id/textLabelMinimum"
             android:text="t="
             android:textSize="24sp" />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignStart="@+id/device_battery"
+            android:layout_below="@+id/device_battery"
+            android:background="@null"
+            card_view:srcCompat="@android:drawable/ic_menu_preferences" />
+
+        <TextView
+            android:id="@+id/deviceBatteryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/device_battery"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentTop="true"
+            android:layout_alignStart="@+id/device_battery"
+            android:layout_marginLeft="6dp"
+            android:text="80%"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/device_serial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/textViewMac"
+            android:text="serial"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="14sp" />
 
 
     </RelativeLayout>

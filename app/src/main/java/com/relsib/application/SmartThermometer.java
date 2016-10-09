@@ -8,6 +8,9 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.relsib.bluetooth.RelsibBluetoothProfile;
@@ -16,6 +19,8 @@ import com.relsib.dao.DbModel;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.UUID;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 /**
@@ -38,8 +43,9 @@ public class SmartThermometer {
     public String mDeviceSoftwareRevisionNumber;
     public String mDeviceManufacturer;
     public int mDeviceBatteryLevel;
-    public String mDeviceColorLabel;
-    public String mDeviceBackgroundColor;
+    public long measureTime = -1;
+    public Integer mDeviceColorLabel = Color.WHITE;
+    public Integer mDeviceBackgroundColor = Color.WHITE;
     public Float intermediateTemperature;
     public Float maxTemperature = -200f;
     public Float minTemperature = 200f;
@@ -51,7 +57,6 @@ public class SmartThermometer {
     private boolean isNotifyEnabled = false;
     private Queue<BluetoothGattDescriptor> descriptorWriteQueue = new LinkedList<BluetoothGattDescriptor>();
     private Queue<BluetoothGattCharacteristic> characteristicReadQueue = new LinkedList<BluetoothGattCharacteristic>();
-
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -67,7 +72,7 @@ public class SmartThermometer {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = BLEService.ACTION_GATT_DISCONNECTED;
                 mConnectionState = BLEService.STATE_DISCONNECTED;
-                Log.e(TAG, "Disconnected from GATT server.");
+                Log.e(TAG, "TURN OFF Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
         }
@@ -82,6 +87,7 @@ public class SmartThermometer {
                     } else {
                         broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
                         getTemperatureByNotify(true);
+                        measureTime = SystemClock.elapsedRealtime();
                     }
             } else {
                 Log.e(TAG, "onServicesDiscovered received: " + status);
@@ -174,26 +180,40 @@ public class SmartThermometer {
         this.mDeviceMacAddress = mDeviceMacAddress;
         this.mDeviceName = mDeviceName;
     }
-    public SmartThermometer(BluetoothDevice device) {
-        this.mDeviceMacAddress = device.getAddress();
-        this.mDeviceName = device.getName();
-
-    }
 
     public static SmartThermometer SmartThermometerFactory(long _ID, String mDeviceName, String mDeviceMac, String mDeviceModelNumber, String mDeviceSerialNumber, String mDeviceFirmwareRevisionNumber,
                                                            String mDeviceHardwareRevisionNumber, String mDeviceSoftwareRevisionNumber, String mDeviceManufacturer, int mDeviceBatteryLevel) {
         SmartThermometer thermomether = new SmartThermometer(mDeviceMac, mDeviceName);
         thermomether._ID = _ID;
         thermomether.mDeviceModelNumber = mDeviceModelNumber;
-
-        thermomether.mDeviceSerialNumber = mDeviceSerialNumber;
-        Log.e(TAG, "Setting S/N" + mDeviceSerialNumber);
+        thermomether.setmDeviceSerialNumber(mDeviceSerialNumber);
         thermomether.mDeviceFirmwareRevisionNumber = mDeviceFirmwareRevisionNumber;
         thermomether.mDeviceHardwareRevisionNumber = mDeviceHardwareRevisionNumber;
         thermomether.mDeviceSoftwareRevisionNumber = mDeviceSoftwareRevisionNumber;
         thermomether.mDeviceManufacturer = mDeviceManufacturer;
         thermomether.mDeviceBatteryLevel = mDeviceBatteryLevel;
         return thermomether;
+
+    }
+
+    public void setmDeviceName(String mDeviceName) {
+        this.mDeviceName = mDeviceName;
+    }
+
+    public void setmDeviceColorLabel(Integer mDeviceColorLabel) {
+        Log.e(TAG, mDeviceName);
+        this.mDeviceColorLabel = mDeviceColorLabel;
+    }
+//    public SmartThermometer(BluetoothDevice device) {
+//        this.mDeviceMacAddress = device.getAddress();
+//        Log.e(TAG,device.getName());
+//        this.mDeviceName = device.getName();
+//
+//    }
+
+    public void setmDeviceBackgroundColor(Integer mDeviceBackgroundColor) {
+        Log.e(TAG, mDeviceName);
+        this.mDeviceBackgroundColor = mDeviceBackgroundColor;
     }
 
     public void setMaxTemperature(Float maxTemperature) {
@@ -212,6 +232,7 @@ public class SmartThermometer {
     public void resetValues() {
         setMaxTemperature(-200F);
         minTemperature = 200F;
+        measureTime = SystemClock.elapsedRealtime();
         //intermediateTemperature=0f;
     }
 
@@ -221,7 +242,7 @@ public class SmartThermometer {
         //intent.putExtra(TEMP_CURR,intermediateTemperature);
         //intent.putExtra(TEMP_MAX,maxTemperature);
         // intent.putExtra(TEMP_MIN,minTemperature);
-        BLEService.mServiceContext.sendBroadcast(intent);
+        BLEService.mActivityContext.sendBroadcast(intent);
 
     }
 
@@ -234,20 +255,21 @@ public class SmartThermometer {
         intent.putExtra(TEMP_CURR, intermediateTemperature);
         intent.putExtra(TEMP_MAX, maxTemperature);
         intent.putExtra(TEMP_MIN, minTemperature);
-        BLEService.mServiceContext.sendBroadcast(intent);
+        BLEService.mActivityContext.sendBroadcast(intent);
 
     }
 
     //
     public String getmDeviceSerialNumber() {
-//        if (mDeviceSerialNumber==null && mConnectionState==BLEService.STATE_CONNECTED){
-//            readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE,RelsibBluetoothProfile.SERIAL_NUMBER_UUID);
-//        }
         return mDeviceSerialNumber;
     }
 
     public void setmDeviceSerialNumber(String mDeviceSerialNumber) {
         this.mDeviceSerialNumber = mDeviceSerialNumber;
+        SharedPreferences preferences = BLEService.mActivityContext.getSharedPreferences(mDeviceMacAddress + SettingsView.FILE_NAME, MODE_PRIVATE);
+        setmDeviceName(preferences.getString(mDeviceMacAddress + SettingsView.KEY_NAME, "WT-50"));
+        setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsView.KEY_COLOR_LABEL, Color.WHITE));
+        setmDeviceBackgroundColor(preferences.getInt(mDeviceMacAddress + SettingsView.KEY_BACKGROUND_COLOR, Color.WHITE));
     }
 
     @Override
@@ -264,7 +286,7 @@ public class SmartThermometer {
     }
 
     public boolean connect(boolean autoConnect) {
-
+        Log.e(TAG, "start connecting");
         if (BLEService.mBluetoothAdapter == null || mDeviceMacAddress == null) {
             Log.e(TAG, "BluetoothAdapter not initialized or unspecified address.");
             return false;
@@ -281,16 +303,15 @@ public class SmartThermometer {
             }
         }
 
-        final BluetoothDevice device = BLEService.mBluetoothAdapter.getRemoteDevice(mDeviceMacAddress); //address
+        BluetoothDevice device = BLEService.mBluetoothAdapter.getRemoteDevice(mDeviceMacAddress); //address
         if (device == null) {
             Log.e(TAG, "Device not found.  Unable to connect.");
             mConnectionState = BLEService.STATE_DISCONNECTED;
             return false;
         }
-
 //         We want to directly connect to the device, so we are setting the autoConnect
 //         parameter to false.
-        mBluetoothGatt = device.connectGatt(BLEService.mServiceContext, autoConnect, mGattCallback);
+        mBluetoothGatt = device.connectGatt(BLEService.mActivityContext, autoConnect, mGattCallback);
         if (mBluetoothGatt == null) return false;
         Log.e(TAG, "Trying to create a new connection.");
 
@@ -318,6 +339,7 @@ public class SmartThermometer {
         if (mBluetoothGatt == null) {
             return;
         }
+        // mConnectionState=BLEService.STATE_DISCONNECTED;
         disconnect();
         mBluetoothGatt.close();
         mBluetoothGatt = null;

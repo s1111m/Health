@@ -1,15 +1,14 @@
 package com.relsib.application;
 
+import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,15 +20,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.relsib.adapters.BLEDevicesViewAdapter;
-import com.relsib.bluetooth.RelsibBluetoothProfile;
 
-import java.util.UUID;
-
-public class BLEDevicesView extends Fragment {
+public class DeviceSearchView extends Fragment {
     public static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 2000;
-    private final static String TAG = BLEDevicesView.class.getSimpleName();
+    private final static String TAG = DeviceSearchView.class.getSimpleName();
     private BLEDevicesViewAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
@@ -52,11 +48,11 @@ public class BLEDevicesView extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public BLEDevicesView() {
+    public DeviceSearchView() {
     }
 
-    public static BLEDevicesView newInstance() {
-        BLEDevicesView fragment = new BLEDevicesView();
+    public static DeviceSearchView newInstance() {
+        DeviceSearchView fragment = new DeviceSearchView();
         return fragment;
     }
 
@@ -73,13 +69,13 @@ public class BLEDevicesView extends Fragment {
                 }
             }, SCAN_PERIOD);
             mScanning = true;
-            if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            //   if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
                 // Do something for lollipop and above versions
                 mBluetoothAdapter.startLeScan(mLeScanCallback);
-            } else {
-                UUID[] services = {RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE};
-                mBluetoothAdapter.startLeScan(services, mLeScanCallback);
-            }
+//            } else {
+//                UUID[] services = {RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE};
+//                mBluetoothAdapter.startLeScan(services, mLeScanCallback);
+//            }
 
 
             mLeDeviceListAdapter.notifyDataSetChanged();
@@ -152,8 +148,9 @@ public class BLEDevicesView extends Fragment {
 
     @Override
     public void onDetach() {
-        super.onDetach();
         swipeRefreshLayout.setRefreshing(false);
+        super.onDetach();
+
     }
 }
 

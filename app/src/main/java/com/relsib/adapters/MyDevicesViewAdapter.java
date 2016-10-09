@@ -1,18 +1,22 @@
 package com.relsib.adapters;
 
+
 import android.os.SystemClock;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.relsib.application.BLEService;
 import com.relsib.application.R;
+import com.relsib.application.SettingsView;
 import com.relsib.application.SmartThermometer;
 
 
@@ -52,10 +56,20 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
         holder.textViewMac.setText(tempThermometer.mDeviceMacAddress);
 
         holder.battery_level.setProgress(tempThermometer.mDeviceBatteryLevel);
+        holder.deviceBatteryText.setText(tempThermometer.mDeviceBatteryLevel + "%");
 
         holder.textDeviceSerial.setText("SN: " + tempThermometer.getmDeviceSerialNumber());
 
-        holder.topToolBar.setTitle(tempThermometer.mDeviceName);// + " SN:" + tempThermometer.mDeviceSerialNumber);
+        holder.itemView.setBackgroundColor(tempThermometer.mDeviceBackgroundColor);
+        holder.textViewName.setTextColor(tempThermometer.mDeviceColorLabel);
+        //holder.topToolBar.setTitle(tempThermometer.mDeviceName);// + " SN:" + tempThermometer.mDeviceSerialNumber);
+        Log.e("adapter", String.valueOf(tempThermometer.measureTime));
+        if (tempThermometer.measureTime != -1) {
+
+            holder.chronometer.setBase(tempThermometer.measureTime);
+            holder.chronometer.start();
+        }
+
 
         tempThermometer.setAdapterPosition(holder.getAdapterPosition());
 
@@ -71,7 +85,12 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
             holder.textViewMinimumTemperature.setText(tempThermometer.minTemperature.toString());
         else holder.textViewMaximumTemperature.setText("-,-");
 
-
+        holder.mSettingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsView.newInstance(BLEService.thermometers.get(listPosition).mDeviceMacAddress)).commit();
+            }
+        });
         holder.topToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -79,9 +98,9 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
                 switch (id) {
                     case R.id.action_disconnect:
                         BLEService.thermometers.get(listPosition).close();
-                        holder.textViewMaximumTemperature.setText("-,-");
-                        //holder.textViewIntermediateTemperature.setText("-,-");
-                        holder.chronometer.setBase(SystemClock.elapsedRealtime());
+                        //holder.textViewMaximumTemperature.setText("-,-");
+                        holder.textViewIntermediateTemperature.setText("-,-");
+                        //holder.chronometer.setBase(SystemClock.elapsedRealtime());
                         holder.chronometer.stop();
                         break;
                     case R.id.action_reset:
@@ -95,9 +114,10 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
                     case R.id.action_settings:
                         //tempThermometer.autoconnect
                         //BLEService.thermometers.get(listPosition).autoconnect = true;
-                        BLEService.thermometers.get(listPosition).connect(false);
+
+                        //BLEService.thermometers.get(listPosition).connect(false);
                         // SettingsView test = new SettingsView();
-                        //(BLEService.mServiceContext).getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsView.newInstance("1","1")).commit();
+                        //(BLEService.mActivityContext).getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsView.newInstance("1","1")).commit();
 
                         break;
                     default:
@@ -139,6 +159,8 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
         TextView textDeviceSerial;
         Toolbar topToolBar;
         Chronometer chronometer;
+        TextView deviceBatteryText;
+        ImageButton mSettingsButton;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -153,6 +175,8 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
             this.chronometer = (Chronometer) itemView.findViewById(R.id.chronometer);
             //if (topToolBar != null) {
             // inflate your menu
+            this.deviceBatteryText = (TextView) itemView.findViewById(R.id.deviceBatteryText);
+            this.mSettingsButton = (ImageButton) itemView.findViewById(R.id.settingsButton);
             topToolBar.inflateMenu(R.menu.card_toolbar_menu);
             //}
 

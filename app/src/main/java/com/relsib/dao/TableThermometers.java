@@ -110,7 +110,7 @@ public class TableThermometers implements BaseColumns {
         Cursor res = db.rawQuery("select * from " + TABLE_NAME, null);
         res.moveToFirst();
         while (res.isAfterLast() == false) {
-            Log.e(TAG, res.getLong(res.getColumnIndex(_ID)) + res.getString(res.getColumnIndex(COLUMN_DEVICE_SERIAL)));
+            Log.e(TAG, "id: " + res.getLong(res.getColumnIndex(_ID)) + " S/N: " + res.getString(res.getColumnIndex(COLUMN_DEVICE_SERIAL)));
             array_list.add(SmartThermometer.SmartThermometerFactory(
                     res.getLong(res.getColumnIndex(_ID)),
                     res.getString(res.getColumnIndex(COLUMN_DEVICE_NAME)),
