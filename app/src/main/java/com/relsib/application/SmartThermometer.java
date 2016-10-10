@@ -10,7 +10,11 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.util.Log;
 
 import com.relsib.bluetooth.RelsibBluetoothProfile;
@@ -218,6 +222,14 @@ public class SmartThermometer {
 
     public void setMaxTemperature(Float maxTemperature) {
         this.maxTemperature = maxTemperature;
+        if (maxTemperature > 35) {
+            Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            Ringtone ringtoneSound = RingtoneManager.getRingtone(BLEService.mServiceContext, ringtoneUri);
+            if (ringtoneSound != null) {
+                ((Vibrator) BLEService.mServiceContext.getSystemService(BLEService.VIBRATOR_SERVICE)).vibrate(800);
+                ringtoneSound.play();
+            }
+        }
         Log.e(TAG, mDeviceMacAddress + " setting " + maxTemperature);
     }
 
