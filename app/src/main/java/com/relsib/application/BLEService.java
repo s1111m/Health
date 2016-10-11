@@ -156,7 +156,8 @@ public class BLEService extends Service {
                     SmartThermometer tempThermometer = thermometers.get(i);
                     if (tempThermometer.mConnectionState == BLEService.STATE_DISCONNECTED) {
                         Log.e(TAG, "try to connect");
-                        tempThermometer.connect(false);
+                        //tempThermometer.connect(true);
+                        new ConnectThread(tempThermometer).start();
                         // new ConnectThread(thermometers.get(i));
                     }
                 }
@@ -186,7 +187,8 @@ public class BLEService extends Service {
             if (tempThermometer.selected) {
                 if (thermometers.size() < MAX_BLE_DEVICES) {
                     Log.e(TAG, String.valueOf(thermometers.size()));
-                    tempThermometer.connect(false);
+                    new ConnectThread(tempThermometer).start();
+                    //tempThermometer.connect(true);
                     thermometers.add(tempThermometer);
                 } else {
                     Toast.makeText(mActivityContext, "Протокол BLE не поддерживает больше " + MAX_BLE_DEVICES + " устройств", Toast.LENGTH_LONG);
@@ -218,30 +220,31 @@ public class BLEService extends Service {
         }
     }
 
-//    static class ConnectThread extends Thread {
-//        SmartThermometer thermometer;
-//
-//        public ConnectThread(SmartThermometer thermometer2) {
-//            Log.e(TAG,thermometer2.mDeviceName);
-//            thermometer = thermometer2;
-//            Log.e(TAG,thermometer.mDeviceName);
-//        }
-//
-//
-//        public void run() {
-////            Integer index = thermometers.indexOf(thermometer);
-////            if (index != UNKNOWN_THERMOMETER) {
-////                thermometers.get(index).connect(true);
-////                Log.e(TAG,"thread_connect");
-////            } else {
-//                if (thermometers.size()<MAX_BLE_DEVICES) {
-//                    thermometer.connect(true);
-//                   // thermometers.add(thermometer);
-//                } else {
-//                    Toast.makeText(mActivityContext,"Протокол BLE не поддерживает больше "+ MAX_BLE_DEVICES +" устройств",Toast.LENGTH_LONG);
-//                }
-//            }
+    class ConnectThread extends Thread {
+        SmartThermometer thermometer;
 
-//        }
-    //   }
+        public ConnectThread(SmartThermometer thermometer2) {
+            Log.e(TAG, thermometer2.mDeviceName);
+            thermometer = thermometer2;
+            Log.e(TAG, thermometer.mDeviceName);
+        }
+
+
+        public void run() {
+//            Integer index = thermometers.indexOf(thermometer);
+//            if (index != UNKNOWN_THERMOMETER) {
+//                thermometers.get(index).connect(true);
+//                Log.e(TAG,"thread_connect");
+//            } else {
+            if (thermometers.size() < MAX_BLE_DEVICES) {
+                Log.e(TAG, "thread");
+                thermometer.connect(true);
+                // thermometers.add(thermometer);
+            } else {
+                Toast.makeText(mActivityContext, "Протокол BLE не поддерживает больше " + MAX_BLE_DEVICES + " устройств", Toast.LENGTH_LONG);
+            }
+        }
+
+    }
+    //}
 }

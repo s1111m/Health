@@ -4,7 +4,6 @@ package com.relsib.adapters;
 import android.os.SystemClock;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,8 +17,6 @@ import com.relsib.application.BLEService;
 import com.relsib.application.R;
 import com.relsib.application.SettingsView;
 import com.relsib.application.SmartThermometer;
-
-import static android.content.ContentValues.TAG;
 
 
 public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdapter.MyViewHolder>
@@ -65,15 +62,16 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
         holder.itemView.setBackgroundColor(tempThermometer.mDeviceBackgroundColor);
         holder.textViewName.setTextColor(tempThermometer.mDeviceColorLabel);
         //holder.topToolBar.setTitle(tempThermometer.mDeviceName);// + " SN:" + tempThermometer.mDeviceSerialNumber);
-        Log.e(TAG, "measure time " + String.valueOf(tempThermometer.measureTime));
+        // Log.e(TAG, "measure time " + String.valueOf(tempThermometer.measureTime));
         //  if (tempThermometer.measureTime != -1) {// if  gettempbynotify set's timer
 
-        if (tempThermometer.mConnectionState == BLEService.STATE_CONNECTED && tempThermometer.measureTime != -1) {
+        if (tempThermometer.mConnectionState == BLEService.STATE_CONNECTED && tempThermometer.isNotifyEnabled) {
             holder.chronometer.setBase(tempThermometer.measureTime);
             holder.chronometer.start();
         } else {
-            Log.e(TAG, String.valueOf(tempThermometer.measureTime) + String.valueOf(SystemClock.elapsedRealtime()));
-            holder.chronometer.setBase(SystemClock.elapsedRealtime() - tempThermometer.measureTime); //saved basetime
+            // Log.e(TAG,tempThermometer.mDeviceMacAddress + " " +String.valueOf(tempThermometer.mConnectionState) + " - state isnotifyenabled = " + tempThermometer.isNotifyEnabled);
+            //  Log.e(TAG, String.valueOf(tempThermometer.measureTime) + " " +String.valueOf(SystemClock.elapsedRealtime()));
+            holder.chronometer.setBase(SystemClock.elapsedRealtime()); //saved basetime
         }
 
         //  }
@@ -104,9 +102,10 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
                 int id = menuItem.getItemId();
                 switch (id) {
                     case R.id.action_disconnect:
-                        tempThermometer.shutdown();
-                        tempThermometer.measureTime = SystemClock.elapsedRealtime() - holder.chronometer.getBase(); //save basetime when disconnect
                         holder.chronometer.stop();
+                        holder.chronometer.setBase(SystemClock.elapsedRealtime());
+                        //      tempThermometer.measureTime = holder.chronometer.getBase(); //save basetime when disconnect
+                        tempThermometer.shutdown();
                         holder.textViewIntermediateTemperature.setText("-,-");
                         break;
                     case R.id.action_reset:

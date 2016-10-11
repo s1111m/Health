@@ -47,7 +47,7 @@ public class SmartThermometer {
     public String mDeviceSoftwareRevisionNumber;
     public String mDeviceManufacturer;
     public int mDeviceBatteryLevel;
-    public long measureTime = -1;
+    public long measureTime;// = -1;
     public Integer mDeviceColorLabel = Color.WHITE;
     public Integer mDeviceBackgroundColor = Color.WHITE;
     public Float intermediateTemperature;
@@ -65,6 +65,7 @@ public class SmartThermometer {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
+            Log.e(TAG, "State changed  " + newState);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 // intentAction = BLEService.ACTION_GATT_CONNECTED;
                 mConnectionState = BLEService.STATE_CONNECTED;
@@ -76,7 +77,7 @@ public class SmartThermometer {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = BLEService.ACTION_GATT_DISCONNECTED;
                 mConnectionState = BLEService.STATE_DISCONNECTED;
-                //isNotifyEnabled=false;
+                isNotifyEnabled = false;
                 Log.e(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
@@ -85,17 +86,20 @@ public class SmartThermometer {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.v(TAG, "Services discovered");
+                Log.e(TAG, "Services discovered");
                 broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
-                    if (mDeviceSerialNumber == null) {
+                if (mDeviceSerialNumber == null) { //
                         readInfoTypes();
                     } else {
-                        broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
+                    // broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
                         getTemperatureByNotify(true);
-                        //measureTime = SystemClock.elapsedRealtime();
+
                     }
             } else {
                 Log.e(TAG, "onServicesDiscovered received: " + status);
+                disconnect();
+                //connect(true);
+                //mBluetoothGatt.discoverServices();
                 // disconnect();
             }
         }
@@ -146,7 +150,7 @@ public class SmartThermometer {
                 if (characteristicReadQueue.size() == 0)
                     broadcastUpdate(BLEService.EXTRA_DATA);
                 BLEService.tableThermometers.save(SmartThermometer.this);
-                //  getTemperatureByNotify(true);
+                getTemperatureByNotify(true);
 
             }
         }
@@ -154,8 +158,10 @@ public class SmartThermometer {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             UUID uuid = characteristic.getUuid();
+            Log.e(TAG, "ONCHANGE " + mDeviceMacAddress);
             if (uuid.equals(RelsibBluetoothProfile.INTERMEDIATE_TEMPERATURE)) {
                 intermediateTemperature = characteristic.getFloatValue(BluetoothGattCharacteristic.FORMAT_FLOAT, 1);
+                Log.e(TAG, "ONCHANGE " + intermediateTemperature);
                 if (maxTemperature <= intermediateTemperature) {
                     setMaxTemperature(intermediateTemperature);
                 }
@@ -317,14 +323,14 @@ public class SmartThermometer {
         BluetoothDevice device = BLEService.mBluetoothAdapter.getRemoteDevice(mDeviceMacAddress); //address
         if (device == null) {
             Log.e(TAG, "Device not found.  Unable to connect.");
-            //    mConnectionState = BLEService.STATE_DISCONNECTED;
+            mConnectionState = BLEService.STATE_DISCONNECTED;
             return false;
         }
 //         We want to directly connect to the device, so we are setting the autoConnect
 //         parameter to false.
         mBluetoothGatt = device.connectGatt(BLEService.mActivityContext, autoConnect, mGattCallback);
         if (mBluetoothGatt == null) {
-//            mConnectionState=BLEService.STATE_DISCONNECTED;
+            mConnectionState = BLEService.STATE_DISCONNECTED;
             return false;
 
         }
@@ -385,10 +391,10 @@ public class SmartThermometer {
     }
 
     public boolean getTemperatureByNotify(boolean enabled) {
-
         setCharacteristicNotify(RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE, RelsibBluetoothProfile.INTERMEDIATE_TEMPERATURE, enabled);
-        isNotifyEnabled = true;
         measureTime = SystemClock.elapsedRealtime();
+        isNotifyEnabled = enabled;
+        Log.e(TAG, "call get by notyfy + isnotify " + enabled);
         return true;
     }
     public boolean setCharacteristicNotify(UUID mServiceName, UUID mCharacteristicName, boolean enabled) {
@@ -443,11 +449,9 @@ public class SmartThermometer {
     }
 
     public void shutdown() {
-
         intermediateTemperature = null;
-
-
-
+        mConnectionState = BLEService.STATE_DISCONNECTED;
+        isNotifyEnabled = false;
         if (mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return;
@@ -463,6 +467,6 @@ public class SmartThermometer {
         if (!mBluetoothGatt.writeCharacteristic(mWriteCharacteristic)) {
             Log.w(TAG, "Failed to write characteristic");
         }
-        mConnectionState = BLEService.STATE_DISCONNECTED;
+
     }
 }
