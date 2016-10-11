@@ -56,9 +56,9 @@ public class SmartThermometer {
     public boolean selected = false;
     public boolean autoconnect = true;
     public int mConnectionState = BLEService.STATE_DISCONNECTED;
+    public boolean isNotifyEnabled = false;
     private long adapterPosition;
     private BluetoothGatt mBluetoothGatt;
-    private boolean isNotifyEnabled = false;
     private Queue<BluetoothGattDescriptor> descriptorWriteQueue = new LinkedList<BluetoothGattDescriptor>();
     private Queue<BluetoothGattCharacteristic> characteristicReadQueue = new LinkedList<BluetoothGattCharacteristic>();
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
@@ -76,7 +76,8 @@ public class SmartThermometer {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = BLEService.ACTION_GATT_DISCONNECTED;
                 mConnectionState = BLEService.STATE_DISCONNECTED;
-                Log.e(TAG, "TURN OFF Disconnected from GATT server.");
+                //isNotifyEnabled=false;
+                Log.e(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
             }
         }
@@ -91,10 +92,11 @@ public class SmartThermometer {
                     } else {
                         broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
                         getTemperatureByNotify(true);
-                        measureTime = SystemClock.elapsedRealtime();
+                        //measureTime = SystemClock.elapsedRealtime();
                     }
             } else {
                 Log.e(TAG, "onServicesDiscovered received: " + status);
+                // disconnect();
             }
         }
 
@@ -144,19 +146,16 @@ public class SmartThermometer {
                 if (characteristicReadQueue.size() == 0)
                     broadcastUpdate(BLEService.EXTRA_DATA);
                 BLEService.tableThermometers.save(SmartThermometer.this);
-                    getTemperatureByNotify(true);
+                //  getTemperatureByNotify(true);
 
             }
         }
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-            // Log.e(TAG, "onCHANGE " + mDeviceMacAddress);
-
             UUID uuid = characteristic.getUuid();
             if (uuid.equals(RelsibBluetoothProfile.INTERMEDIATE_TEMPERATURE)) {
                 intermediateTemperature = characteristic.getFloatValue(BluetoothGattCharacteristic.FORMAT_FLOAT, 1);
-                Log.e(TAG, "mac " + mDeviceMacAddress + " inter : " + intermediateTemperature + " max: " + maxTemperature);
                 if (maxTemperature <= intermediateTemperature) {
                     setMaxTemperature(intermediateTemperature);
                 }
@@ -169,7 +168,6 @@ public class SmartThermometer {
             if (uuid.equals(RelsibBluetoothProfile.BATTERY_LEVEL)) {
                 mDeviceBatteryLevel = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
                 Log.e(TAG, "Battery level + " + mDeviceBatteryLevel);
-                //mDeviceBatteryLevel=Integer.valueOf(characteristic.getStringValue(0));
             }
 
         }
@@ -208,12 +206,6 @@ public class SmartThermometer {
         Log.e(TAG, mDeviceName);
         this.mDeviceColorLabel = mDeviceColorLabel;
     }
-//    public SmartThermometer(BluetoothDevice device) {
-//        this.mDeviceMacAddress = device.getAddress();
-//        Log.e(TAG,device.getName());
-//        this.mDeviceName = device.getName();
-//
-//    }
 
     public void setmDeviceBackgroundColor(Integer mDeviceBackgroundColor) {
         Log.e(TAG, mDeviceName);
@@ -222,15 +214,19 @@ public class SmartThermometer {
 
     public void setMaxTemperature(Float maxTemperature) {
         this.maxTemperature = maxTemperature;
+        Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        Ringtone ringtoneSound = RingtoneManager.getRingtone(BLEService.mServiceContext, ringtoneUri);
         if (maxTemperature > 35) {
-            Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-            Ringtone ringtoneSound = RingtoneManager.getRingtone(BLEService.mServiceContext, ringtoneUri);
+
+
             if (ringtoneSound != null) {
                 ((Vibrator) BLEService.mServiceContext.getSystemService(BLEService.VIBRATOR_SERVICE)).vibrate(800);
                 ringtoneSound.play();
             }
+        } else {
+            ringtoneSound.stop();
         }
-        Log.e(TAG, mDeviceMacAddress + " setting " + maxTemperature);
+        //Log.e(TAG, mDeviceMacAddress + " setting " + maxTemperature);
     }
 
     public long getAdapterPosition() {
@@ -244,8 +240,9 @@ public class SmartThermometer {
     public void resetValues() {
         setMaxTemperature(-200F);
         minTemperature = 200F;
+        intermediateTemperature = null;
         measureTime = SystemClock.elapsedRealtime();
-        //intermediateTemperature=0f;
+
     }
 
     private void broadcastUpdate(final String action) {
@@ -262,11 +259,11 @@ public class SmartThermometer {
                                 final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
-        Log.e(TAG, "mac " + mDeviceMacAddress + " SENDING adapter position  " + adapterPosition);
-        intent.putExtra(ADAPTER_POSITION, adapterPosition);
-        intent.putExtra(TEMP_CURR, intermediateTemperature);
-        intent.putExtra(TEMP_MAX, maxTemperature);
-        intent.putExtra(TEMP_MIN, minTemperature);
+        //     Log.e(TAG, "mac " + mDeviceMacAddress + " SENDING adapter position  " + adapterPosition);
+        //intent.putExtra(ADAPTER_POSITION, adapterPosition);
+        //intent.putExtra(TEMP_CURR, intermediateTemperature);
+        //intent.putExtra(TEMP_MAX, maxTemperature);
+        //intent.putExtra(TEMP_MIN, minTemperature);
         BLEService.mActivityContext.sendBroadcast(intent);
 
     }
@@ -298,13 +295,15 @@ public class SmartThermometer {
     }
 
     public boolean connect(boolean autoConnect) {
+
         Log.e(TAG, "start connecting");
+
         if (BLEService.mBluetoothAdapter == null || mDeviceMacAddress == null) {
             Log.e(TAG, "BluetoothAdapter not initialized or unspecified address.");
             return false;
         }
         //Previously connected device.  Try to reconnect.
-        if (mDeviceMacAddress != null //&& address.equals(mDeviceMacAddress)
+        if (mDeviceMacAddress != null // && address.equals(mDeviceMacAddress)
                 && mBluetoothGatt != null) {
             Log.e(TAG, "Trying to use an existing mBluetoothGatt for connection.");
             if (mBluetoothGatt.connect()) {
@@ -318,16 +317,20 @@ public class SmartThermometer {
         BluetoothDevice device = BLEService.mBluetoothAdapter.getRemoteDevice(mDeviceMacAddress); //address
         if (device == null) {
             Log.e(TAG, "Device not found.  Unable to connect.");
-            mConnectionState = BLEService.STATE_DISCONNECTED;
+            //    mConnectionState = BLEService.STATE_DISCONNECTED;
             return false;
         }
 //         We want to directly connect to the device, so we are setting the autoConnect
 //         parameter to false.
         mBluetoothGatt = device.connectGatt(BLEService.mActivityContext, autoConnect, mGattCallback);
-        if (mBluetoothGatt == null) return false;
+        if (mBluetoothGatt == null) {
+//            mConnectionState=BLEService.STATE_DISCONNECTED;
+            return false;
+
+        }
         Log.e(TAG, "Trying to create a new connection.");
 
-        mConnectionState = BLEService.STATE_CONNECTED;
+        mConnectionState = BLEService.STATE_CONNECTING;
         return true;
     }
 
@@ -345,24 +348,20 @@ public class SmartThermometer {
         }
         broadcastUpdate(BLEService.ACTION_GATT_DISCONNECTED);
         mBluetoothGatt.disconnect();
+
     }
 
     public void close() {
         if (mBluetoothGatt == null) {
             return;
         }
-        // mConnectionState=BLEService.STATE_DISCONNECTED;
-        shutdown();
-        disconnect();
+        //mConnectionState=BLEService.STATE_DISCONNECTED;
         mBluetoothGatt.close();
         mBluetoothGatt = null;
         Log.e(TAG, "KILL connection");
     }
 
     public void readCharacteristic(UUID serviceUUID, UUID characteristicUUID) {
-//        if (isNotifyEnabled) {
-//            getTemperatureByNotify(false);
-//        }
         if (BLEService.mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.e(TAG, "BluetoothAdapter not initialized or gatt null");
             return;
@@ -376,7 +375,6 @@ public class SmartThermometer {
             return;
         }
         characteristicReadQueue.add(mReadCharacteristic);
-
         //if there is only 1 item in the queue, then read it.  If more than 1, we handle asynchronously in the callback above
         //GIVE PRECEDENCE to descriptor writes.  They must all finish first.
         if ((characteristicReadQueue.size() == 1) && (descriptorWriteQueue.size() == 0)) {
@@ -389,12 +387,13 @@ public class SmartThermometer {
     public boolean getTemperatureByNotify(boolean enabled) {
 
         setCharacteristicNotify(RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE, RelsibBluetoothProfile.INTERMEDIATE_TEMPERATURE, enabled);
-
+        isNotifyEnabled = true;
+        measureTime = SystemClock.elapsedRealtime();
         return true;
     }
     public boolean setCharacteristicNotify(UUID mServiceName, UUID mCharacteristicName, boolean enabled) {
 
-        Log.e(TAG, "NOTIFY_CUSTOM " + mDeviceMacAddress);
+        Log.e(TAG, "CALL setCharacteristicNotify " + mDeviceMacAddress);
         if (BLEService.mBluetoothAdapter == null) {
             Log.e(TAG, "BluetoothAdapter not initialized");
             return false;
@@ -419,9 +418,8 @@ public class SmartThermometer {
         } else {
             descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
         }
-        isNotifyEnabled = enabled;
-        mBluetoothGatt.writeDescriptor(descriptor);
 
+        mBluetoothGatt.writeDescriptor(descriptor);
         return true;
     }
     public void readInfoTypes() {
@@ -445,6 +443,11 @@ public class SmartThermometer {
     }
 
     public void shutdown() {
+
+        intermediateTemperature = null;
+
+
+
         if (mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
             return;
@@ -460,5 +463,6 @@ public class SmartThermometer {
         if (!mBluetoothGatt.writeCharacteristic(mWriteCharacteristic)) {
             Log.w(TAG, "Failed to write characteristic");
         }
+        mConnectionState = BLEService.STATE_DISCONNECTED;
     }
 }

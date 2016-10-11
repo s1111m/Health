@@ -11,20 +11,10 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.RingtonePreference;
+import android.util.Log;
 import android.util.TypedValue;
 
 import static android.text.TextUtils.split;
-
-//import android.support.v14.preference.PreferenceFragment;
-//import android.support.v7.preference.CheckBoxPreference;
-//import android.support.v7.preference.EditTextPreference;
-//import android.support.v7.preference.PreferenceCategory;
-//
-//import android.support.v7.preference.PreferenceFragmentCompat;
-//import android.support.v7.preference.PreferenceScreen;
-//import android.support.v7.preference.*;
-//import android.support.v7.view.ContextThemeWrapper;
-//import com.rarepebble.colorpicker.ColorPreference;
 
 public class SettingsView extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -113,6 +103,7 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
         thermometer_alarms_screen.setSummary("Установка режимов уведомлений");
         thermometer_alarms_screen.setKey(idTag + KEY_ALARMS_SCREEN);
         thermometer_alarms_screen.setFragment(SettingsView.class.getName());
+
 //        thermometer_alarms_screen.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 //            @Override
 //            public boolean onPreferenceClick(Preference preference) {
@@ -174,7 +165,7 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
         list = new ListPreference(activityContext);
         list.setKey(idTag + KEY_MEASURE_UNITS);
         list.setTitle("Единицы измерения");
-        //list.setSummary("Description of list");
+
         list.setSummary(getPreferenceManager().getSharedPreferences().getString(idTag + KEY_MEASURE_UNITS, "°C"));
         list.setEntries(R.array.entries);
         list.setEntryValues(R.array.entries);
@@ -184,11 +175,9 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
         thermometer_autoconnect.setTitle("Автоподключение");
         thermometer_autoconnect.setSummary("Обнаруживать и производить подключение к термометру");
         thermometer_autoconnect.setKey(idTag + KEY_AUTOCONNECT);
-        //thermometer_autoconnect.setChecked(true);
+
+        thermometer_autoconnect.setDefaultValue(true);
         rootCategory.addPreference(thermometer_autoconnect);
-
-
-
 
     }
 
@@ -205,7 +194,7 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         String[] changes = split(s, "_");
-        SmartThermometer whoChanged = MainActivityView.mBLEService.findThermometerBySerial(changes[0]);
+        final SmartThermometer whoChanged = MainActivityView.mBLEService.findThermometerByMac(changes[0]);
 
         if (whoChanged != null) {
             switch ("_" + changes[1]) {
@@ -215,6 +204,7 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
                     thermometer_name.setSummary(mDeviceName);
                     break;
                 case SettingsView.KEY_COLOR_LABEL:
+                    Log.e(TAG, "Changing " + whoChanged.mDeviceMacAddress);
                     whoChanged.setmDeviceColorLabel(sharedPreferences.getInt(s, Color.WHITE));
                     break;
                 case SettingsView.KEY_BACKGROUND_COLOR:

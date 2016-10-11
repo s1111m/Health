@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public interface RelsibBluetoothProfile {
 
-    int SHUTDOWN_THERMOMETER = 1;
+    int SHUTDOWN_THERMOMETER = 0x01;
     //Каждый блок будет начинаться с имени сервиса и далее переменные по стандарту блютуса
     //=====================================================================================
     UUID GENERIC_ACCESS_SERVICE = UUID.fromString("00001800-0000-1000-8000-00805f9b34fb");

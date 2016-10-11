@@ -19,12 +19,14 @@ import com.relsib.application.R;
 import com.relsib.application.SettingsView;
 import com.relsib.application.SmartThermometer;
 
+import static android.content.ContentValues.TAG;
+
 
 public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdapter.MyViewHolder>
     //    implements ItemTouchHelperAdapter
 {
     OnItemClickListener mListener;
-    SmartThermometer tempThermometer;
+    //SmartThermometer tempThermometer;
     BLEService service;
    // private final OnStartDragListener mDragStartListener;
 
@@ -51,7 +53,7 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int listPosition) {
 
-        tempThermometer = BLEService.thermometers.get(listPosition);
+        final SmartThermometer tempThermometer = BLEService.thermometers.get(listPosition);
         holder.textViewName.setText(tempThermometer.mDeviceName);
         holder.textViewMac.setText(tempThermometer.mDeviceMacAddress);
 
@@ -63,17 +65,22 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
         holder.itemView.setBackgroundColor(tempThermometer.mDeviceBackgroundColor);
         holder.textViewName.setTextColor(tempThermometer.mDeviceColorLabel);
         //holder.topToolBar.setTitle(tempThermometer.mDeviceName);// + " SN:" + tempThermometer.mDeviceSerialNumber);
-        Log.e("adapter", String.valueOf(tempThermometer.measureTime));
-        if (tempThermometer.measureTime != -1) {
+        Log.e(TAG, "measure time " + String.valueOf(tempThermometer.measureTime));
+        //  if (tempThermometer.measureTime != -1) {// if  gettempbynotify set's timer
 
+        if (tempThermometer.mConnectionState == BLEService.STATE_CONNECTED && tempThermometer.measureTime != -1) {
             holder.chronometer.setBase(tempThermometer.measureTime);
             holder.chronometer.start();
+        } else {
+            Log.e(TAG, String.valueOf(tempThermometer.measureTime) + String.valueOf(SystemClock.elapsedRealtime()));
+            holder.chronometer.setBase(SystemClock.elapsedRealtime() - tempThermometer.measureTime); //saved basetime
         }
 
+        //  }
 
         tempThermometer.setAdapterPosition(holder.getAdapterPosition());
 
-        if (tempThermometer.intermediateTemperature != null)
+        if (tempThermometer.intermediateTemperature != null && tempThermometer.mConnectionState == BLEService.STATE_CONNECTED)
             holder.textViewIntermediateTemperature.setText(tempThermometer.intermediateTemperature.toString());
         else holder.textViewIntermediateTemperature.setText("-,-");
 
@@ -88,7 +95,7 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
         holder.mSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsView.newInstance(BLEService.thermometers.get(listPosition).mDeviceMacAddress)).commit();
+                BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsView.newInstance(tempThermometer.mDeviceMacAddress)).commit();
             }
         });
         holder.topToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -97,19 +104,17 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
                 int id = menuItem.getItemId();
                 switch (id) {
                     case R.id.action_disconnect:
-                        BLEService.thermometers.get(listPosition).close();
-                        //holder.textViewMaximumTemperature.setText("-,-");
-                        holder.textViewIntermediateTemperature.setText("-,-");
-                        //holder.chronometer.setBase(SystemClock.elapsedRealtime());
+                        tempThermometer.shutdown();
+                        tempThermometer.measureTime = SystemClock.elapsedRealtime() - holder.chronometer.getBase(); //save basetime when disconnect
                         holder.chronometer.stop();
+                        holder.textViewIntermediateTemperature.setText("-,-");
                         break;
                     case R.id.action_reset:
-                        //BLEService.thermometers.get(listPosition).setMaxTemperature(-200f);
-                        BLEService.thermometers.get(listPosition).resetValues();
+                        tempThermometer.resetValues();
                         holder.textViewMaximumTemperature.setText("-,-");
                         holder.textViewIntermediateTemperature.setText("-,-");
                         holder.textViewMinimumTemperature.setText("-,-");
-                        holder.chronometer.setBase(SystemClock.elapsedRealtime());
+                        holder.chronometer.setBase(tempThermometer.measureTime);
                         break;
                     case R.id.action_settings:
                         //tempThermometer.autoconnect
@@ -173,12 +178,9 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
             this.textDeviceSerial = (TextView) itemView.findViewById(R.id.device_serial);
             this.topToolBar = (Toolbar) itemView.findViewById(R.id.card_toolbar);
             this.chronometer = (Chronometer) itemView.findViewById(R.id.chronometer);
-            //if (topToolBar != null) {
-            // inflate your menu
             this.deviceBatteryText = (TextView) itemView.findViewById(R.id.deviceBatteryText);
             this.mSettingsButton = (ImageButton) itemView.findViewById(R.id.settingsButton);
             topToolBar.inflateMenu(R.menu.card_toolbar_menu);
-            //}
 
         }
 

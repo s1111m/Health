@@ -32,10 +32,10 @@ public class MainActivityView extends AppCompatActivity
 
             mBLEService = ((BLEService.LocalBinder) service).getService();
             if (!mBLEService.initialize(MainActivityView.this)) {
-                Log.e(TAG, "Unable to initialize Bluetooth");
+                //  Log.e(TAG, "Unable to initialize Bluetooth");
             }
 
-            Log.e(TAG, "onService connected");
+            //Log.e(TAG, "onService connected");
             mBLEService.loadMyThermometers();
 
         }
