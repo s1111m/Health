@@ -20,12 +20,20 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.relsib.adapters.BLEDevicesViewAdapter;
+import com.relsib.bluetooth.RelsibBluetoothProfile;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class DeviceSearchView extends Fragment {
     public static final int REQUEST_ENABLE_BT = 1;
-    // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 2000;
+    // Stops scanning after 1 seconds.
+    private static final long SCAN_PERIOD = 1000;
     private final static String TAG = DeviceSearchView.class.getSimpleName();
+    UUID[] services = {RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE};
     private BLEDevicesViewAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
@@ -39,21 +47,66 @@ public class DeviceSearchView extends Fragment {
                 @Override
                 public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
                     // попытка работать в новом потоке
-                    Log.e(TAG, "onLeScan: ");
-                    mLeDeviceListAdapter.addDevice(device, rssi);
+
+                    List<UUID> uuids = parseUuids(scanRecord);
+                    if (uuids.get(0).equals(RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE)) {
+                        //for (int i=0;i<uuids.size();i++){
+                        //  Log.e(TAG,uuids.get(i).toString());
+                        //}
+                        mLeDeviceListAdapter.addDevice(device, rssi);
+                    }
                 }
             };
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public DeviceSearchView() {
     }
 
     public static DeviceSearchView newInstance() {
         DeviceSearchView fragment = new DeviceSearchView();
         return fragment;
+    }
+
+    /**
+     * Mandatory empty constructor for the fragment manager to instantiate the
+     * fragment (e.g. upon screen orientation changes).
+     */
+    private List<UUID> parseUuids(byte[] advertisedData) {
+        List<UUID> uuids = new ArrayList<UUID>();
+
+
+        ByteBuffer buffer = ByteBuffer.wrap(advertisedData).order(ByteOrder.LITTLE_ENDIAN);
+        while (buffer.remaining() > 2) {
+            byte length = buffer.get();
+            if (length == 0) break;
+
+            byte type = buffer.get();
+            switch (type) {
+                case 0x02: // Partial list of 16-bit UUIDs
+                case 0x03: // Complete list of 16-bit UUIDs
+                    while (length >= 2) {
+                        uuids.add(UUID.fromString(String.format(
+                                "%08x-0000-1000-8000-00805f9b34fb", buffer.getShort())));
+                        length -= 2;
+                    }
+                    break;
+
+                case 0x06: // Partial list of 128-bit UUIDs
+                case 0x07: // Complete list of 128-bit UUIDs
+                    while (length >= 16) {
+                        long lsb = buffer.getLong();
+                        long msb = buffer.getLong();
+                        uuids.add(new UUID(msb, lsb));
+                        length -= 16;
+                    }
+                    break;
+
+                default:
+                    buffer.position(buffer.position() + length - 1);
+                    break;
+            }
+        }
+
+        return uuids;
     }
 
     private void scanLeDevice(final boolean enable) {
@@ -66,15 +119,21 @@ public class DeviceSearchView extends Fragment {
                     mBluetoothAdapter.stopLeScan(mLeScanCallback);
                     mLeDeviceListAdapter.notifyDataSetChanged();
                     swipeRefreshLayout.setRefreshing(false);
+                    Log.e(TAG, "stopLeScan");
                 }
             }, SCAN_PERIOD);
             mScanning = true;
             //   if (android.os.Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
                 // Do something for lollipop and above versions
-                mBluetoothAdapter.startLeScan(mLeScanCallback);
+            //   mBluetoothAdapter.startLeScan(mLeScanCallback);
 //            } else {
-//                UUID[] services = {RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE};
-//                mBluetoothAdapter.startLeScan(services, mLeScanCallback);
+            //UUID[] services = {UUID.fromString("1809")};
+            mBluetoothAdapter.startLeScan(mLeScanCallback);
+
+            Log.e(TAG, "starting scan");
+            //  UUID test= new UUID(0x1809);
+            //UUID
+            //      mBluetoothAdapter.startLeScan(], mLeScanCallback);
 //            }
 
 
@@ -85,7 +144,33 @@ public class DeviceSearchView extends Fragment {
             swipeRefreshLayout.setRefreshing(false);
         }
     }
+//public static boolean hasMyService(byte[] scanRecord) {
 
+    // UUID we want to filter by (without hyphens)
+    //   final String myServiceID = "0177AAA0B4550E17D0DA14EA33F8DE11";
+
+    // The offset in the scan record. In my case the offset was 13; it will probably be different for you
+//    final int serviceOffset = 6;
+
+//    try{
+
+    // Get a 16-byte array of what may or may not be the service we're filtering for
+    //  byte[] service = ArrayUtils.subarray(scanRecord, serviceOffset, serviceOffset + 16);
+
+    // The bytes are probably in reverse order, so we need to fix that
+//        ArrayUtils.reverse(service);
+
+    // Get the hex string
+    //    String discoveredServiceID = bytesToHex(service);
+
+    // Compare against our service
+    //   return myServiceID.equals(discoveredServiceID);
+
+    //   } catch (Exception e){
+//        return false;
+//    }
+//
+//}
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

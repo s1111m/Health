@@ -34,6 +34,7 @@ public interface RelsibBluetoothProfile {
     UUID BATTERY_SERVICE = UUID.fromString("0000180F-0000-1000-8000-00805f9b34fb");
     UUID BATTERY_LEVEL = UUID.fromString("00002A19-0000-1000-8000-00805f9b34fb");
     //=====================================================================================
+
     UUID RELSIBPROFILE_SERV = UUID.fromString("0177AAA0-B455-0E17-D0DA-14EA33F8DE11");
     UUID RELSIBPROFILE_TEMP = UUID.fromString("0177AAA1-B455-0E17-D0DA-14EA33F8DE11");
     UUID RELSIBPROFILE_SERIAL_NUMBER = UUID.fromString("0177AAA2-B455-0E17-D0DA-14EA33F8DE11");
