@@ -31,7 +31,7 @@ import java.util.UUID;
 public class DeviceSearchView extends Fragment {
     public static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 1 seconds.
-    private static final long SCAN_PERIOD = 1000;
+    private static final long SCAN_PERIOD = 3000;
     private final static String TAG = DeviceSearchView.class.getSimpleName();
     UUID[] services = {RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE};
     private BLEDevicesViewAdapter mLeDeviceListAdapter;
@@ -49,6 +49,7 @@ public class DeviceSearchView extends Fragment {
                     // попытка работать в новом потоке
 
                     List<UUID> uuids = parseUuids(scanRecord);
+
                     if (uuids.get(0).equals(RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE)) {
                         //for (int i=0;i<uuids.size();i++){
                         //  Log.e(TAG,uuids.get(i).toString());
