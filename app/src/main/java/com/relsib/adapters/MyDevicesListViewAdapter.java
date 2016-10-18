@@ -14,12 +14,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.relsib.application.BLEService;
+import com.relsib.application.MyDevicesSingleView;
 import com.relsib.application.R;
 import com.relsib.application.SettingsView;
 import com.relsib.application.SmartThermometer;
 
 
-public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdapter.MyViewHolder>
+public class MyDevicesListViewAdapter extends RecyclerView.Adapter<MyDevicesListViewAdapter.MyViewHolder>
     //    implements ItemTouchHelperAdapter
 {
     OnItemClickListener mListener;
@@ -27,7 +28,7 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
     BLEService service;
    // private final OnStartDragListener mDragStartListener;
 
-    public MyDevicesViewAdapter(BLEService service) {
+    public MyDevicesListViewAdapter(BLEService service) {
         this.service = service;
 
     }
@@ -57,7 +58,7 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
         holder.battery_level.setProgress(tempThermometer.mDeviceBatteryLevel);
         holder.deviceBatteryText.setText(tempThermometer.mDeviceBatteryLevel + "%");
 
-        holder.textDeviceSerial.setText("SN: " + tempThermometer.getmDeviceSerialNumber());
+//        holder.textDeviceSerial.setText("SN: " + tempThermometer.getmDeviceSerialNumber());
 
         holder.itemView.setBackgroundColor(tempThermometer.mDeviceBackgroundColor);
         holder.textViewName.setTextColor(tempThermometer.mDeviceColorLabel);
@@ -79,15 +80,15 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
         tempThermometer.setAdapterPosition(holder.getAdapterPosition());
 
         if (tempThermometer.intermediateTemperature != null && tempThermometer.mConnectionState == BLEService.STATE_CONNECTED)
-            holder.textViewIntermediateTemperature.setText(tempThermometer.intermediateTemperature.toString());
+            holder.textViewIntermediateTemperature.setText(tempThermometer.intermediateTemperature.toString() + " " + tempThermometer.mDeviceMeasureUnits);
         else holder.textViewIntermediateTemperature.setText("-,-");
 
-        if (tempThermometer.maxTemperature != -200f)
-            holder.textViewMaximumTemperature.setText(tempThermometer.maxTemperature.toString());
+        if (tempThermometer.maxTemperature != -500f)
+            holder.textViewMaximumTemperature.setText(tempThermometer.maxTemperature.toString() + " " + tempThermometer.mDeviceMeasureUnits);
         else holder.textViewMaximumTemperature.setText("-,-");
 
-        if (tempThermometer.minTemperature != 200f)
-            holder.textViewMinimumTemperature.setText(tempThermometer.minTemperature.toString());
+        if (tempThermometer.minTemperature != 500f)
+            holder.textViewMinimumTemperature.setText(tempThermometer.minTemperature.toString() + " " + tempThermometer.mDeviceMeasureUnits);
         else holder.textViewMaximumTemperature.setText("-,-");
 
         holder.mSettingsButton.setOnClickListener(new View.OnClickListener() {
@@ -115,14 +116,8 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
                         holder.textViewMinimumTemperature.setText("-,-");
                         holder.chronometer.setBase(tempThermometer.measureTime);
                         break;
-                    case R.id.action_settings:
-                        //tempThermometer.autoconnect
-                        //BLEService.thermometers.get(listPosition).autoconnect = true;
-
-                        //BLEService.thermometers.get(listPosition).connect(false);
-                        // SettingsView test = new SettingsView();
-                        //(BLEService.mActivityContext).getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsView.newInstance("1","1")).commit();
-
+                    case R.id.action_delete:
+                        BLEService.removeThermometer(tempThermometer);
                         break;
                     default:
 
@@ -131,20 +126,21 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
                 return true;
             }
         });
-//        holder.itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (mListener != null)
-//                    mListener.onItemClick(tempThermometer.mDeviceMacAddress);
-//            }
-//        });
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Log.e(TAG, "onClick: " + tempThermometer.mDeviceMacAddress );
+                BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesSingleView.newInstance(tempThermometer.mDeviceMacAddress, "1")).commit();
+                //(BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesSingleView.newInstance(tempThermometer.mDeviceMacAddress,"1")).commit();
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        // if (service.thermometers!=null)
+        if (BLEService.thermometers != null)
         return BLEService.thermometers.size();
-        // else return 0;
+        else return 0;
     }
 
     public interface OnItemClickListener {
@@ -174,7 +170,7 @@ public class MyDevicesViewAdapter extends RecyclerView.Adapter<MyDevicesViewAdap
             this.textViewMaximumTemperature = (TextView) itemView.findViewById(R.id.MaximumTemperature);
             this.textViewMinimumTemperature = (TextView) itemView.findViewById(R.id.minimumTemperature);
             this.battery_level = (ProgressBar) itemView.findViewById(R.id.device_battery);
-            this.textDeviceSerial = (TextView) itemView.findViewById(R.id.device_serial);
+            // this.textDeviceSerial = (TextView) itemView.findViewById(R.id.device_serial);
             this.topToolBar = (Toolbar) itemView.findViewById(R.id.card_toolbar);
             this.chronometer = (Chronometer) itemView.findViewById(R.id.chronometer);
             this.deviceBatteryText = (TextView) itemView.findViewById(R.id.deviceBatteryText);

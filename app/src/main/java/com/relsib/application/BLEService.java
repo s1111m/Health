@@ -85,6 +85,31 @@ public class BLEService extends Service {
         mServiceContext.sendBroadcast(intent);
     }
 
+    public static SmartThermometer findThermometerByMac(String macAddress) {
+        Log.e(TAG, "mac to search " + macAddress + "size " + thermometers.size());
+        SmartThermometer tempThermometer;
+        for (int i = 0; i < thermometers.size(); i++) {
+            Log.e(TAG, " enumerate " + thermometers.get(i).mDeviceMacAddress);
+            tempThermometer = thermometers.get(i);
+            if (tempThermometer.mDeviceMacAddress.equals(macAddress)) {
+                Log.e(TAG, "findThermometerByMac return: " + thermometers.get(i).mDeviceMacAddress);
+                return tempThermometer;
+            }
+        }
+
+        Log.e(TAG, "NOT FOUND ");
+        return null;
+    }
+
+    public static void removeThermometer(SmartThermometer thermometer) {
+        thermometers.remove(thermometer);
+        tableThermometers.deleteRecord(thermometer);
+        thermometer.shutdown();
+        thermometer.disconnect();
+        thermometer.close();
+        return;
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -144,18 +169,17 @@ public class BLEService extends Service {
         return true;
     }
 
-
     public void loadMyThermometers() {
         Log.e(TAG, "LOADING");
         thermometers = tableThermometers.getAllRecordsAsObjects();
         myTimer.schedule(new TimerTask() { // Определяем задачу
             @Override
             public void run() {
-                Log.e(TAG, "CONNECT task");
+                //Log.e(TAG, "CONNECT task");
                 for (int i = 0; i < thermometers.size(); i++) {
                     SmartThermometer tempThermometer = thermometers.get(i);
                     if (tempThermometer.mConnectionState == BLEService.STATE_DISCONNECTED) {
-                        Log.e(TAG, "try to connect");
+                        //      Log.e(TAG, "try to connect");
                         //tempThermometer.connect(true);
                         new ConnectThread(tempThermometer).start();
                         // new ConnectThread(thermometers.get(i));
@@ -200,20 +224,6 @@ public class BLEService extends Service {
         unknownThermometers.clear();
     }
 
-    public SmartThermometer findThermometerByMac(String macAddress) {
-        //Log.e(TAG, "therm size " + thermometers.size());
-        for (int i = 0; i < thermometers.size(); i++) {
-            SmartThermometer tempThermometer = thermometers.get(i);
-            if (tempThermometer.mDeviceMacAddress.equals(macAddress)) {
-                //Log.e(TAG, "findThermometerByMac return: " + thermometers.get(i).mDeviceMacAddress);
-                return tempThermometer;
-            }
-
-        }
-        //Log.e(TAG, "NOT FOUND " );
-        return null;
-    }
-
     public class LocalBinder extends Binder {
         BLEService getService() {
             return BLEService.this;
@@ -224,9 +234,9 @@ public class BLEService extends Service {
         SmartThermometer thermometer;
 
         public ConnectThread(SmartThermometer thermometer2) {
-            Log.e(TAG, thermometer2.mDeviceName);
+            //Log.e(TAG, thermometer2.mDeviceName);
             thermometer = thermometer2;
-            Log.e(TAG, thermometer.mDeviceName);
+            // Log.e(TAG, thermometer.mDeviceName);
         }
 
 

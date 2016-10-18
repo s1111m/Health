@@ -46,13 +46,14 @@ public class SmartThermometer {
     public String mDeviceHardwareRevisionNumber;
     public String mDeviceSoftwareRevisionNumber;
     public String mDeviceManufacturer;
+    public String mDeviceMeasureUnits;
     public int mDeviceBatteryLevel;
     public long measureTime;// = -1;
     public Integer mDeviceColorLabel = Color.WHITE;
     public Integer mDeviceBackgroundColor = Color.WHITE;
     public Float intermediateTemperature;
-    public Float maxTemperature = -200f;
-    public Float minTemperature = 200f;
+    public Float maxTemperature = -500f;
+    public Float minTemperature = 500f;
     public boolean selected = false;
     public boolean autoconnect = true;
     public int mConnectionState = BLEService.STATE_DISCONNECTED;
@@ -161,7 +162,19 @@ public class SmartThermometer {
             Log.e(TAG, "ONCHANGE " + mDeviceMacAddress);
             if (uuid.equals(RelsibBluetoothProfile.INTERMEDIATE_TEMPERATURE)) {
                 intermediateTemperature = characteristic.getFloatValue(BluetoothGattCharacteristic.FORMAT_FLOAT, 1);
-                Log.e(TAG, "ONCHANGE " + intermediateTemperature);
+/**
+ * Перекидывем температуру в нужную систему координат
+ * **/
+                switch (mDeviceMeasureUnits) {
+                    case "°F":
+                        intermediateTemperature = round(intermediateTemperature * 1.8f + 32f, 1);
+                        break;
+                    case "°K":
+                        intermediateTemperature = round(intermediateTemperature - 273.15f, 1);
+                        break;
+                    default:
+                        break;
+                }
                 if (maxTemperature <= intermediateTemperature) {
                     setMaxTemperature(intermediateTemperature);
                 }
@@ -189,6 +202,14 @@ public class SmartThermometer {
         this.mDeviceName = mDeviceName;
     }
 
+    private static float round(float number, int scale) {
+        int pow = 10;
+        for (int i = 1; i < scale; i++)
+            pow *= 10;
+        float tmp = number * pow;
+        return (float) (int) ((tmp - (int) tmp) >= 0.5f ? tmp + 1 : tmp) / pow;
+    }
+
     public static SmartThermometer SmartThermometerFactory(long _ID, String mDeviceName, String mDeviceMac, String mDeviceModelNumber, String mDeviceSerialNumber, String mDeviceFirmwareRevisionNumber,
                                                            String mDeviceHardwareRevisionNumber, String mDeviceSoftwareRevisionNumber, String mDeviceManufacturer, int mDeviceBatteryLevel) {
         SmartThermometer thermomether = new SmartThermometer(mDeviceMac, mDeviceName);
@@ -204,12 +225,17 @@ public class SmartThermometer {
 
     }
 
+    public void setmDeviceMeasureUnits(String mDeviceMeasureUnits) {
+        this.mDeviceMeasureUnits = mDeviceMeasureUnits;
+    }
+
     public void setmDeviceName(String mDeviceName) {
+        Log.e(TAG, mDeviceName);
         this.mDeviceName = mDeviceName;
     }
 
     public void setmDeviceColorLabel(Integer mDeviceColorLabel) {
-        Log.e(TAG, mDeviceName);
+
         this.mDeviceColorLabel = mDeviceColorLabel;
     }
 
@@ -222,6 +248,7 @@ public class SmartThermometer {
         this.maxTemperature = maxTemperature;
         Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         Ringtone ringtoneSound = RingtoneManager.getRingtone(BLEService.mServiceContext, ringtoneUri);
+
         if (maxTemperature > 35) {
 
 
@@ -244,8 +271,8 @@ public class SmartThermometer {
     }
 
     public void resetValues() {
-        setMaxTemperature(-200F);
-        minTemperature = 200F;
+        setMaxTemperature(-500F);
+        minTemperature = 500F;
         intermediateTemperature = null;
         measureTime = SystemClock.elapsedRealtime();
 
@@ -283,8 +310,9 @@ public class SmartThermometer {
         this.mDeviceSerialNumber = mDeviceSerialNumber;
         SharedPreferences preferences = BLEService.mActivityContext.getSharedPreferences(mDeviceMacAddress + SettingsView.FILE_NAME, MODE_PRIVATE);
         setmDeviceName(preferences.getString(mDeviceMacAddress + SettingsView.KEY_NAME, "WT-50"));
-        setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsView.KEY_COLOR_LABEL, Color.WHITE));
+        setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsView.KEY_COLOR_LABEL, Color.BLACK));
         setmDeviceBackgroundColor(preferences.getInt(mDeviceMacAddress + SettingsView.KEY_BACKGROUND_COLOR, Color.WHITE));
+        setmDeviceMeasureUnits(preferences.getString(mDeviceMacAddress + SettingsView.KEY_MEASURE_UNITS, "°C"));
     }
 
     @Override

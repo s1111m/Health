@@ -213,7 +213,9 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
                 case SettingsView.KEY_ALARMS:
                     break;
                 case SettingsView.KEY_MEASURE_UNITS:
-                    list.setSummary(sharedPreferences.getString(s, "°C"));
+
+                    whoChanged.setmDeviceMeasureUnits(sharedPreferences.getString(s, "°C"));
+                    list.setSummary(whoChanged.mDeviceMeasureUnits);
                     break;
                 default:
                     break;

@@ -72,13 +72,13 @@ public class MainActivityView extends AppCompatActivity
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        getFragmentManager().beginTransaction().replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
+        getFragmentManager().beginTransaction().replace(R.id.frgmCont, MyDevicesListView.newInstance("tesy", "test")).commit();
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mBLEService.pushUnknownToMyDevices();
-                getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
+                getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesListView.newInstance("tesy", "test")).commit();
                 //    for (int i = 0; i < BLEService.thermometers.size(); i++) {
                 //   BLEService.thermometers.get(i).connect(true);
                     //   mBLEService.thermometers.get(i).getTemperatureByNotify(true);
@@ -153,7 +153,7 @@ public class MainActivityView extends AppCompatActivity
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_calendar:
-                fragmentClass = MyDevicesView.class;
+                fragmentClass = MyDevicesListView.class;
                 //fragmentClass = MeasureCalendarView.class;
                 break;
 //            case R.id.nav_charts:
@@ -172,7 +172,7 @@ public class MainActivityView extends AppCompatActivity
 //                fragmentClass = SettingsView.class;
 //                break;
             default:
-                fragmentClass = MyDevicesView.class;
+                fragmentClass = MyDevicesListView.class;
                 break;
         }
         try {
@@ -181,7 +181,7 @@ public class MainActivityView extends AppCompatActivity
             e.printStackTrace();
         }
         if (id == R.id.nav_calendar) {
-            getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesView.newInstance("tesy", "test")).commit();
+            getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesListView.newInstance("tesy", "test")).commit();
         } else {
             getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, currentFragment).commit();
         }

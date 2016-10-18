@@ -4,5 +4,5 @@
     android:id="@+id/my_recycler_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.relsib.application.MyDevicesView"
+    tools:context="com.relsib.application.MyDevicesListView"
     tools:listitem="@layout/f_mydevices_view_item" />

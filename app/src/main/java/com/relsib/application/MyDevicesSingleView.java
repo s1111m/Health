@@ -15,16 +15,15 @@ import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.TextView;
 
-import com.relsib.adapters.MyDevicesViewAdapter;
+import com.relsib.adapters.MyDevicesSingleViewAdapter;
 
 //import android.support.v4.app.Fragment;
 
-public class MyDevicesView extends Fragment {
-    private final static String TAG = MyDevicesView.class.getSimpleName();
+public class MyDevicesSingleView extends Fragment {
+    private final static String TAG = MyDevicesSingleView.class.getSimpleName();
     private static final String ARG_PARAM1 = "data";
     private static final String ARG_PARAM2 = "mDeviceAddress";
-    private static BLEService service = null;
-    private static MyDevicesViewAdapter adapter;
+    private static MyDevicesSingleViewAdapter adapter;
     private static RecyclerView.LayoutManager layoutManager;
     private static RecyclerView recyclerView;
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
@@ -65,9 +64,10 @@ public class MyDevicesView extends Fragment {
             }
         }
     };
+    String mDeviceMac;
     private Chronometer mChronometer;
 
-    public MyDevicesView() {
+    public MyDevicesSingleView() {
 
     }
 
@@ -81,8 +81,8 @@ public class MyDevicesView extends Fragment {
         return intentFilter;
     }
 
-    public static MyDevicesView newInstance(String param1, String param2) {
-        MyDevicesView fragment = new MyDevicesView();
+    public static MyDevicesSingleView newInstance(String param1, String param2) {
+        MyDevicesSingleView fragment = new MyDevicesSingleView();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -100,30 +100,31 @@ public class MyDevicesView extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            // data =(ArrayList<com.relsib.application.BLEService.SmartThermometer>)getArguments().getSerializable(ARG_PARAM1);
+            mDeviceMac = getArguments().getString(ARG_PARAM1);
         }
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.f_mydevices_view, container, false);
-        adapter = new MyDevicesViewAdapter(MainActivityView.mBLEService);
+        //Log.e(TAG, " in Fragmen t" + mDeviceMac);
+        adapter = new MyDevicesSingleViewAdapter(mDeviceMac);
+        /*
+        *
+        * make copy of recylerview
+        * */
+
+
         recyclerView = (RecyclerView) rootView.findViewById(R.id.my_recycler_view);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
-        adapter.setOnItemClickListener(new MyDevicesViewAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(String macAddress) {
-                getActivity().getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, TabbedView.newInstance(macAddress, macAddress)).commit();
-            }
-        });
-
-
         return rootView;
     }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -151,6 +152,7 @@ public class MyDevicesView extends Fragment {
         super.onDetach();
 
     }
+
     private void updateConnectionState(final int resourceId) {
 
     }
