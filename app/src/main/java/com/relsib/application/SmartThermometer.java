@@ -14,7 +14,6 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.SystemClock;
-import android.os.Vibrator;
 import android.util.Log;
 
 import com.relsib.bluetooth.RelsibBluetoothProfile;
@@ -46,14 +45,15 @@ public class SmartThermometer {
     public String mDeviceHardwareRevisionNumber;
     public String mDeviceSoftwareRevisionNumber;
     public String mDeviceManufacturer;
-    public String mDeviceMeasureUnits;
+    public String mDeviceMeasureUnits = null;
+
     public int mDeviceBatteryLevel;
     public long measureTime;// = -1;
     public Integer mDeviceColorLabel = Color.WHITE;
     public Integer mDeviceBackgroundColor = Color.WHITE;
-    public Float intermediateTemperature;
-    public Float maxTemperature = -500f;
-    public Float minTemperature = 500f;
+    public Float intermediateTemperature = 1000f;
+    public Float maxTemperature = -1000f;
+    public Float minTemperature = 1000f;
     public boolean selected = false;
     public boolean autoconnect = true;
     public int mConnectionState = BLEService.STATE_DISCONNECTED;
@@ -159,17 +159,17 @@ public class SmartThermometer {
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
             UUID uuid = characteristic.getUuid();
-            Log.e(TAG, "ONCHANGE " + mDeviceMacAddress);
+            //Log.e(TAG, "ONCHANGE " + mDeviceMacAddress);
             if (uuid.equals(RelsibBluetoothProfile.INTERMEDIATE_TEMPERATURE)) {
                 intermediateTemperature = characteristic.getFloatValue(BluetoothGattCharacteristic.FORMAT_FLOAT, 1);
 /**
  * Перекидывем температуру в нужную систему координат
  * **/
                 switch (mDeviceMeasureUnits) {
-                    case "°F":
+                    case MeasureUnits.Fahrenheit:
                         intermediateTemperature = round(intermediateTemperature * 1.8f + 32f, 1);
                         break;
-                    case "°K":
+                    case MeasureUnits.Kelvin:
                         intermediateTemperature = round(intermediateTemperature - 273.15f, 1);
                         break;
                     default:
@@ -225,7 +225,66 @@ public class SmartThermometer {
 
     }
 
+    public void changeMeasureUnits(String to) {
+        Log.e(TAG, "convert called ");
+        switch (mDeviceMeasureUnits) {
+            case MeasureUnits.Celsium:
+                Log.e(TAG, "case celsium");
+                if (to.equals(MeasureUnits.Fahrenheit)) {
+                    Log.e(TAG, "case to celsium");
+                    maxTemperature = round(maxTemperature * 1.8f + 32f, 1);
+                    minTemperature = round(minTemperature * 1.8f + 32f, 1);
+                    intermediateTemperature = round(intermediateTemperature * 1.8f + 32f, 1);
+                } else {
+                    maxTemperature = round(maxTemperature - 273.15f, 1);
+                    minTemperature = round(minTemperature - 273.15f, 1);
+                    intermediateTemperature = round(intermediateTemperature - 273.15f, 1);
+                }
+                break;
+            case MeasureUnits.Fahrenheit:
+                Log.e(TAG, "case  fahr");
+                if (to.equals(MeasureUnits.Celsium)) {
+                    Log.e(TAG, "case to celsium");
+                    maxTemperature = round((maxTemperature - 32) * 5 / 9, 1);
+                    minTemperature = round((minTemperature - 32) * 5 / 9, 1);
+                    intermediateTemperature = round((intermediateTemperature - 32) * 5 / 9, 1);
+                } else {
+
+                    maxTemperature = round((maxTemperature - 32) * 5 / 9 - 273.15f, 1);
+                    minTemperature = round((minTemperature - 32) * 5 / 9 - 273.15f, 1);
+                    intermediateTemperature = round((intermediateTemperature - 32) * 5 / 9 - 273.15f, 1);
+                }
+                break;
+            case MeasureUnits.Kelvin:
+                Log.e(TAG, "case kelvin");
+                if (to.equals(MeasureUnits.Celsium)) {
+                    Log.e(TAG, "case to celsium");
+                    maxTemperature = round(maxTemperature + 273.15f, 1);
+                    minTemperature = round(minTemperature + 273.15f, 1);
+                    intermediateTemperature = round(intermediateTemperature + 273.15f, 1);
+                } else {
+
+                    maxTemperature = round((maxTemperature + 273.15f) * 9 / 5 + 32f, 1);
+                    Log.e(TAG, "MIN temp: " + minTemperature);
+                    minTemperature = round((minTemperature + 273.15f) * 9 / 5 + 32f, 1);
+                    Log.e(TAG, "MIN temp: " + minTemperature);
+                    intermediateTemperature = round((intermediateTemperature + 273.15f) * 9 / 5 + 32f, 1);
+                }
+                break;
+            default:
+                break;
+
+        }
+
+        broadcastUpdate(BLEService.EXTRA_DATA);
+    }
+
     public void setmDeviceMeasureUnits(String mDeviceMeasureUnits) {
+        Log.e(TAG, "Call change units current: " + this.mDeviceMeasureUnits + " to: " + mDeviceMeasureUnits);
+        if (this.mDeviceMeasureUnits != null && !this.mDeviceMeasureUnits.equals(mDeviceMeasureUnits)) {
+            Log.e(TAG, "Call change units");
+            changeMeasureUnits(mDeviceMeasureUnits);
+        }
         this.mDeviceMeasureUnits = mDeviceMeasureUnits;
     }
 
@@ -253,11 +312,11 @@ public class SmartThermometer {
 
 
             if (ringtoneSound != null) {
-                ((Vibrator) BLEService.mServiceContext.getSystemService(BLEService.VIBRATOR_SERVICE)).vibrate(800);
-                ringtoneSound.play();
+                //   ((Vibrator) BLEService.mServiceContext.getSystemService(BLEService.VIBRATOR_SERVICE)).vibrate(800);
+                //   ringtoneSound.play();
             }
         } else {
-            ringtoneSound.stop();
+            // ringtoneSound.stop();
         }
         //Log.e(TAG, mDeviceMacAddress + " setting " + maxTemperature);
     }
@@ -271,9 +330,9 @@ public class SmartThermometer {
     }
 
     public void resetValues() {
-        setMaxTemperature(-500F);
-        minTemperature = 500F;
-        intermediateTemperature = null;
+        setMaxTemperature(-1000F);
+        minTemperature = 1000F;
+        intermediateTemperature = 1000f;
         measureTime = SystemClock.elapsedRealtime();
 
     }
@@ -312,7 +371,7 @@ public class SmartThermometer {
         setmDeviceName(preferences.getString(mDeviceMacAddress + SettingsView.KEY_NAME, "WT-50"));
         setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsView.KEY_COLOR_LABEL, Color.BLACK));
         setmDeviceBackgroundColor(preferences.getInt(mDeviceMacAddress + SettingsView.KEY_BACKGROUND_COLOR, Color.WHITE));
-        setmDeviceMeasureUnits(preferences.getString(mDeviceMacAddress + SettingsView.KEY_MEASURE_UNITS, "°C"));
+        setmDeviceMeasureUnits(preferences.getString(mDeviceMacAddress + SettingsView.KEY_MEASURE_UNITS, MeasureUnits.Celsium));
     }
 
     @Override
@@ -425,6 +484,7 @@ public class SmartThermometer {
         Log.e(TAG, "call get by notyfy + isnotify " + enabled);
         return true;
     }
+
     public boolean setCharacteristicNotify(UUID mServiceName, UUID mCharacteristicName, boolean enabled) {
 
         Log.e(TAG, "CALL setCharacteristicNotify " + mDeviceMacAddress);
@@ -456,6 +516,7 @@ public class SmartThermometer {
         mBluetoothGatt.writeDescriptor(descriptor);
         return true;
     }
+
     public void readInfoTypes() {
 
         readCharacteristic(RelsibBluetoothProfile.GENERIC_ACCESS_SERVICE, RelsibBluetoothProfile.DEVICE_NAME);
@@ -477,7 +538,7 @@ public class SmartThermometer {
     }
 
     public void shutdown() {
-        intermediateTemperature = null;
+        intermediateTemperature = 1000f;
         mConnectionState = BLEService.STATE_DISCONNECTED;
         isNotifyEnabled = false;
         if (mBluetoothGatt == null) {
@@ -496,5 +557,31 @@ public class SmartThermometer {
             Log.w(TAG, "Failed to write characteristic");
         }
 
+    }
+
+    public static class MeasureUnits {
+        public final static String Celsium = "°C";
+        public final static String Fahrenheit = "°F";
+        public final static String Kelvin = "K";
+
+        public static float convertToCelsium(String fromUnits, float value) {
+            switch (fromUnits) {
+                case MeasureUnits.Fahrenheit:
+                    return round(value * 1.8f + 32f, 1);
+                //break;
+                case MeasureUnits.Kelvin:
+                    round(-273.15f, 1);
+                    //   break;
+            }
+            return 0f;
+        }
+
+        public static float convertToFahrenheit() {
+            return 0f;
+        }
+
+        public static float convertToKelvin() {
+            return 0f;
+        }
     }
 }

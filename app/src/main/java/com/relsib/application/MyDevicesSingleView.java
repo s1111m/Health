@@ -110,6 +110,7 @@ public class MyDevicesSingleView extends Fragment {
         View rootView = inflater.inflate(R.layout.f_mydevices_view, container, false);
         //Log.e(TAG, " in Fragmen t" + mDeviceMac);
         adapter = new MyDevicesSingleViewAdapter(mDeviceMac);
+        adapter.notifyDataSetChanged();
         /*
         *
         * make copy of recylerview

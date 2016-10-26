@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#dc582a</color>
     <color name="colorAccent">#d8453c</color>
     <color name="transparent">#00000000</color>
+    <color name="red" type="color">#FFFF4444</color>
     <!-- color="#009ada" blue
     color="#dc582a"
     color="#d8453c"

@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.relsib.application.BLEService;
@@ -53,7 +52,7 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
             holder.textViewMac.setText(thermometer.mDeviceMacAddress);
 
             holder.battery_level.setProgress(thermometer.mDeviceBatteryLevel);
-            holder.deviceBatteryText.setText(thermometer.mDeviceBatteryLevel + "%");
+            //holder.deviceBatteryText.setText(thermometer.mDeviceBatteryLevel + "%");
 
             // holder.textDeviceSerial.setText("SN: " + thermometer.getmDeviceSerialNumber());
 
@@ -76,15 +75,15 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
 
             // thermometer.setAdapterPosition(holder.getAdapterPosition());
 
-            if (thermometer.intermediateTemperature != null && thermometer.mConnectionState == BLEService.STATE_CONNECTED)
+            if (thermometer.intermediateTemperature != 1000f && thermometer.mConnectionState == BLEService.STATE_CONNECTED)
                 holder.textViewIntermediateTemperature.setText(thermometer.intermediateTemperature.toString() + " " + thermometer.mDeviceMeasureUnits);
             else holder.textViewIntermediateTemperature.setText("-,-");
 
-            if (thermometer.maxTemperature != -500f)
+            if (thermometer.maxTemperature != -1000f)
                 holder.textViewMaximumTemperature.setText(thermometer.maxTemperature.toString() + " " + thermometer.mDeviceMeasureUnits);
             else holder.textViewMaximumTemperature.setText("-,-");
 
-            if (thermometer.minTemperature != 500f)
+            if (thermometer.minTemperature != 1000f)
                 holder.textViewMinimumTemperature.setText(thermometer.minTemperature.toString() + " " + thermometer.mDeviceMeasureUnits);
             else holder.textViewMaximumTemperature.setText("-,-");
 
@@ -148,11 +147,11 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
         TextView textViewIntermediateTemperature;
         TextView textViewMaximumTemperature;
         TextView textViewMinimumTemperature;
-        ProgressBar battery_level;
+        com.github.lzyzsd.circleprogress.DonutProgress battery_level;
         TextView textDeviceSerial;
         Toolbar topToolBar;
         Chronometer chronometer;
-        TextView deviceBatteryText;
+
         ImageButton mSettingsButton;
 
         public MyViewHolder(View itemView) {
@@ -162,11 +161,11 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
             this.textViewIntermediateTemperature = (TextView) itemView.findViewById(R.id.intermediateTemperature);
             this.textViewMaximumTemperature = (TextView) itemView.findViewById(R.id.MaximumTemperature);
             this.textViewMinimumTemperature = (TextView) itemView.findViewById(R.id.minimumTemperature);
-            this.battery_level = (ProgressBar) itemView.findViewById(R.id.device_battery);
+            this.battery_level = (com.github.lzyzsd.circleprogress.DonutProgress) itemView.findViewById(R.id.device_battery);
             //  this.textDeviceSerial = (TextView) itemView.findViewById(R.id.device_serial);
             this.topToolBar = (Toolbar) itemView.findViewById(R.id.card_toolbar);
             this.chronometer = (Chronometer) itemView.findViewById(R.id.chronometer);
-            this.deviceBatteryText = (TextView) itemView.findViewById(R.id.deviceBatteryText);
+            // this.deviceBatteryText = (TextView) itemView.findViewById(R.id.deviceBatteryText);
             this.mSettingsButton = (ImageButton) itemView.findViewById(R.id.settingsButton);
             topToolBar.inflateMenu(R.menu.card_toolbar_menu);
 

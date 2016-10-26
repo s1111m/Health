@@ -86,18 +86,18 @@ public class BLEService extends Service {
     }
 
     public static SmartThermometer findThermometerByMac(String macAddress) {
-        Log.e(TAG, "mac to search " + macAddress + "size " + thermometers.size());
+        //Log.e(TAG, "mac to search " + macAddress + "size " + thermometers.size());
         SmartThermometer tempThermometer;
         for (int i = 0; i < thermometers.size(); i++) {
-            Log.e(TAG, " enumerate " + thermometers.get(i).mDeviceMacAddress);
+            //Log.e(TAG, " enumerate " + thermometers.get(i).mDeviceMacAddress);
             tempThermometer = thermometers.get(i);
             if (tempThermometer.mDeviceMacAddress.equals(macAddress)) {
-                Log.e(TAG, "findThermometerByMac return: " + thermometers.get(i).mDeviceMacAddress);
+                //        Log.e(TAG, "findThermometerByMac return: " + thermometers.get(i).mDeviceMacAddress);
                 return tempThermometer;
             }
         }
 
-        Log.e(TAG, "NOT FOUND ");
+        //  Log.e(TAG, "NOT FOUND ");
         return null;
     }
 

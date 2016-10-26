@@ -62,6 +62,7 @@
     <string-array name="entries">
         <item>°C</item>
         <item>°F</item>
-        <item>°K</item>
+        <item>K</item>
     </string-array>
+
 </resources>

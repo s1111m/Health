@@ -14,8 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp">
+        android:padding="5dp">
 
         <View
             android:id="@+id/divider"
@@ -74,6 +73,16 @@
             android:text="-,-"
             android:textSize="30sp" />
 
+        <com.github.lzyzsd.circleprogress.DonutProgress
+            android:id="@+id/device_battery"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            card_view:donut_finished_stroke_width="2dp"
+            card_view:donut_text_size="7sp"
+            card_view:donut_unfinished_color="@color/red"
+            card_view:donut_unfinished_stroke_width="2dp" />
+
         <TextView
             android:id="@+id/minimumTemperature"
             android:layout_width="wrap_content"
@@ -83,17 +92,6 @@
             android:layout_toRightOf="@+id/textLabelMaximum"
             android:text="-,-"
             android:textSize="30sp" />
-
-        <ProgressBar
-
-            android:id="@+id/device_battery"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="35dp"
-            android:layout_height="15dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@+id/textViewName"
-            android:layout_marginTop="1dp"
-            android:indeterminate="false" />
 
         <Chronometer
             android:id="@+id/chronometer"
@@ -131,54 +129,6 @@
             card_view:srcCompat="@android:drawable/ic_menu_preferences" />
 
         <TextView
-            android:id="@+id/deviceBatteryText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/device_battery"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentTop="true"
-            android:layout_alignStart="@+id/device_battery"
-            android:layout_marginLeft="6dp"
-            android:text="80%"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/device_battery"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentTop="true"
-            android:layout_alignStart="@+id/device_battery"
-            android:layout_marginLeft="6dp"
-            android:text="80%"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/device_battery"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentTop="true"
-            android:layout_alignStart="@+id/device_battery"
-            android:layout_marginLeft="6dp"
-            android:text="80%"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/device_battery"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentTop="true"
-            android:layout_alignStart="@+id/device_battery"
-            android:layout_marginLeft="6dp"
-            android:text="80%"
-            android:textSize="12sp" />
-
-        <TextView
             android:id="@+id/textLabelCurrent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -187,38 +137,24 @@
             android:text="Текущая"
             android:textSize="28sp" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="@android:style/Widget.DeviceDefault.Light.ProgressBar"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignTop="@+id/device_battery"
-            android:layout_marginEnd="12dp"
-            android:layout_toLeftOf="@+id/device_battery"
-            android:indeterminate="true"
-            android:indeterminateOnly="false"
-            android:progress="87" />
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/progressBar"
-            android:layout_marginRight="3dp"
-            android:layout_marginTop="7dp"
-            android:text="80%"
-            android:textSize="8sp" />
-
         <TextView
             android:id="@+id/textViewName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="false"
+            android:layout_marginTop="-15dp"
+            android:elegantTextHeight="false"
             android:fontFamily="sans-serif"
             android:gravity="top"
+            android:lineSpacingExtra="0sp"
+            android:lineSpacingMultiplier="0"
+            android:lines="1"
+            android:maxLines="1"
+            android:padding="0dp"
+            android:singleLine="true"
             android:text="name"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="50sp" />
+            android:textSize="55sp" />
 
         <TextView
             android:id="@+id/textViewMac"

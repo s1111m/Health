@@ -213,7 +213,10 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
                 case SettingsView.KEY_ALARMS:
                     break;
                 case SettingsView.KEY_MEASURE_UNITS:
-                    whoChanged.setmDeviceMeasureUnits(sharedPreferences.getString(s, "°C"));
+                    String newMeasureUnits = sharedPreferences.getString(s, SmartThermometer.MeasureUnits.Celsium);
+                    //// whoChanged.changeMeasureUnits(newMeasureUnits);
+                    Log.e(TAG, newMeasureUnits);
+                    whoChanged.setmDeviceMeasureUnits(newMeasureUnits);
                     list.setSummary(whoChanged.mDeviceMeasureUnits);
                     break;
                 default:

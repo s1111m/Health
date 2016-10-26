@@ -114,6 +114,7 @@ public class MyDevicesListView extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
+
 //        adapter.setOnItemClickListener(new MyDevicesListViewAdapter.OnItemClickListener() {
 //            @Override
 //            public void onItemClick(String macAddress) {
@@ -134,6 +135,7 @@ public class MyDevicesListView extends Fragment {
     public void onResume() {
         super.onResume();
         getActivity().registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
+        adapter.notifyDataSetChanged();
     }
 
     public void onPause() {

@@ -49,12 +49,13 @@ public class DeviceSearchView extends Fragment {
                     // попытка работать в новом потоке
 
                     List<UUID> uuids = parseUuids(scanRecord);
-
-                    if (uuids.get(0).equals(RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE)) {
-                        //for (int i=0;i<uuids.size();i++){
-                        //  Log.e(TAG,uuids.get(i).toString());
-                        //}
-                        mLeDeviceListAdapter.addDevice(device, rssi);
+                    if (uuids.size() != 0) {
+                        if (uuids.get(0).equals(RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE)) {
+                            //for (int i=0;i<uuids.size();i++){
+                            //  Log.e(TAG,uuids.get(i).toString());
+                            //}
+                            mLeDeviceListAdapter.addDevice(device, rssi);
+                        }
                     }
                 }
             };
