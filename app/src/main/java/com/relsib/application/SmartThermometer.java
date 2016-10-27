@@ -94,6 +94,7 @@ public class SmartThermometer {
                     } else {
                     // broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
                         getTemperatureByNotify(true);
+                    getBatteryByNotify(true);
 
                     }
             } else {
@@ -141,17 +142,18 @@ public class SmartThermometer {
                     Log.e(TAG, "Device model + " + mDeviceModelNumber);
                     //   return;
                 }
-                if (uuid.equals(RelsibBluetoothProfile.BATTERY_LEVEL)) {
-                    mDeviceBatteryLevel = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
-                    Log.e(TAG, "Battery level + " + mDeviceBatteryLevel);
-                    //   return;
-                }
+//                if (uuid.equals(RelsibBluetoothProfile.BATTERY_LEVEL)) {
+//                    mDeviceBatteryLevel = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+//                    Log.e(TAG, "Battery level + " + mDeviceBatteryLevel);
+//                    //   return;
+//                }
                 if (characteristicReadQueue.size() > 0)
                     mBluetoothGatt.readCharacteristic(characteristicReadQueue.element());
                 if (characteristicReadQueue.size() == 0)
                     broadcastUpdate(BLEService.EXTRA_DATA);
                 BLEService.tableThermometers.save(SmartThermometer.this);
                 getTemperatureByNotify(true);
+                getBatteryByNotify(true);
 
             }
         }
@@ -485,6 +487,10 @@ public class SmartThermometer {
         return true;
     }
 
+    public void getBatteryByNotify(boolean enabled) {
+        setCharacteristicNotify(RelsibBluetoothProfile.BATTERY_SERVICE, RelsibBluetoothProfile.BATTERY_LEVEL, enabled);
+    }
+
     public boolean setCharacteristicNotify(UUID mServiceName, UUID mCharacteristicName, boolean enabled) {
 
         Log.e(TAG, "CALL setCharacteristicNotify " + mDeviceMacAddress);
@@ -563,25 +569,5 @@ public class SmartThermometer {
         public final static String Celsium = "°C";
         public final static String Fahrenheit = "°F";
         public final static String Kelvin = "K";
-
-        public static float convertToCelsium(String fromUnits, float value) {
-            switch (fromUnits) {
-                case MeasureUnits.Fahrenheit:
-                    return round(value * 1.8f + 32f, 1);
-                //break;
-                case MeasureUnits.Kelvin:
-                    round(-273.15f, 1);
-                    //   break;
-            }
-            return 0f;
-        }
-
-        public static float convertToFahrenheit() {
-            return 0f;
-        }
-
-        public static float convertToKelvin() {
-            return 0f;
-        }
     }
 }

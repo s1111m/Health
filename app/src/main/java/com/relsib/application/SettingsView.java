@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
@@ -63,16 +64,14 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
         }
         super.onCreate(savedInstanceState);
 
-
         Context activityContext = getActivity();
         TypedValue themeTypedValue = new TypedValue();
         activityContext.getTheme().resolveAttribute(R.attr.preferenceTheme, themeTypedValue, true);
-
         getPreferenceManager().setSharedPreferencesName(idTag + FILE_NAME);
+
         final PreferenceScreen rootScreen = getPreferenceManager().createPreferenceScreen(activityContext);
         setPreferenceScreen(rootScreen);
         getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-
         //создаем категорию и добавляем в экран
         final PreferenceCategory rootCategory = new PreferenceCategory(activityContext);
         rootCategory.setTitle("Настройки");
@@ -86,6 +85,9 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
         rootCategory.addPreference(thermometer_name);
 
         final com.kizitonwose.colorpreference.ColorPreference thermometer_color_label = new com.kizitonwose.colorpreference.ColorPreference(BLEService.mActivityContext);
+
+
+        //thermometer_color_label.
         thermometer_color_label.setKey(idTag + KEY_COLOR_LABEL);
         thermometer_color_label.setTitle("Цветовая метка");
         thermometer_color_label.setSummary("Установить цветовую метку в программе");
@@ -99,19 +101,24 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
 
     /* вложенный экран настроек */
         final PreferenceScreen thermometer_alarms_screen = getPreferenceManager().createPreferenceScreen(activityContext);
+
         thermometer_alarms_screen.setTitle("Настройка уведомлений");
         thermometer_alarms_screen.setSummary("Установка режимов уведомлений");
         thermometer_alarms_screen.setKey(idTag + KEY_ALARMS_SCREEN);
+
         thermometer_alarms_screen.setFragment(SettingsView.class.getName());
 
-//        thermometer_alarms_screen.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-//            @Override
-//            public boolean onPreferenceClick(Preference preference) {
-//            //    Log.e(TAG,"clicked " + this.getClass().getSimpleName());
-//               setPreferenceScreen(thermometer_alarms_screen);
-//                return true;
-//            }
-//        });
+        thermometer_alarms_screen.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                //    Log.e(TAG,"clicked " + this.getClass().getSimpleName());
+                setPreferenceScreen(thermometer_alarms_screen);
+                return false;
+            }
+        });
+        rootScreen.addPreference(thermometer_alarms_screen);
+
+
         rootCategory.addPreference(thermometer_alarms_screen);
 
         final PreferenceCategory rootCategory2 = new PreferenceCategory(activityContext);
@@ -177,6 +184,7 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
         thermometer_autoconnect.setKey(idTag + KEY_AUTOCONNECT);
 
         thermometer_autoconnect.setDefaultValue(true);
+
         rootCategory.addPreference(thermometer_autoconnect);
 
     }
