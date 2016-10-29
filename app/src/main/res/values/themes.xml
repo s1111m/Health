@@ -16,10 +16,6 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay.Material</item>
-        <item name="asp_preferenceIconTint">@color/colorPrimary</item>
-        <item name="asp_preferenceDialogIconTint">@color/colorPrimary</item>
-
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

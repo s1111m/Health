@@ -17,7 +17,7 @@ import android.util.TypedValue;
 
 import static android.text.TextUtils.split;
 
-public class SettingsView extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsViewCommon extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
@@ -42,13 +42,15 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
     String idTag;
     EditTextPreference thermometer_name;
     ListPreference list;
+    EditTextPreference thermometer_alarms_min_treshold;
+    EditTextPreference thermometer_alarms_max_treshold;
 
-    public SettingsView() {
+    public SettingsViewCommon() {
         // Required empty public constructor
     }
 
-    public static SettingsView newInstance(String param1) {
-        SettingsView fragment = new SettingsView();
+    public static SettingsViewCommon newInstance(String param1) {
+        SettingsViewCommon fragment = new SettingsViewCommon();
         Bundle args = new Bundle();
         args.putString(TAG, param1);
         fragment.setArguments(args);
@@ -105,32 +107,39 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
         thermometer_alarms_screen.setTitle("Настройка уведомлений");
         thermometer_alarms_screen.setSummary("Установка режимов уведомлений");
         thermometer_alarms_screen.setKey(idTag + KEY_ALARMS_SCREEN);
-
-        thermometer_alarms_screen.setFragment(SettingsView.class.getName());
+        thermometer_alarms_screen.setFragment(SettingsViewAlarm.class.toString());
 
         thermometer_alarms_screen.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                //    Log.e(TAG,"clicked " + this.getClass().getSimpleName());
+                Log.e(TAG, "clicked " + this.getClass().getSimpleName());
+                //preference.
                 setPreferenceScreen(thermometer_alarms_screen);
+                //  BLEService.mActivityContext.getFragmentManager().beginTransaction().replace(R.id.frgmCont, SettingsViewAlarm.newInstance(idTag)).commit();
                 return false;
             }
         });
-        rootScreen.addPreference(thermometer_alarms_screen);
 
-
+        // rootScreen.addPreference(thermometer_alarms_screen);
         rootCategory.addPreference(thermometer_alarms_screen);
+
 
         final PreferenceCategory rootCategory2 = new PreferenceCategory(activityContext);
         rootCategory2.setTitle("Уведомлять о минимальной температуре");
         thermometer_alarms_screen.addPreference(rootCategory2);
 
 
-        final EditTextPreference thermometer_alarms_min_treshold = new EditTextPreference(activityContext);
+//        thermometer_alarms_min_treshold = new com.pavelsikun.seekbarpreference.SeekBarPreference(activityContext);
+//        thermometer_alarms_min_treshold.setMinValue(-20);
+//        thermometer_alarms_min_treshold.setMaxValue(70);
+//        thermometer_alarms_min_treshold.setDefaultValue(-20);
+//        thermometer_alarms_min_treshold.setKey(idTag + KEY_ALARMS_MIN_VALUE);
+//        thermometer_alarms_min_treshold.setTitle("Установить порог");
 
-        thermometer_alarms_min_treshold.setKey(idTag + KEY_ALARMS_MIN_VALUE);
-        thermometer_alarms_min_treshold.setTitle("Установить порог");
+        //thermometer_alarms_min_treshold.setMeasurementUnit(getPreferenceManager().getSharedPreferences().getString(idTag + KEY_MEASURE_UNITS, "°C"));
+
         rootCategory2.addPreference(thermometer_alarms_min_treshold);
+
 
         final CheckBoxPreference thermometer_alarms_min_vibrate = new CheckBoxPreference(activityContext);
         thermometer_alarms_min_vibrate.setTitle("Вибрация");
@@ -150,10 +159,15 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
         rootCategory3.setTitle("Уведомлять о максимальной температуре");
         thermometer_alarms_screen.addPreference(rootCategory3);
 
-        final EditTextPreference thermometer_alarms_max_treshold = new EditTextPreference(activityContext);
-        thermometer_alarms_max_treshold.setKey(idTag + KEY_ALARMS_MIN_VALUE);
-        thermometer_alarms_max_treshold.setTitle("Установить порог");
-        thermometer_alarms_max_treshold.setDefaultValue("1");
+//        thermometer_alarms_max_treshold = new com.pavelsikun.seekbarpreference.SeekBarPreference(activityContext);
+//        thermometer_alarms_max_treshold.setKey(idTag + KEY_ALARMS_MAX_VALUE);
+//        thermometer_alarms_max_treshold.setTitle("Установить порог");
+//        thermometer_alarms_max_treshold.setMinValue(-20);
+//        thermometer_alarms_max_treshold.setMaxValue(70);
+//        thermometer_alarms_max_treshold.setDefaultValue(70);
+//        thermometer_alarms_max_treshold.setMeasurementUnit(getPreferenceManager().getSharedPreferences().getString(idTag + KEY_MEASURE_UNITS, "°C"));
+
+
         rootCategory3.addPreference(thermometer_alarms_max_treshold);
 
         final CheckBoxPreference thermometer_alarms_max_vibrate = new CheckBoxPreference(activityContext);
@@ -176,15 +190,13 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
         list.setSummary(getPreferenceManager().getSharedPreferences().getString(idTag + KEY_MEASURE_UNITS, "°C"));
         list.setEntries(R.array.entries);
         list.setEntryValues(R.array.entries);
-        rootScreen.addPreference(list);
+        rootCategory.addPreference(list);
 
         final CheckBoxPreference thermometer_autoconnect = new CheckBoxPreference(activityContext);
         thermometer_autoconnect.setTitle("Автоподключение");
         thermometer_autoconnect.setSummary("Обнаруживать и производить подключение к термометру");
         thermometer_autoconnect.setKey(idTag + KEY_AUTOCONNECT);
-
         thermometer_autoconnect.setDefaultValue(true);
-
         rootCategory.addPreference(thermometer_autoconnect);
 
     }
@@ -206,26 +218,28 @@ public class SettingsView extends PreferenceFragment implements SharedPreference
 
         if (whoChanged != null) {
             switch ("_" + changes[1]) {
-                case SettingsView.KEY_NAME:
+                case SettingsViewCommon.KEY_NAME:
                     String mDeviceName = sharedPreferences.getString(s, "WT-50");
                     whoChanged.setmDeviceName(mDeviceName);
                     thermometer_name.setSummary(mDeviceName);
                     break;
-                case SettingsView.KEY_COLOR_LABEL:
+                case SettingsViewCommon.KEY_COLOR_LABEL:
                     Log.e(TAG, "Changing " + whoChanged.mDeviceMacAddress);
                     whoChanged.setmDeviceColorLabel(sharedPreferences.getInt(s, Color.WHITE));
                     break;
-                case SettingsView.KEY_BACKGROUND_COLOR:
+                case SettingsViewCommon.KEY_BACKGROUND_COLOR:
                     whoChanged.setmDeviceBackgroundColor(sharedPreferences.getInt(s, Color.WHITE));
                     break;
-                case SettingsView.KEY_ALARMS:
+                case SettingsViewCommon.KEY_ALARMS:
                     break;
-                case SettingsView.KEY_MEASURE_UNITS:
+                case SettingsViewCommon.KEY_MEASURE_UNITS:
                     String newMeasureUnits = sharedPreferences.getString(s, SmartThermometer.MeasureUnits.Celsium);
                     //// whoChanged.changeMeasureUnits(newMeasureUnits);
                     Log.e(TAG, newMeasureUnits);
                     whoChanged.setmDeviceMeasureUnits(newMeasureUnits);
                     list.setSummary(whoChanged.mDeviceMeasureUnits);
+                    // thermometer_alarms_min_treshold.setMeasurementUnit(whoChanged.mDeviceMeasureUnits);
+                    //  thermometer_alarms_max_treshold.setMeasurementUnit(whoChanged.mDeviceMeasureUnits);
                     break;
                 default:
                     break;

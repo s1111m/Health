@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.relsib.application.BLEService;
 import com.relsib.application.MyDevicesSingleView;
 import com.relsib.application.R;
-import com.relsib.application.SettingsView;
+import com.relsib.application.SettingsViewCommon;
 import com.relsib.application.SmartThermometer;
 
 
@@ -79,21 +79,21 @@ public class MyDevicesListViewAdapter extends RecyclerView.Adapter<MyDevicesList
         tempThermometer.setAdapterPosition(holder.getAdapterPosition());
 
         if (tempThermometer.intermediateTemperature != 1000f && tempThermometer.mConnectionState != BLEService.STATE_DISCONNECTED)
-            holder.textViewIntermediateTemperature.setText(tempThermometer.intermediateTemperature.toString() + " " + tempThermometer.mDeviceMeasureUnits);
+            holder.textViewIntermediateTemperature.setText(String.valueOf(tempThermometer.intermediateTemperature) + " " + tempThermometer.mDeviceMeasureUnits);
         else holder.textViewIntermediateTemperature.setText("-,-");
 
         if (tempThermometer.maxTemperature != -1000f)
-            holder.textViewMaximumTemperature.setText(tempThermometer.maxTemperature.toString() + " " + tempThermometer.mDeviceMeasureUnits);
+            holder.textViewMaximumTemperature.setText(String.valueOf(tempThermometer.maxTemperature) + " " + tempThermometer.mDeviceMeasureUnits);
         else holder.textViewMaximumTemperature.setText("-,-");
 
         if (tempThermometer.minTemperature != 1000f)
-            holder.textViewMinimumTemperature.setText(tempThermometer.minTemperature.toString() + " " + tempThermometer.mDeviceMeasureUnits);
+            holder.textViewMinimumTemperature.setText(String.valueOf(tempThermometer.minTemperature) + " " + tempThermometer.mDeviceMeasureUnits);
         else holder.textViewMaximumTemperature.setText("-,-");
 
         holder.mSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsView.newInstance(tempThermometer.mDeviceMacAddress)).commit();
+                BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsViewCommon.newInstance(tempThermometer.mDeviceMacAddress)).commit();
             }
         });
         holder.topToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {

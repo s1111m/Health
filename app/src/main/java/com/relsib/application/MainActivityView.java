@@ -169,7 +169,7 @@ public class MainActivityView extends AppCompatActivity
 //                fragmentClass = AlarmsView.class;
 //                break;
 //            case R.id.nav_settings:
-//                fragmentClass = SettingsView.class;
+//                fragmentClass = SettingsViewAlarm.class;
 //                break;
             default:
                 fragmentClass = MyDevicesListView.class;
