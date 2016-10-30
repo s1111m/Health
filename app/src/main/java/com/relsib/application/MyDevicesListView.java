@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
-import android.widget.TextView;
 
 import com.relsib.adapters.MyDevicesListViewAdapter;
 
@@ -38,9 +37,9 @@ public class MyDevicesListView extends Fragment {
 
                 //invalidateOptionsMenu();
             } else if (BLEService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                View itemView = recyclerView.getLayoutManager().findViewByPosition((int) intent.getLongExtra(SmartThermometer.ADAPTER_POSITION, 0));
-                ((Chronometer) itemView.findViewById(R.id.chronometer)).stop();
-                ((TextView) itemView.findViewById(R.id.intermediateTemperature)).setText("-,-");
+                //View itemView = recyclerView.getLayoutManager().findViewByPosition((int) intent.getLongExtra(SmartThermometer.ADAPTER_POSITION, 0));
+                //((Chronometer) itemView.findViewById(R.id.chronometer)).stop();
+                //((TextView) itemView.findViewById(R.id.intermediateTemperature)).setText("-,-");
                 adapter.notifyDataSetChanged();
                 //invalidateOptionsMenu();
                 //clearUI();
@@ -136,6 +135,7 @@ public class MyDevicesListView extends Fragment {
         super.onResume();
         getActivity().registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         adapter.notifyDataSetChanged();
+
     }
 
     public void onPause() {

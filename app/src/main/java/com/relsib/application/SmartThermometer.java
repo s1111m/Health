@@ -48,7 +48,7 @@ public class SmartThermometer {
     public String mDeviceMeasureUnits = null;
     public int mDeviceBatteryLevel;
     public long measureTime;// = -1;
-    public int mDeviceColorLabel = Color.WHITE;
+    public int mDeviceColorLabel = Color.BLACK;
     public int mDeviceBackgroundColor = Color.WHITE;
     public float intermediateTemperature = 1000f;
     public float maxTemperature = -1000f;
@@ -57,8 +57,8 @@ public class SmartThermometer {
     public boolean autoconnect = true;
     public int mConnectionState = BLEService.STATE_DISCONNECTED;
     public boolean isNotifyEnabled = false;
-    public float minAlarmTreshold = -1000f;
-    public float maxAlarmTreshold = 1000f;
+    public float minAlarmTreshold;
+    public float maxAlarmTreshold;
     SharedPreferences preferences;
     private long adapterPosition;
     private BluetoothGatt mBluetoothGatt;
@@ -91,15 +91,18 @@ public class SmartThermometer {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.e(TAG, "Services discovered");
+                getTemperatureByNotify(true);
                 broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
+                //readInfoTypes();
                 if (mDeviceSerialNumber == null) { //
-                        readInfoTypes();
-                    } else {
+                    readInfoTypes();
+                } //else {
                     // broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
-                    getTemperatureByNotify(true);
+                //getTemperatureByNotify(true);
                     //getBatteryByNotify(true);
-
-                    }
+                //readInfoTypes();
+                getBatteryByNotify(true);
+                // }
             } else {
                 Log.e(TAG, "onServicesDiscovered received: " + status);
                 disconnect();
@@ -107,6 +110,7 @@ public class SmartThermometer {
                 //mBluetoothGatt.discoverServices();
                 // disconnect();
             }
+
         }
 
         @Override
@@ -114,8 +118,6 @@ public class SmartThermometer {
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
             characteristicReadQueue.remove();
-
-
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 UUID uuid = characteristic.getUuid();
                 if (uuid.equals(RelsibBluetoothProfile.SERIAL_NUMBER_UUID)) {
@@ -145,22 +147,24 @@ public class SmartThermometer {
                     Log.e(TAG, "Device model + " + mDeviceModelNumber);
                     //   return;
                 }
-//                if (uuid.equals(RelsibBluetoothProfile.BATTERY_LEVEL)) {
-//                    mDeviceBatteryLevel = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
-//                    Log.e(TAG, "Battery level + " + mDeviceBatteryLevel);
-//                    //   return;
-//                }
+                if (uuid.equals(RelsibBluetoothProfile.BATTERY_LEVEL)) {
+                    mDeviceBatteryLevel = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 0);
+                    Log.e(TAG, "Battery level + " + mDeviceBatteryLevel);
+                    //   return;
+                }
                 if (characteristicReadQueue.size() > 0)
                     mBluetoothGatt.readCharacteristic(characteristicReadQueue.element());
+
                 if (characteristicReadQueue.size() == 0) {
-                    broadcastUpdate(BLEService.EXTRA_DATA);
                     BLEService.tableThermometers.save(SmartThermometer.this);
-                    getTemperatureByNotify(true);
+                    broadcastUpdate(BLEService.EXTRA_DATA);
+                    //getTemperatureByNotify(true);
                     //getBatteryByNotify(true);
                 }
 
             }
         }
+
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
@@ -198,6 +202,23 @@ public class SmartThermometer {
         }
 
         @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            super.onDescriptorWrite(gatt, descriptor, status);
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.d(TAG, "Callback: Wrote GATT Descriptor successfully.");
+            } else {
+                Log.d(TAG, "Callback: Error writing GATT Descriptor: " + status);
+            }
+            descriptorWriteQueue.remove();  //pop the item that we just finishing writing
+            //if there is more to write, do it!
+            if (descriptorWriteQueue.size() > 0)
+                mBluetoothGatt.writeDescriptor(descriptorWriteQueue.element());
+            else if (characteristicReadQueue.size() > 0)
+                mBluetoothGatt.readCharacteristic(characteristicReadQueue.element());
+
+        }
+
+        @Override
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
             super.onReadRemoteRssi(gatt, rssi, status);
             mDeviceRssi = rssi;
@@ -205,9 +226,10 @@ public class SmartThermometer {
     };
     public SmartThermometer(String mDeviceMacAddress, String mDeviceName) {
         this.mDeviceMacAddress = mDeviceMacAddress;
-        preferences = BLEService.mActivityContext.getSharedPreferences(mDeviceMacAddress + SettingsViewCommon.FILE_NAME, MODE_PRIVATE);
-        setmDeviceName(preferences.getString(mDeviceMacAddress + SettingsViewCommon.KEY_NAME, "WT-50"));
-        setmDeviceName(mDeviceName);
+        this.preferences = BLEService.mActivityContext.getSharedPreferences(mDeviceMacAddress + SettingsViewCommon.FILE_NAME, MODE_PRIVATE);
+        // Log.e(TAG,"calling from constructor");
+        setmDeviceName(preferences.getString(this.mDeviceMacAddress + SettingsViewCommon.KEY_NAME, mDeviceName));
+        //setmDeviceName(mDeviceName);
     }
 
     private static float round(float number, int scale) {
@@ -223,7 +245,6 @@ public class SmartThermometer {
         SmartThermometer thermomether = new SmartThermometer(mDeviceMac, mDeviceName);
         thermomether._ID = _ID;
         thermomether.mDeviceModelNumber = mDeviceModelNumber;
-
         thermomether.setmDeviceSerialNumber(mDeviceSerialNumber);
         thermomether.mDeviceFirmwareRevisionNumber = mDeviceFirmwareRevisionNumber;
         thermomether.mDeviceHardwareRevisionNumber = mDeviceHardwareRevisionNumber;
@@ -234,56 +255,84 @@ public class SmartThermometer {
 
     }
 
+    public String getmDeviceName() {
+        if (mDeviceName == null)
+            mDeviceName = preferences.getString(this.mDeviceMacAddress + SettingsViewCommon.KEY_NAME, "WT-50");
+        return mDeviceName;
+    }
+
+    public void setmDeviceName(String mDeviceName) {
+        Log.e(TAG, "Setting mDeviceName : " + mDeviceName);
+        this.mDeviceName = mDeviceName;
+    }
+
     public void changeMeasureUnits(String to) {
         Log.e(TAG, "convert called ");
-        switch (mDeviceMeasureUnits) {
-            case MeasureUnits.Celsium:
-                Log.e(TAG, "case celsium");
-                if (to.equals(MeasureUnits.Fahrenheit)) {
-                    Log.e(TAG, "case to celsium");
-                    maxTemperature = round(maxTemperature * 1.8f + 32f, 1);
-                    minTemperature = round(minTemperature * 1.8f + 32f, 1);
-                    intermediateTemperature = round(intermediateTemperature * 1.8f + 32f, 1);
-                } else {
-                    maxTemperature = round(maxTemperature - 273.15f, 1);
-                    minTemperature = round(minTemperature - 273.15f, 1);
-                    intermediateTemperature = round(intermediateTemperature - 273.15f, 1);
-                }
-                break;
-            case MeasureUnits.Fahrenheit:
-                Log.e(TAG, "case  fahr");
-                if (to.equals(MeasureUnits.Celsium)) {
-                    Log.e(TAG, "case to celsium");
-                    maxTemperature = round((maxTemperature - 32) * 5 / 9, 1);
-                    minTemperature = round((minTemperature - 32) * 5 / 9, 1);
-                    intermediateTemperature = round((intermediateTemperature - 32) * 5 / 9, 1);
-                } else {
+        maxTemperature = MeasureUnits.convertMeasureUnits(maxTemperature, mDeviceMeasureUnits, to);
+        minTemperature = MeasureUnits.convertMeasureUnits(minTemperature, mDeviceMeasureUnits, to);
+        intermediateTemperature = MeasureUnits.convertMeasureUnits(intermediateTemperature, mDeviceMeasureUnits, to);
+        minAlarmTreshold = MeasureUnits.convertMeasureUnits(minAlarmTreshold, mDeviceMeasureUnits, to);
+        maxAlarmTreshold = MeasureUnits.convertMeasureUnits(maxAlarmTreshold, mDeviceMeasureUnits, to);
 
-                    maxTemperature = round((maxTemperature - 32) * 5 / 9 - 273.15f, 1);
-                    minTemperature = round((minTemperature - 32) * 5 / 9 - 273.15f, 1);
-                    intermediateTemperature = round((intermediateTemperature - 32) * 5 / 9 - 273.15f, 1);
-                }
-                break;
-            case MeasureUnits.Kelvin:
-                Log.e(TAG, "case kelvin");
-                if (to.equals(MeasureUnits.Celsium)) {
-                    Log.e(TAG, "case to celsium");
-                    maxTemperature = round(maxTemperature + 273.15f, 1);
-                    minTemperature = round(minTemperature + 273.15f, 1);
-                    intermediateTemperature = round(intermediateTemperature + 273.15f, 1);
-                } else {
-
-                    maxTemperature = round((maxTemperature + 273.15f) * 9 / 5 + 32f, 1);
-                    Log.e(TAG, "MIN temp: " + minTemperature);
-                    minTemperature = round((minTemperature + 273.15f) * 9 / 5 + 32f, 1);
-                    Log.e(TAG, "MIN temp: " + minTemperature);
-                    intermediateTemperature = round((intermediateTemperature + 273.15f) * 9 / 5 + 32f, 1);
-                }
-                break;
-            default:
-                break;
-
-        }
+//        switch (mDeviceMeasureUnits) {
+//            case MeasureUnits.Celsium:
+//                Log.e(TAG, "case celsium");
+//                if (to.equals(MeasureUnits.Fahrenheit)) {
+//                    Log.e(TAG, "case to celsium");
+//                    maxTemperature = round(maxTemperature * 1.8f + 32f, 1);
+//                    minTemperature = round(minTemperature * 1.8f + 32f, 1);
+//                    intermediateTemperature = round(intermediateTemperature * 1.8f + 32f, 1);
+//                    minAlarmTreshold = round(minAlarmTreshold * 1.8f + 32f, 1);
+//                    maxAlarmTreshold = round(maxAlarmTreshold * 1.8f + 32f, 1);
+//                } else {
+//                    maxTemperature = round(maxTemperature - 273.15f, 1);
+//                    minTemperature = round(minTemperature - 273.15f, 1);
+//                    intermediateTemperature = round(intermediateTemperature - 273.15f, 1);
+//                    minAlarmTreshold = round(minAlarmTreshold - 273.15f, 1);
+//                    maxAlarmTreshold = round(maxAlarmTreshold - 273.15f, 1);
+//                }
+//                break;
+//            case MeasureUnits.Fahrenheit:
+//                Log.e(TAG, "case  fahr");
+//                if (to.equals(MeasureUnits.Celsium)) {
+//                    Log.e(TAG, "case to celsium");
+//                    maxTemperature = round((maxTemperature - 32) * 5 / 9, 1);
+//                    minTemperature = round((minTemperature - 32) * 5 / 9, 1);
+//                    intermediateTemperature = round((intermediateTemperature - 32) * 5 / 9, 1);
+//                    minAlarmTreshold = round((minAlarmTreshold - 32) * 5 / 9, 1);
+//                    minAlarmTreshold = round((minAlarmTreshold - 32) * 5 / 9, 1);
+//                } else {
+//                    maxTemperature = round((maxTemperature - 32) * 5 / 9 - 273.15f, 1);
+//                    minTemperature = round((minTemperature - 32) * 5 / 9 - 273.15f, 1);
+//                    intermediateTemperature = round((intermediateTemperature - 32) * 5 / 9 - 273.15f, 1);
+//                    minAlarmTreshold = round((minAlarmTreshold - 32) * 5 / 9 - 273.15f, 1);
+//                    maxAlarmTreshold = round((maxAlarmTreshold - 32) * 5 / 9 - 273.15f, 1);
+//                }
+//                break;
+//            case MeasureUnits.Kelvin:
+//                Log.e(TAG, "case kelvin");
+//                if (to.equals(MeasureUnits.Celsium)) {
+//                    Log.e(TAG, "case to celsium");
+//                    maxTemperature = round(maxTemperature + 273.15f, 1);
+//                    minTemperature = round(minTemperature + 273.15f, 1);
+//                    intermediateTemperature = round(intermediateTemperature + 273.15f, 1);
+//                    minAlarmTreshold = round(minAlarmTreshold + 273.15f, 1);
+//                    maxAlarmTreshold = round(maxAlarmTreshold + 273.15f, 1);
+//                } else {
+//
+//                    maxTemperature = round((maxTemperature + 273.15f) * 9 / 5 + 32f, 1);
+//                    Log.e(TAG, "MIN temp: " + minTemperature);
+//                    minTemperature = round((minTemperature + 273.15f) * 9 / 5 + 32f, 1);
+//                    Log.e(TAG, "MIN temp: " + minTemperature);
+//                    intermediateTemperature = round((intermediateTemperature + 273.15f) * 9 / 5 + 32f, 1);
+//                    minAlarmTreshold = round((minAlarmTreshold + 273.15f) * 9 / 5 + 32f, 1);
+//                    maxAlarmTreshold = round((maxAlarmTreshold + 273.15f) * 9 / 5 + 32f, 1);
+//                }
+//                break;
+//            default:
+//                break;
+//
+//        }
 
         broadcastUpdate(BLEService.EXTRA_DATA);
     }
@@ -295,11 +344,6 @@ public class SmartThermometer {
             changeMeasureUnits(mDeviceMeasureUnits);
         }
         this.mDeviceMeasureUnits = mDeviceMeasureUnits;
-    }
-
-    public void setmDeviceName(String mDeviceName) {
-        //Log.e(TAG, mDeviceName);
-        this.mDeviceName = mDeviceName;
     }
 
     public void setmDeviceColorLabel(Integer mDeviceColorLabel) {
@@ -380,6 +424,8 @@ public class SmartThermometer {
         setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_COLOR_LABEL, Color.BLACK));
         setmDeviceBackgroundColor(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_BACKGROUND_COLOR, Color.WHITE));
         setmDeviceMeasureUnits(preferences.getString(mDeviceMacAddress + SettingsViewCommon.KEY_MEASURE_UNITS, MeasureUnits.Celsium));
+        minAlarmTreshold = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
+        maxAlarmTreshold = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_VALUE, 50f);
     }
 
     @Override
@@ -441,6 +487,7 @@ public class SmartThermometer {
             Log.e(TAG, "BluetoothAdapter not initialized");
             return;
         }
+        intermediateTemperature = 1000f;
         broadcastUpdate(BLEService.ACTION_GATT_DISCONNECTED);
         mBluetoothGatt.disconnect();
 
@@ -511,6 +558,7 @@ public class SmartThermometer {
             return false;
         }
         BluetoothGattCharacteristic characteristic = mCustomService.getCharacteristic(mCharacteristicName);
+
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
         BluetoothGattDescriptor descriptor = characteristic.getDescriptor(
                 RelsibBluetoothProfile.CLIENT_CHARACTERISTIC_CONFIG);
@@ -519,8 +567,15 @@ public class SmartThermometer {
         } else {
             descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
         }
+        /*****/
+        descriptorWriteQueue.add(descriptor);
+        //if there is only 1 item in the queue, then read it.  If more than 1, we handle asynchronously in the callback above
+        //GIVE PRECEDENCE to descriptor writes.  They must all finish first.
 
-        mBluetoothGatt.writeDescriptor(descriptor);
+        if (((descriptorWriteQueue.size() == 1) && characteristicReadQueue.size() == 0)) {
+            mBluetoothGatt.writeDescriptor(descriptor);
+        }
+        //mBluetoothGatt.writeDescriptor(descriptor);
         return true;
     }
 
@@ -570,5 +625,41 @@ public class SmartThermometer {
         public final static String Celsium = "°C";
         public final static String Fahrenheit = "°F";
         public final static String Kelvin = "K";
+
+        public static float convertMeasureUnits(float valueFrom, String fromMeasureUnits, String toMeasureUnits) {
+            switch (fromMeasureUnits) {
+                case MeasureUnits.Celsium:
+                    Log.e(TAG, "from celsium");
+                    if (toMeasureUnits.equals(MeasureUnits.Fahrenheit)) {
+                        Log.e(TAG, "to fahrengheit");
+                        return round(valueFrom * 1.8f + 32f, 1);
+                    } else if (toMeasureUnits.equals(MeasureUnits.Kelvin)) {
+                        Log.e(TAG, "to kelvin");
+                        return round(valueFrom - 273.15f, 1);
+                    }
+                    return valueFrom;
+
+                case MeasureUnits.Fahrenheit:
+                    Log.e(TAG, "from fahr");
+                    if (toMeasureUnits.equals(MeasureUnits.Celsium)) {
+                        Log.e(TAG, "to celsium");
+                        return round((valueFrom - 32) * 5 / 9, 1);
+                    } else if (toMeasureUnits.equals(MeasureUnits.Kelvin)) {
+                        return round((valueFrom - 32) * 5 / 9 - 273.15f, 1);
+                    }
+                    return valueFrom;
+                case MeasureUnits.Kelvin:
+                    Log.e(TAG, "kelvin");
+                    if (toMeasureUnits.equals(MeasureUnits.Celsium)) {
+                        Log.e(TAG, "to celsium");
+                        return round(valueFrom + 273.15f, 1);
+                    } else if (toMeasureUnits.equals(MeasureUnits.Fahrenheit)) {
+                        return round((valueFrom + 273.15f) * 9 / 5 + 32f, 1);
+                    }
+                    return valueFrom;
+                default:
+                    return valueFrom;
+            }
+        }
     }
 }

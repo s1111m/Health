@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.relsib.dao.DbModel;
 import com.relsib.dao.TableThermometers;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -77,7 +78,7 @@ public class BLEService extends Service {
     public static void clear() {
 
         for (int i = 0; i < thermometers.size(); i++) {
-            thermometers.get(i).close();
+            removeThermometer(thermometers.get(i));
         }
         thermometers.clear();
         tableThermometers.clear();
@@ -103,11 +104,24 @@ public class BLEService extends Service {
 
     public static void removeThermometer(SmartThermometer thermometer) {
         thermometers.remove(thermometer);
+        String filePath = mServiceContext.getFilesDir().getParent() + "/shared_prefs/" + thermometer.mDeviceMacAddress + SettingsViewCommon.FILE_NAME + ".xml";
+        File deletePrefFile = new File(filePath);
+        Log.e(TAG, filePath);
+        if (deletePrefFile.delete()) Log.e(TAG, "deleted");
+        else Log.e(TAG, "delete failed");
         tableThermometers.deleteRecord(thermometer);
-        thermometer.shutdown();
+        //thermometer.shutdown();
         thermometer.disconnect();
         thermometer.close();
         return;
+    }
+
+    public static void addUnknownSmartThermometer(BluetoothDevice device, int rssi) {
+        SmartThermometer tempDevice = new SmartThermometer(device.getAddress(), device.getName());
+        if (!unknownThermometers.contains(tempDevice)) {
+            unknownThermometers.add(tempDevice);
+            tempDevice.mDeviceRssi = rssi;
+        }
     }
 
     @Override
@@ -166,41 +180,32 @@ public class BLEService extends Service {
 
         db = new DbModel(mServiceContext);
         tableThermometers = new TableThermometers(db.getWritableDatabase());
+
         return true;
     }
 
     public void loadMyThermometers() {
-        Log.e(TAG, "LOADING");
         thermometers = tableThermometers.getAllRecordsAsObjects();
         myTimer.schedule(new TimerTask() { // Определяем задачу
             @Override
             public void run() {
-                //Log.e(TAG, "CONNECT task");
                 for (int i = 0; i < thermometers.size(); i++) {
                     SmartThermometer tempThermometer = thermometers.get(i);
                     if (tempThermometer.mConnectionState == BLEService.STATE_DISCONNECTED) {
-                        //      Log.e(TAG, "try to connect");
-                        //tempThermometer.connect(true);
-                        new ConnectThread(tempThermometer).start();
-                        // new ConnectThread(thermometers.get(i));
+                        // new ConnectThread(tempThermometer).start();
+                        if (tempThermometer.mDeviceMacAddress != "aa:aa:aa:aa:aa")
+                            tempThermometer.connect(true);
                     }
                 }
             }
 
             ;
         }, 0L, 60L * 100); // интервал - 60000 миллисекунд, 0 миллисекунд до первого запуска.
+        thermometers.add(new SmartThermometer("aa:aa:aa:aa:aa", "TEST DEVICE"));
     }
 
     public void addSmartThermometer(String mDeviceAddress, String deviceName) {
         thermometers.add(new SmartThermometer(mDeviceAddress, deviceName));
-    }
-
-    public void addUnknownSmartThermometer(BluetoothDevice device, int rssi) {
-        SmartThermometer tempDevice = new SmartThermometer(device.getAddress(), device.getName());
-        if (!unknownThermometers.contains(tempDevice)) {
-            unknownThermometers.add(tempDevice);
-            tempDevice.mDeviceRssi = rssi;
-        }
     }
 
     public void pushUnknownToMyDevices() {
@@ -210,12 +215,10 @@ public class BLEService extends Service {
             tempThermometer = unknownThermometers.get(i);
             if (tempThermometer.selected) {
                 if (thermometers.size() < MAX_BLE_DEVICES) {
-                    Log.e(TAG, String.valueOf(thermometers.size()));
-                    new ConnectThread(tempThermometer).start();
-                    //tempThermometer.connect(true);
                     thermometers.add(tempThermometer);
+                    new ConnectThread(tempThermometer).start();
                 } else {
-                    Toast.makeText(mActivityContext, "Протокол BLE не поддерживает больше " + MAX_BLE_DEVICES + " устройств", Toast.LENGTH_LONG);
+                    Toast.makeText(mActivityContext, "Протокол BLE не поддерживает больше " + MAX_BLE_DEVICES + " устройств", Toast.LENGTH_LONG).show();
                 }
 
 
@@ -234,27 +237,16 @@ public class BLEService extends Service {
         SmartThermometer thermometer;
 
         public ConnectThread(SmartThermometer thermometer2) {
-            //Log.e(TAG, thermometer2.mDeviceName);
             thermometer = thermometer2;
-            // Log.e(TAG, thermometer.mDeviceName);
         }
-
-
         public void run() {
-//            Integer index = thermometers.indexOf(thermometer);
-//            if (index != UNKNOWN_THERMOMETER) {
-//                thermometers.get(index).connect(true);
-//                Log.e(TAG,"thread_connect");
-//            } else {
             if (thermometers.size() < MAX_BLE_DEVICES) {
                 Log.e(TAG, "thread");
                 thermometer.connect(true);
-                // thermometers.add(thermometer);
             } else {
                 Toast.makeText(mActivityContext, "Протокол BLE не поддерживает больше " + MAX_BLE_DEVICES + " устройств", Toast.LENGTH_LONG);
             }
         }
 
     }
-    //}
 }

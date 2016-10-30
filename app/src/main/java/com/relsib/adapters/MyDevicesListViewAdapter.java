@@ -51,88 +51,82 @@ public class MyDevicesListViewAdapter extends RecyclerView.Adapter<MyDevicesList
     public void onBindViewHolder(final MyViewHolder holder, final int listPosition) {
 
         final SmartThermometer tempThermometer = BLEService.thermometers.get(listPosition);
-        holder.textViewName.setText(tempThermometer.mDeviceName);
-        holder.textViewMac.setText(tempThermometer.mDeviceMacAddress);
+        if (tempThermometer != null) {
+            holder.textViewName.setText(tempThermometer.mDeviceName);
+            holder.textViewMac.setText(tempThermometer.mDeviceMacAddress);
+            holder.battery_level.setProgress(tempThermometer.mDeviceBatteryLevel);
+            holder.itemView.setBackgroundColor(tempThermometer.mDeviceBackgroundColor);
+            holder.textViewName.setTextColor(tempThermometer.mDeviceColorLabel);
 
-        holder.battery_level.setProgress(tempThermometer.mDeviceBatteryLevel);
-        //holder.deviceBatteryText.setText(tempThermometer.mDeviceBatteryLevel + "%");
-
-//        holder.textDeviceSerial.setText("SN: " + tempThermometer.getmDeviceSerialNumber());
-
-        holder.itemView.setBackgroundColor(tempThermometer.mDeviceBackgroundColor);
-        holder.textViewName.setTextColor(tempThermometer.mDeviceColorLabel);
-        //holder.topToolBar.setTitle(tempThermometer.mDeviceName);// + " SN:" + tempThermometer.mDeviceSerialNumber);
-        // Log.e(TAG, "measure time " + String.valueOf(tempThermometer.measureTime));
-        //  if (tempThermometer.measureTime != -1) {// if  gettempbynotify set's timer
-
-        if (tempThermometer.mConnectionState == BLEService.STATE_CONNECTED && tempThermometer.isNotifyEnabled) {
-            holder.chronometer.setBase(tempThermometer.measureTime);
-            holder.chronometer.start();
-        } else {
-            // Log.e(TAG,tempThermometer.mDeviceMacAddress + " " +String.valueOf(tempThermometer.mConnectionState) + " - state isnotifyenabled = " + tempThermometer.isNotifyEnabled);
-            //  Log.e(TAG, String.valueOf(tempThermometer.measureTime) + " " +String.valueOf(SystemClock.elapsedRealtime()));
-            holder.chronometer.setBase(SystemClock.elapsedRealtime()); //saved basetime
-        }
-
-        //  }
-
-        tempThermometer.setAdapterPosition(holder.getAdapterPosition());
-
-        if (tempThermometer.intermediateTemperature != 1000f && tempThermometer.mConnectionState != BLEService.STATE_DISCONNECTED)
-            holder.textViewIntermediateTemperature.setText(String.valueOf(tempThermometer.intermediateTemperature) + " " + tempThermometer.mDeviceMeasureUnits);
-        else holder.textViewIntermediateTemperature.setText("-,-");
-
-        if (tempThermometer.maxTemperature != -1000f)
-            holder.textViewMaximumTemperature.setText(String.valueOf(tempThermometer.maxTemperature) + " " + tempThermometer.mDeviceMeasureUnits);
-        else holder.textViewMaximumTemperature.setText("-,-");
-
-        if (tempThermometer.minTemperature != 1000f)
-            holder.textViewMinimumTemperature.setText(String.valueOf(tempThermometer.minTemperature) + " " + tempThermometer.mDeviceMeasureUnits);
-        else holder.textViewMaximumTemperature.setText("-,-");
-
-        holder.mSettingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsViewCommon.newInstance(tempThermometer.mDeviceMacAddress)).commit();
+            if (tempThermometer.mConnectionState == BLEService.STATE_CONNECTED && tempThermometer.isNotifyEnabled) {
+                holder.chronometer.setBase(tempThermometer.measureTime);
+                holder.chronometer.start();
+            } else {
+                // Log.e(TAG,tempThermometer.mDeviceMacAddress + " " +String.valueOf(tempThermometer.mConnectionState) + " - state isnotifyenabled = " + tempThermometer.isNotifyEnabled);
+                //  Log.e(TAG, String.valueOf(tempThermometer.measureTime) + " " +String.valueOf(SystemClock.elapsedRealtime()));
+                holder.chronometer.setBase(SystemClock.elapsedRealtime()); //saved basetime
             }
-        });
-        holder.topToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                switch (id) {
-                    case R.id.action_disconnect:
-                        holder.chronometer.stop();
-                        holder.chronometer.setBase(SystemClock.elapsedRealtime());
-                        //      tempThermometer.measureTime = holder.chronometer.getBase(); //save basetime when disconnect
-                        tempThermometer.shutdown();
-                        holder.textViewIntermediateTemperature.setText("-,-");
-                        break;
-                    case R.id.action_reset:
-                        tempThermometer.resetValues();
-                        holder.textViewMaximumTemperature.setText("-,-");
-                        holder.textViewIntermediateTemperature.setText("-,-");
-                        holder.textViewMinimumTemperature.setText("-,-");
-                        holder.chronometer.setBase(tempThermometer.measureTime);
-                        break;
-                    case R.id.action_delete:
-                        BLEService.removeThermometer(tempThermometer);
-                        break;
-                    default:
 
-                        break;
+            //  }
+
+            tempThermometer.setAdapterPosition(holder.getAdapterPosition());
+
+            if (tempThermometer.intermediateTemperature != 1000f && tempThermometer.mConnectionState != BLEService.STATE_DISCONNECTED)
+                holder.textViewIntermediateTemperature.setText(String.valueOf(tempThermometer.intermediateTemperature) + " " + tempThermometer.mDeviceMeasureUnits);
+            else holder.textViewIntermediateTemperature.setText("-,-");
+
+            if (tempThermometer.maxTemperature != -1000f)
+                holder.textViewMaximumTemperature.setText(String.valueOf(tempThermometer.maxTemperature) + " " + tempThermometer.mDeviceMeasureUnits);
+            else holder.textViewMaximumTemperature.setText("-,-");
+
+            if (tempThermometer.minTemperature != 1000f)
+                holder.textViewMinimumTemperature.setText(String.valueOf(tempThermometer.minTemperature) + " " + tempThermometer.mDeviceMeasureUnits);
+            else holder.textViewMaximumTemperature.setText("-,-");
+
+            holder.mSettingsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsViewCommon.newInstance(tempThermometer.mDeviceMacAddress)).commit();
                 }
-                return true;
-            }
-        });
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Log.e(TAG, "onClick: " + tempThermometer.mDeviceMacAddress );
-                BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesSingleView.newInstance(tempThermometer.mDeviceMacAddress, "1")).commit();
-                //(BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesSingleView.newInstance(tempThermometer.mDeviceMacAddress,"1")).commit();
-            }
-        });
+            });
+            holder.topToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    int id = menuItem.getItemId();
+                    switch (id) {
+                        case R.id.action_disconnect:
+                            holder.chronometer.stop();
+                            holder.chronometer.setBase(SystemClock.elapsedRealtime());
+                            //      tempThermometer.measureTime = holder.chronometer.getBase(); //save basetime when disconnect
+                            tempThermometer.shutdown();
+                            holder.textViewIntermediateTemperature.setText("-,-");
+                            break;
+                        case R.id.action_reset:
+                            tempThermometer.resetValues();
+                            holder.textViewMaximumTemperature.setText("-,-");
+                            holder.textViewIntermediateTemperature.setText("-,-");
+                            holder.textViewMinimumTemperature.setText("-,-");
+                            holder.chronometer.setBase(tempThermometer.measureTime);
+                            break;
+                        case R.id.action_delete:
+                            BLEService.removeThermometer(tempThermometer);
+                            break;
+                        default:
+
+                            break;
+                    }
+                    return true;
+                }
+            });
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //Log.e(TAG, "onClick: " + tempThermometer.mDeviceMacAddress );
+                    BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesSingleView.newInstance(tempThermometer.mDeviceMacAddress, "1")).commit();
+                    //(BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesSingleView.newInstance(tempThermometer.mDeviceMacAddress,"1")).commit();
+                }
+            });
+        }
     }
 
     @Override

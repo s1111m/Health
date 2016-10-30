@@ -31,6 +31,7 @@ dependencies {
     compile 'com.github.lzyzsd:circleprogress:1.1.0'
     compile 'com.rarepebble:colorpicker:1.7.0'
     compile 'com.github.kizitonwose.colorpreference:core:1.0.2'
+    compile 'com.github.michael-rapp:android-material-preferences:3.0.0'
 
 
 }
