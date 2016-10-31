@@ -282,14 +282,14 @@ public class SmartThermometer {
 //                    maxTemperature = round(maxTemperature * 1.8f + 32f, 1);
 //                    minTemperature = round(minTemperature * 1.8f + 32f, 1);
 //                    intermediateTemperature = round(intermediateTemperature * 1.8f + 32f, 1);
-//                    minAlarmTreshold = round(minAlarmTreshold * 1.8f + 32f, 1);
-//                    maxAlarmTreshold = round(maxAlarmTreshold * 1.8f + 32f, 1);
+//                    minAlarmTresholdBound = round(minAlarmTresholdBound * 1.8f + 32f, 1);
+//                    maxAlarmTresholdBound = round(maxAlarmTresholdBound * 1.8f + 32f, 1);
 //                } else {
 //                    maxTemperature = round(maxTemperature - 273.15f, 1);
 //                    minTemperature = round(minTemperature - 273.15f, 1);
 //                    intermediateTemperature = round(intermediateTemperature - 273.15f, 1);
-//                    minAlarmTreshold = round(minAlarmTreshold - 273.15f, 1);
-//                    maxAlarmTreshold = round(maxAlarmTreshold - 273.15f, 1);
+//                    minAlarmTresholdBound = round(minAlarmTresholdBound - 273.15f, 1);
+//                    maxAlarmTresholdBound = round(maxAlarmTresholdBound - 273.15f, 1);
 //                }
 //                break;
 //            case MeasureUnits.Fahrenheit:
@@ -299,14 +299,14 @@ public class SmartThermometer {
 //                    maxTemperature = round((maxTemperature - 32) * 5 / 9, 1);
 //                    minTemperature = round((minTemperature - 32) * 5 / 9, 1);
 //                    intermediateTemperature = round((intermediateTemperature - 32) * 5 / 9, 1);
-//                    minAlarmTreshold = round((minAlarmTreshold - 32) * 5 / 9, 1);
-//                    minAlarmTreshold = round((minAlarmTreshold - 32) * 5 / 9, 1);
+//                    minAlarmTresholdBound = round((minAlarmTresholdBound - 32) * 5 / 9, 1);
+//                    minAlarmTresholdBound = round((minAlarmTresholdBound - 32) * 5 / 9, 1);
 //                } else {
 //                    maxTemperature = round((maxTemperature - 32) * 5 / 9 - 273.15f, 1);
 //                    minTemperature = round((minTemperature - 32) * 5 / 9 - 273.15f, 1);
 //                    intermediateTemperature = round((intermediateTemperature - 32) * 5 / 9 - 273.15f, 1);
-//                    minAlarmTreshold = round((minAlarmTreshold - 32) * 5 / 9 - 273.15f, 1);
-//                    maxAlarmTreshold = round((maxAlarmTreshold - 32) * 5 / 9 - 273.15f, 1);
+//                    minAlarmTresholdBound = round((minAlarmTresholdBound - 32) * 5 / 9 - 273.15f, 1);
+//                    maxAlarmTresholdBound = round((maxAlarmTresholdBound - 32) * 5 / 9 - 273.15f, 1);
 //                }
 //                break;
 //            case MeasureUnits.Kelvin:
@@ -316,8 +316,8 @@ public class SmartThermometer {
 //                    maxTemperature = round(maxTemperature + 273.15f, 1);
 //                    minTemperature = round(minTemperature + 273.15f, 1);
 //                    intermediateTemperature = round(intermediateTemperature + 273.15f, 1);
-//                    minAlarmTreshold = round(minAlarmTreshold + 273.15f, 1);
-//                    maxAlarmTreshold = round(maxAlarmTreshold + 273.15f, 1);
+//                    minAlarmTresholdBound = round(minAlarmTresholdBound + 273.15f, 1);
+//                    maxAlarmTresholdBound = round(maxAlarmTresholdBound + 273.15f, 1);
 //                } else {
 //
 //                    maxTemperature = round((maxTemperature + 273.15f) * 9 / 5 + 32f, 1);
@@ -325,8 +325,8 @@ public class SmartThermometer {
 //                    minTemperature = round((minTemperature + 273.15f) * 9 / 5 + 32f, 1);
 //                    Log.e(TAG, "MIN temp: " + minTemperature);
 //                    intermediateTemperature = round((intermediateTemperature + 273.15f) * 9 / 5 + 32f, 1);
-//                    minAlarmTreshold = round((minAlarmTreshold + 273.15f) * 9 / 5 + 32f, 1);
-//                    maxAlarmTreshold = round((maxAlarmTreshold + 273.15f) * 9 / 5 + 32f, 1);
+//                    minAlarmTresholdBound = round((minAlarmTresholdBound + 273.15f) * 9 / 5 + 32f, 1);
+//                    maxAlarmTresholdBound = round((maxAlarmTresholdBound + 273.15f) * 9 / 5 + 32f, 1);
 //                }
 //                break;
 //            default:
