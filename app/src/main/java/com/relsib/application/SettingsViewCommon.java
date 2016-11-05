@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+import android.preference.RingtonePreference;
 import android.util.Log;
 import android.util.TypedValue;
 
@@ -135,8 +137,11 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
         thermometer_alarms_screen.addPreference(rootCategory2);
 
         currentMeasureUnits = getPreferenceManager().getSharedPreferences().getString(idTag + KEY_MEASURE_UNITS, SmartThermometer.MeasureUnits.Celsium);
-        minAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(-2000, SmartThermometer.MeasureUnits.Celsium, currentMeasureUnits);
-        maxAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(7000, SmartThermometer.MeasureUnits.Celsium, currentMeasureUnits);
+        if (currentMeasureUnits == null)
+            currentMeasureUnits = SmartThermometer.MeasureUnits.Celsium;
+
+        minAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(-20, SmartThermometer.MeasureUnits.Celsium, currentMeasureUnits);
+        maxAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(70, SmartThermometer.MeasureUnits.Celsium, currentMeasureUnits);
         Log.e(TAG, "converted " + minAlarmTresholdBound + " " + maxAlarmTresholdBound);
 
         thermometer_alarms_min_treshold = new de.mrapp.android.preference.SeekBarPreference(activityContext);
@@ -146,58 +151,55 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
         thermometer_alarms_min_treshold.setMinValue(minAlarmTresholdBound);
         thermometer_alarms_min_treshold.setMaxValue(maxAlarmTresholdBound);
         thermometer_alarms_min_treshold.setDefaultValue((float) minAlarmTresholdBound);
-        //thermometer_alarms_min_treshold.setSummary(String.valueOf(getPreferenceManager().getSharedPreferences().getFloat(idTag + KEY_ALARMS_MIN_VALUE, minAlarmTresholdBound)) + " " + currentMeasureUnits);
+        thermometer_alarms_min_treshold.setSummary(String.valueOf(getPreferenceManager().getSharedPreferences().getFloat(idTag + KEY_ALARMS_MIN_VALUE, minAlarmTresholdBound)) + " " + currentMeasureUnits.toString());
         thermometer_alarms_min_treshold.setUnit(currentMeasureUnits);
 
         rootCategory2.addPreference(thermometer_alarms_min_treshold);
         Log.e(TAG, "converted " + minAlarmTresholdBound + " " + maxAlarmTresholdBound);
 
-//        thermometer_alarms_max_treshold = new de.mrapp.android.preference.SeekBarPreference(activityContext);
+        thermometer_alarms_max_treshold = new de.mrapp.android.preference.SeekBarPreference(activityContext);
+
+        thermometer_alarms_max_treshold.setKey(idTag + KEY_ALARMS_MAX_VALUE);
+        thermometer_alarms_max_treshold.setTitle("Установить порог");
+        thermometer_alarms_max_treshold.setMinValue(minAlarmTresholdBound);
+        thermometer_alarms_max_treshold.setMaxValue(maxAlarmTresholdBound);
+        thermometer_alarms_max_treshold.setDefaultValue((float) maxAlarmTresholdBound);
+        thermometer_alarms_max_treshold.setSummary(String.valueOf(getPreferenceManager().getSharedPreferences().getFloat(idTag + KEY_ALARMS_MAX_VALUE, maxAlarmTresholdBound)) + " " + currentMeasureUnits);
+        thermometer_alarms_max_treshold.setUnit(currentMeasureUnits);
+
+        final CheckBoxPreference thermometer_alarms_min_vibrate = new CheckBoxPreference(activityContext);
+        thermometer_alarms_min_vibrate.setTitle("Вибрация");
+        thermometer_alarms_min_vibrate.setSummary("Отключено");
+        thermometer_alarms_min_vibrate.setDefaultValue(false);
+        thermometer_alarms_min_vibrate.setKey(idTag + KEY_ALARMS_MIN_VIBRATE);
+
+        thermometer_alarms_min_vibrate.setChecked(false);
+        rootCategory2.addPreference(thermometer_alarms_min_vibrate);
+
+        final RingtonePreference thermometer_alarms_min_sound = new RingtonePreference(activityContext);
+        thermometer_alarms_min_sound.setKey(idTag + KEY_ALARMS_MIN_SOUND);
+        thermometer_alarms_min_sound.setTitle("Выбрать мелодию");
+        rootCategory2.addPreference(thermometer_alarms_min_sound);
 //
-//        thermometer_alarms_max_treshold.setKey(idTag + KEY_ALARMS_MAX_VALUE);
-//        thermometer_alarms_max_treshold.setTitle("Установить порог");
-//        thermometer_alarms_max_treshold.setMinValue(minAlarmTresholdBound);
-//        thermometer_alarms_max_treshold.setMaxValue(maxAlarmTresholdBound);
-//        thermometer_alarms_max_treshold.setDefaultValue((float) maxAlarmTresholdBound);
-//        thermometer_alarms_max_treshold.setSummary(String.valueOf(getPreferenceManager().getSharedPreferences().getFloat(idTag + KEY_ALARMS_MAX_VALUE, maxAlarmTresholdBound)) + " " + currentMeasureUnits);
-//        thermometer_alarms_max_treshold.setUnit(currentMeasureUnits);
+        final PreferenceCategory rootCategory3 = new PreferenceCategory(activityContext);
+        rootCategory3.setTitle("Уведомлять о максимальной температуре");
+        thermometer_alarms_screen.addPreference(rootCategory3);
+//
 
 
-//        final CheckBoxPreference thermometer_alarms_min_vibrate = new CheckBoxPreference(activityContext);
-//        thermometer_alarms_min_vibrate.setTitle("Вибрация");
-//        thermometer_alarms_min_vibrate.setSummary("Отключено");
-//        thermometer_alarms_min_vibrate.setDefaultValue(false);
-//        thermometer_alarms_min_vibrate.setKey(idTag + KEY_ALARMS_MIN_VIBRATE);
-//
-//        thermometer_alarms_min_vibrate.setChecked(false);
-//        rootCategory2.addPreference(thermometer_alarms_min_vibrate);
-//
-//        final RingtonePreference thermometer_alarms_min_sound = new RingtonePreference(activityContext);
-//        thermometer_alarms_min_sound.setKey(idTag + KEY_ALARMS_MIN_SOUND);
-//        thermometer_alarms_min_sound.setTitle("Выбрать мелодию");
-//        rootCategory2.addPreference(thermometer_alarms_min_sound);
-//
-//        final PreferenceCategory rootCategory3 = new PreferenceCategory(activityContext);
-//        rootCategory3.setTitle("Уведомлять о максимальной температуре");
-//        thermometer_alarms_screen.addPreference(rootCategory3);
-//
+        rootCategory3.addPreference(thermometer_alarms_max_treshold);
 
-//
-//
-//
-//        rootCategory3.addPreference(thermometer_alarms_max_treshold);
-//
-//        final CheckBoxPreference thermometer_alarms_max_vibrate = new CheckBoxPreference(activityContext);
-//        thermometer_alarms_max_vibrate.setTitle("Вибрация");
-//        thermometer_alarms_max_vibrate.setSummary("Отключено");
-//        thermometer_alarms_max_vibrate.setKey(idTag + KEY_ALARMS_MAX_VIBRATE);
-//        thermometer_alarms_max_vibrate.setDefaultValue(false);
-//        rootCategory3.addPreference(thermometer_alarms_max_vibrate);
-//
-//        final RingtonePreference thermometer_alarms_max_sound = new RingtonePreference(activityContext);
-//        thermometer_alarms_max_sound.setKey(idTag + KEY_ALARMS_MAX_SOUND);
-//        thermometer_alarms_max_sound.setTitle("Выбрать мелодию");
-//        rootCategory3.addPreference(thermometer_alarms_max_sound);
+        final CheckBoxPreference thermometer_alarms_max_vibrate = new CheckBoxPreference(activityContext);
+        thermometer_alarms_max_vibrate.setTitle("Вибрация");
+        thermometer_alarms_max_vibrate.setSummary("Отключено");
+        thermometer_alarms_max_vibrate.setKey(idTag + KEY_ALARMS_MAX_VIBRATE);
+        thermometer_alarms_max_vibrate.setDefaultValue(false);
+        rootCategory3.addPreference(thermometer_alarms_max_vibrate);
+
+        final RingtonePreference thermometer_alarms_max_sound = new RingtonePreference(activityContext);
+        thermometer_alarms_max_sound.setKey(idTag + KEY_ALARMS_MAX_SOUND);
+        thermometer_alarms_max_sound.setTitle("Выбрать мелодию");
+        rootCategory3.addPreference(thermometer_alarms_max_sound);
 
       /* ---- вложенный экран настроек */
         list = new ListPreference(activityContext);
@@ -214,7 +216,10 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
 //        thermometer_autoconnect.setSummary("Обнаруживать и производить подключение к термометру");
 //        thermometer_autoconnect.setKey(idTag + KEY_AUTOCONNECT);
 //        thermometer_autoconnect.setDefaultValue(true);
-//        rootCategory.addPreference(thermometer_autoconnect);
+
+        //rootCategory.addPreference(thermometer_autoconnect);
+
+
 
     }
 
@@ -257,38 +262,46 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
 
                     list.setSummary(whoChanged.mDeviceMeasureUnits);
 
-                    minAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(-2000, SmartThermometer.MeasureUnits.Celsium, newMeasureUnits);
-                    maxAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(7000, SmartThermometer.MeasureUnits.Celsium, newMeasureUnits);
+                    minAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(-20, SmartThermometer.MeasureUnits.Celsium, newMeasureUnits);
+                    maxAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(70, SmartThermometer.MeasureUnits.Celsium, newMeasureUnits);
 
                     thermometer_alarms_min_treshold.setMinValue(minAlarmTresholdBound);
                     thermometer_alarms_min_treshold.setMaxValue(maxAlarmTresholdBound);
+                    thermometer_alarms_min_treshold.setValue(whoChanged.minAlarmTreshold);
+                    thermometer_alarms_min_treshold.setDefaultValue((float) minAlarmTresholdBound);
 
-                    //thermometer_alarms_max_treshold.setMinValue(minAlarmTresholdBound);
-                    // thermometer_alarms_max_treshold.setMaxValue(maxAlarmTresholdBound);
+                    thermometer_alarms_max_treshold.setMinValue(minAlarmTresholdBound);
+                    thermometer_alarms_max_treshold.setMaxValue(maxAlarmTresholdBound);
+                    thermometer_alarms_max_treshold.setValue(whoChanged.maxAlarmTreshold);
+                    thermometer_alarms_max_treshold.setDefaultValue((float) maxAlarmTresholdBound);
 
                     thermometer_alarms_min_treshold.setUnit(whoChanged.mDeviceMeasureUnits);
-                    //thermometer_alarms_max_treshold.setUnit(whoChanged.mDeviceMeasureUnits);
+                    thermometer_alarms_max_treshold.setUnit(whoChanged.mDeviceMeasureUnits);
                     Log.e(TAG, " bounds " + minAlarmTresholdBound + " max " + maxAlarmTresholdBound);
                     ;
 
                     Log.e(TAG, " putting " + whoChanged.minAlarmTreshold + " " + whoChanged.maxAlarmTreshold);
                     getPreferenceManager().getSharedPreferences().edit().putFloat(idTag + KEY_ALARMS_MIN_VALUE, whoChanged.minAlarmTreshold).apply();
+                    getPreferenceManager().getSharedPreferences().edit().putFloat(idTag + KEY_ALARMS_MAX_VALUE, whoChanged.maxAlarmTreshold).apply();
 
-                    //getPreferenceManager().getSharedPreferences().edit().putFloat(idTag + KEY_ALARMS_MAX_VALUE, whoChanged.maxAlarmTreshold).apply();
-                    //                 thermometer_alarms_min_treshold.setValue(whoChanged.minAlarmTresholdBound);
-                    //               thermometer_alarms_min_treshold.setValue(whoChanged.maxAlarmTresholdBound);
+                    thermometer_alarms_max_treshold.setValue(whoChanged.minAlarmTreshold);
+                    thermometer_alarms_min_treshold.setValue(whoChanged.maxAlarmTreshold);
 
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MIN_VALUE:
+                    Log.e(TAG, "before value " + thermometer_alarms_min_treshold.getValue());
                     whoChanged.minAlarmTreshold = getPreferenceManager().getSharedPreferences().getFloat(idTag + KEY_ALARMS_MIN_VALUE, minAlarmTresholdBound);
+
                     Log.e(TAG, "on change value Setting min alarm " + whoChanged.minAlarmTreshold);
-                    thermometer_alarms_min_treshold.setSummary(String.valueOf(whoChanged.minAlarmTreshold) + " " + currentMeasureUnits);
+                    thermometer_alarms_min_treshold.setSummary(String.valueOf(whoChanged.minAlarmTreshold) + " " + whoChanged.mDeviceMeasureUnits);
 
 
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MAX_VALUE:
+                    Log.e(TAG, "before value " + thermometer_alarms_max_treshold.getValue());
                     whoChanged.maxAlarmTreshold = getPreferenceManager().getSharedPreferences().getFloat(idTag + KEY_ALARMS_MAX_VALUE, maxAlarmTresholdBound);
-                    thermometer_alarms_max_treshold.setSummary(String.valueOf(String.valueOf(whoChanged.maxAlarmTreshold)) + " " + currentMeasureUnits);
+                    Log.e(TAG, "on change value Setting max alarm " + whoChanged.maxAlarmTreshold);
+                    thermometer_alarms_max_treshold.setSummary(String.valueOf(String.valueOf(whoChanged.maxAlarmTreshold)) + " " + whoChanged.mDeviceMeasureUnits);
                     break;
 //                case SettingsViewCommon.KEY_AUTOCONNECT:
 //                    whoChanged.autoconnect = sharedPreferences.getBoolean(s, true);

@@ -45,7 +45,7 @@ public class SmartThermometer {
     public String mDeviceHardwareRevisionNumber;
     public String mDeviceSoftwareRevisionNumber;
     public String mDeviceManufacturer;
-    public String mDeviceMeasureUnits = null;
+    public String mDeviceMeasureUnits;
     public int mDeviceBatteryLevel;
     public long measureTime;// = -1;
     public int mDeviceColorLabel = Color.BLACK;
@@ -57,8 +57,8 @@ public class SmartThermometer {
     public boolean autoconnect = true;
     public int mConnectionState = BLEService.STATE_DISCONNECTED;
     public boolean isNotifyEnabled = false;
-    public float minAlarmTreshold;
-    public float maxAlarmTreshold;
+    public float minAlarmTreshold = -1000f;
+    public float maxAlarmTreshold = 1000f;
     SharedPreferences preferences;
     private long adapterPosition;
     private BluetoothGatt mBluetoothGatt;
@@ -229,6 +229,11 @@ public class SmartThermometer {
         this.preferences = BLEService.mActivityContext.getSharedPreferences(mDeviceMacAddress + SettingsViewCommon.FILE_NAME, MODE_PRIVATE);
         // Log.e(TAG,"calling from constructor");
         setmDeviceName(preferences.getString(this.mDeviceMacAddress + SettingsViewCommon.KEY_NAME, mDeviceName));
+        setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_COLOR_LABEL, Color.BLACK));
+        setmDeviceBackgroundColor(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_BACKGROUND_COLOR, Color.WHITE));
+        setmDeviceMeasureUnits(preferences.getString(mDeviceMacAddress + SettingsViewCommon.KEY_MEASURE_UNITS, MeasureUnits.Celsium));
+        minAlarmTreshold = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
+        maxAlarmTreshold = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_VALUE, 70f);
         //setmDeviceName(mDeviceName);
     }
 
@@ -267,7 +272,6 @@ public class SmartThermometer {
     }
 
     public void changeMeasureUnits(String to) {
-        Log.e(TAG, "convert called ");
         maxTemperature = MeasureUnits.convertMeasureUnits(maxTemperature, mDeviceMeasureUnits, to);
         minTemperature = MeasureUnits.convertMeasureUnits(minTemperature, mDeviceMeasureUnits, to);
         intermediateTemperature = MeasureUnits.convertMeasureUnits(intermediateTemperature, mDeviceMeasureUnits, to);
@@ -340,7 +344,7 @@ public class SmartThermometer {
     public void setmDeviceMeasureUnits(String mDeviceMeasureUnits) {
         Log.e(TAG, "Call change units current: " + this.mDeviceMeasureUnits + " to: " + mDeviceMeasureUnits);
         if (this.mDeviceMeasureUnits != null && !this.mDeviceMeasureUnits.equals(mDeviceMeasureUnits)) {
-            Log.e(TAG, "Call change units");
+            Log.e(TAG, "Call change units======================================");
             changeMeasureUnits(mDeviceMeasureUnits);
         }
         this.mDeviceMeasureUnits = mDeviceMeasureUnits;
@@ -425,7 +429,7 @@ public class SmartThermometer {
         setmDeviceBackgroundColor(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_BACKGROUND_COLOR, Color.WHITE));
         setmDeviceMeasureUnits(preferences.getString(mDeviceMacAddress + SettingsViewCommon.KEY_MEASURE_UNITS, MeasureUnits.Celsium));
         minAlarmTreshold = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
-        maxAlarmTreshold = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_VALUE, 50f);
+        maxAlarmTreshold = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_VALUE, 70f);
     }
 
     @Override
@@ -627,6 +631,8 @@ public class SmartThermometer {
         public final static String Kelvin = "K";
 
         public static float convertMeasureUnits(float valueFrom, String fromMeasureUnits, String toMeasureUnits) {
+            if (valueFrom == 1000f || valueFrom == -1000f || fromMeasureUnits.equals(toMeasureUnits))
+                return valueFrom;
             switch (fromMeasureUnits) {
                 case MeasureUnits.Celsium:
                     Log.e(TAG, "from celsium");
@@ -637,7 +643,7 @@ public class SmartThermometer {
                         Log.e(TAG, "to kelvin");
                         return round(valueFrom - 273.15f, 1);
                     }
-                    return valueFrom;
+                    //   return valueFrom;
 
                 case MeasureUnits.Fahrenheit:
                     Log.e(TAG, "from fahr");
@@ -647,7 +653,7 @@ public class SmartThermometer {
                     } else if (toMeasureUnits.equals(MeasureUnits.Kelvin)) {
                         return round((valueFrom - 32) * 5 / 9 - 273.15f, 1);
                     }
-                    return valueFrom;
+                    //  return valueFrom;
                 case MeasureUnits.Kelvin:
                     Log.e(TAG, "kelvin");
                     if (toMeasureUnits.equals(MeasureUnits.Celsium)) {
@@ -656,7 +662,7 @@ public class SmartThermometer {
                     } else if (toMeasureUnits.equals(MeasureUnits.Fahrenheit)) {
                         return round((valueFrom + 273.15f) * 9 / 5 + 32f, 1);
                     }
-                    return valueFrom;
+                    //   return valueFrom;
                 default:
                     return valueFrom;
             }
