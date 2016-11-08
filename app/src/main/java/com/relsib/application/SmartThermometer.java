@@ -57,8 +57,8 @@ public class SmartThermometer {
     public boolean autoconnect = true;
     public int mConnectionState = BLEService.STATE_DISCONNECTED;
     public boolean isNotifyEnabled = false;
-    public float minAlarmTreshold = -1000f;
-    public float maxAlarmTreshold = 1000f;
+    public float minAlarm = -1000f;
+    public float maxAlarm = -1000f;
     SharedPreferences preferences;
     private long adapterPosition;
     private BluetoothGatt mBluetoothGatt;
@@ -232,8 +232,8 @@ public class SmartThermometer {
         setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_COLOR_LABEL, Color.BLACK));
         setmDeviceBackgroundColor(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_BACKGROUND_COLOR, Color.WHITE));
         setmDeviceMeasureUnits(preferences.getString(mDeviceMacAddress + SettingsViewCommon.KEY_MEASURE_UNITS, MeasureUnits.Celsium));
-        minAlarmTreshold = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
-        maxAlarmTreshold = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_VALUE, 70f);
+        minAlarm = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
+        maxAlarm = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_VALUE, 70f);
         //setmDeviceName(mDeviceName);
     }
 
@@ -275,8 +275,8 @@ public class SmartThermometer {
         maxTemperature = MeasureUnits.convertMeasureUnits(maxTemperature, mDeviceMeasureUnits, to);
         minTemperature = MeasureUnits.convertMeasureUnits(minTemperature, mDeviceMeasureUnits, to);
         intermediateTemperature = MeasureUnits.convertMeasureUnits(intermediateTemperature, mDeviceMeasureUnits, to);
-        minAlarmTreshold = MeasureUnits.convertMeasureUnits(minAlarmTreshold, mDeviceMeasureUnits, to);
-        maxAlarmTreshold = MeasureUnits.convertMeasureUnits(maxAlarmTreshold, mDeviceMeasureUnits, to);
+        minAlarm = MeasureUnits.convertMeasureUnits(minAlarm, mDeviceMeasureUnits, to);
+        maxAlarm = MeasureUnits.convertMeasureUnits(maxAlarm, mDeviceMeasureUnits, to);
 
 //        switch (mDeviceMeasureUnits) {
 //            case MeasureUnits.Celsium:
@@ -428,8 +428,8 @@ public class SmartThermometer {
         setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_COLOR_LABEL, Color.BLACK));
         setmDeviceBackgroundColor(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_BACKGROUND_COLOR, Color.WHITE));
         setmDeviceMeasureUnits(preferences.getString(mDeviceMacAddress + SettingsViewCommon.KEY_MEASURE_UNITS, MeasureUnits.Celsium));
-        minAlarmTreshold = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
-        maxAlarmTreshold = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_VALUE, 70f);
+        //minAlarm = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
+        //maxAlarm = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_VALUE, 70f);
     }
 
     @Override

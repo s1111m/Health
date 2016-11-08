@@ -257,7 +257,7 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
                 case SettingsViewCommon.KEY_MEASURE_UNITS:
                     String newMeasureUnits = sharedPreferences.getString(s, SmartThermometer.MeasureUnits.Celsium);
 
-                    Log.e(TAG, " before convertation " + whoChanged.minAlarmTreshold + " " + whoChanged.maxAlarmTreshold);
+                    Log.e(TAG, " before convertation " + whoChanged.minAlarm + " " + whoChanged.maxAlarm);
                     whoChanged.setmDeviceMeasureUnits(newMeasureUnits);
 
                     list.setSummary(whoChanged.mDeviceMeasureUnits);
@@ -265,43 +265,42 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
                     minAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(-20, SmartThermometer.MeasureUnits.Celsium, newMeasureUnits);
                     maxAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(70, SmartThermometer.MeasureUnits.Celsium, newMeasureUnits);
 
+                    Log.e(TAG, " bounds " + minAlarmTresholdBound + " max " + maxAlarmTresholdBound);
+
+                    Log.e(TAG, " putting " + whoChanged.minAlarm + " " + whoChanged.maxAlarm);
+
                     thermometer_alarms_min_treshold.setMinValue(minAlarmTresholdBound);
                     thermometer_alarms_min_treshold.setMaxValue(maxAlarmTresholdBound);
-                    thermometer_alarms_min_treshold.setValue(whoChanged.minAlarmTreshold);
-                    thermometer_alarms_min_treshold.setDefaultValue((float) minAlarmTresholdBound);
+                    //thermometer_alarms_min_treshold.setDefaultValue((float) minAlarmTresholdBound);
+                    thermometer_alarms_min_treshold.setUnit(whoChanged.mDeviceMeasureUnits);
+                    getPreferenceManager().getSharedPreferences().edit().putFloat(idTag + KEY_ALARMS_MIN_VALUE, whoChanged.minAlarm).apply();
+                    thermometer_alarms_min_treshold.setValue(whoChanged.minAlarm);
 
                     thermometer_alarms_max_treshold.setMinValue(minAlarmTresholdBound);
                     thermometer_alarms_max_treshold.setMaxValue(maxAlarmTresholdBound);
-                    thermometer_alarms_max_treshold.setValue(whoChanged.maxAlarmTreshold);
-                    thermometer_alarms_max_treshold.setDefaultValue((float) maxAlarmTresholdBound);
-
-                    thermometer_alarms_min_treshold.setUnit(whoChanged.mDeviceMeasureUnits);
+                    //thermometer_alarms_max_treshold.setDefaultValue((float) maxAlarmTresholdBound);
                     thermometer_alarms_max_treshold.setUnit(whoChanged.mDeviceMeasureUnits);
-                    Log.e(TAG, " bounds " + minAlarmTresholdBound + " max " + maxAlarmTresholdBound);
-                    ;
+                    getPreferenceManager().getSharedPreferences().edit().putFloat(idTag + KEY_ALARMS_MAX_VALUE, whoChanged.maxAlarm).apply();
+                    thermometer_alarms_max_treshold.setValue(whoChanged.maxAlarm);
 
-                    Log.e(TAG, " putting " + whoChanged.minAlarmTreshold + " " + whoChanged.maxAlarmTreshold);
-                    getPreferenceManager().getSharedPreferences().edit().putFloat(idTag + KEY_ALARMS_MIN_VALUE, whoChanged.minAlarmTreshold).apply();
-                    getPreferenceManager().getSharedPreferences().edit().putFloat(idTag + KEY_ALARMS_MAX_VALUE, whoChanged.maxAlarmTreshold).apply();
 
-                    thermometer_alarms_max_treshold.setValue(whoChanged.minAlarmTreshold);
-                    thermometer_alarms_min_treshold.setValue(whoChanged.maxAlarmTreshold);
 
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MIN_VALUE:
-                    Log.e(TAG, "before value " + thermometer_alarms_min_treshold.getValue());
-                    whoChanged.minAlarmTreshold = getPreferenceManager().getSharedPreferences().getFloat(idTag + KEY_ALARMS_MIN_VALUE, minAlarmTresholdBound);
+                    //         Log.e(TAG, "before value " + thermometer_alarms_min_treshold.getValue());
+                    whoChanged.minAlarm = getPreferenceManager().getSharedPreferences().getFloat(idTag + KEY_ALARMS_MIN_VALUE, minAlarmTresholdBound);
 
-                    Log.e(TAG, "on change value Setting min alarm " + whoChanged.minAlarmTreshold);
-                    thermometer_alarms_min_treshold.setSummary(String.valueOf(whoChanged.minAlarmTreshold) + " " + whoChanged.mDeviceMeasureUnits);
+                    //    Log.e(TAG, "on change value Setting min alarm " + whoChanged.minAlarm);
+                    thermometer_alarms_min_treshold.setSummary(String.valueOf(whoChanged.minAlarm) + " " + whoChanged.mDeviceMeasureUnits);
 
 
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MAX_VALUE:
                     Log.e(TAG, "before value " + thermometer_alarms_max_treshold.getValue());
-                    whoChanged.maxAlarmTreshold = getPreferenceManager().getSharedPreferences().getFloat(idTag + KEY_ALARMS_MAX_VALUE, maxAlarmTresholdBound);
-                    Log.e(TAG, "on change value Setting max alarm " + whoChanged.maxAlarmTreshold);
-                    thermometer_alarms_max_treshold.setSummary(String.valueOf(String.valueOf(whoChanged.maxAlarmTreshold)) + " " + whoChanged.mDeviceMeasureUnits);
+                    Log.e(TAG, "converted value " + SmartThermometer.MeasureUnits.convertMeasureUnits(110, SmartThermometer.MeasureUnits.Fahrenheit, SmartThermometer.MeasureUnits.Celsium));
+                    whoChanged.maxAlarm = getPreferenceManager().getSharedPreferences().getFloat(idTag + KEY_ALARMS_MAX_VALUE, maxAlarmTresholdBound);
+                    Log.e(TAG, "on change value Setting max alarm " + whoChanged.maxAlarm);
+                    thermometer_alarms_max_treshold.setSummary(String.valueOf(String.valueOf(whoChanged.maxAlarm)) + " " + whoChanged.mDeviceMeasureUnits);
                     break;
 //                case SettingsViewCommon.KEY_AUTOCONNECT:
 //                    whoChanged.autoconnect = sharedPreferences.getBoolean(s, true);
