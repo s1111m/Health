@@ -635,29 +635,29 @@ public class SmartThermometer {
                 return valueFrom;
             switch (fromMeasureUnits) {
                 case MeasureUnits.Celsium:
-                    Log.e(TAG, "from celsium");
+                    //   Log.e(TAG, "from celsium");
                     if (toMeasureUnits.equals(MeasureUnits.Fahrenheit)) {
-                        Log.e(TAG, "to fahrengheit");
+                        //     Log.e(TAG, "to fahrengheit");
                         return round(valueFrom * 1.8f + 32f, 1);
                     } else if (toMeasureUnits.equals(MeasureUnits.Kelvin)) {
-                        Log.e(TAG, "to kelvin");
+                        //   Log.e(TAG, "to kelvin");
                         return round(valueFrom - 273.15f, 1);
                     }
                     //   return valueFrom;
 
                 case MeasureUnits.Fahrenheit:
-                    Log.e(TAG, "from fahr");
+                    //Log.e(TAG, "from fahr");
                     if (toMeasureUnits.equals(MeasureUnits.Celsium)) {
-                        Log.e(TAG, "to celsium");
+                        //  Log.e(TAG, "to celsium");
                         return round((valueFrom - 32) * 5 / 9, 1);
                     } else if (toMeasureUnits.equals(MeasureUnits.Kelvin)) {
                         return round((valueFrom - 32) * 5 / 9 - 273.15f, 1);
                     }
                     //  return valueFrom;
                 case MeasureUnits.Kelvin:
-                    Log.e(TAG, "kelvin");
+                    //Log.e(TAG, "kelvin");
                     if (toMeasureUnits.equals(MeasureUnits.Celsium)) {
-                        Log.e(TAG, "to celsium");
+                        //  Log.e(TAG, "to celsium");
                         return round(valueFrom + 273.15f, 1);
                     } else if (toMeasureUnits.equals(MeasureUnits.Fahrenheit)) {
                         return round((valueFrom + 273.15f) * 9 / 5 + 32f, 1);
