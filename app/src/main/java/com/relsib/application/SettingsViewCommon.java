@@ -282,14 +282,16 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
                     Log.e(TAG, "get setted min value " + thermometer_alarms_min_treshold.getValue());
 
                     Log.e(TAG, "Saving max values" + whoChanged.maxAlarm + " bounds " + minAlarmTresholdBound + " max " + maxAlarmTresholdBound);
-                    thermometer_alarms_max_treshold.setMinValue(minAlarmTresholdBound);
+                    thermometer_alarms_max_treshold.setMinValue(-1000);
                     thermometer_alarms_max_treshold.setMaxValue(1000);
                     // thermometer_alarms_max_treshold.setDefaultValue((float) maxAlarmTresholdBound);
                     thermometer_alarms_max_treshold.setUnit(whoChanged.mDeviceMeasureUnits);
                     getPreferenceManager().getSharedPreferences().edit().putFloat(idTag + KEY_ALARMS_MAX_VALUE, whoChanged.maxAlarm).apply();
 
                     thermometer_alarms_max_treshold.setValue(whoChanged.maxAlarm);
+                    thermometer_alarms_max_treshold.setMinValue(minAlarmTresholdBound);
                     thermometer_alarms_max_treshold.setMaxValue(maxAlarmTresholdBound);
+
                     Log.e(TAG, "get setted value " + thermometer_alarms_max_treshold.getValue());
 
 
