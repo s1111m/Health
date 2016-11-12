@@ -49,6 +49,7 @@ public class DeviceInfoFragment extends Fragment {
         if (getArguments() != null) {
             idTag = getArguments().getString(TAG);
         }
+        SmartThermometer = BLEService.findThermometerByMac(idTag);
 
     }
 
@@ -66,6 +67,7 @@ public class DeviceInfoFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
+
             //recyclerView.setAdapter();
 
         }
