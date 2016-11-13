@@ -2,9 +2,7 @@ package com.relsib.adapters;
 
 import android.os.SystemClock;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
@@ -12,7 +10,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.relsib.application.BLEService;
-import com.relsib.application.MyDevicesListView;
 import com.relsib.application.MyDevicesSingleView;
 import com.relsib.application.R;
 import com.relsib.application.SettingsViewCommon;
@@ -49,7 +46,7 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
         if (thermometer != null) {
 
             holder.textViewName.setText(thermometer.mDeviceName);
-            holder.textViewMac.setText(thermometer.mDeviceMacAddress);
+            holder.textViewSerial.setText("SN: " + thermometer.mDeviceSerialNumber);
 
             holder.battery_level.setProgress(thermometer.mDeviceBatteryLevel);
             //holder.deviceBatteryText.setText(thermometer.mDeviceBatteryLevel + "%");
@@ -57,7 +54,7 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
             // holder.textDeviceSerial.setText("SN: " + thermometer.getmDeviceSerialNumber());
 
             holder.itemView.setBackgroundColor(thermometer.mDeviceBackgroundColor);
-            holder.textViewName.setTextColor(thermometer.mDeviceColorLabel);
+            //holder.textViewName.setTextColor(thermometer.mDeviceColorLabel);
             //holder.topToolBar.setTitle(thermometer.mDeviceName);// + " SN:" + thermometer.mDeviceSerialNumber);
             // Log.e(TAG, "measure time " + String.valueOf(thermometer.measureTime));
             //  if (thermometer.measureTime != -1) {// if  gettempbynotify set's timer
@@ -87,44 +84,64 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
                 holder.textViewMinimumTemperature.setText(String.valueOf(thermometer.minTemperature) + " " + thermometer.mDeviceMeasureUnits);
             else holder.textViewMaximumTemperature.setText("-,-");
 
-            holder.mSettingsButton.setOnClickListener(new View.OnClickListener() {
+            holder.btnSettings.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsViewCommon.newInstance(thermometer.mDeviceMacAddress)).commit();
                 }
             });
-
-            holder.topToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            holder.btnShutdown.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    int id = menuItem.getItemId();
-                    switch (id) {
-                        case R.id.action_disconnect:
+                public void onClick(View view) {
                             holder.chronometer.stop();
                             holder.chronometer.setBase(SystemClock.elapsedRealtime());
-                            //      thermometer.measureTime = holder.chronometer.getBase(); //save basetime when disconnect
+                    thermometer.measureTime = holder.chronometer.getBase(); //save basetime when disconnect
                             thermometer.shutdown();
                             holder.textViewIntermediateTemperature.setText("-,-");
-                            break;
-                        case R.id.action_reset:
-                            thermometer.resetValues();
-                            holder.textViewMaximumTemperature.setText("-,-");
-                            holder.textViewIntermediateTemperature.setText("-,-");
-                            holder.textViewMinimumTemperature.setText("-,-");
-                            holder.chronometer.setBase(thermometer.measureTime);
-                            break;
-                        case R.id.action_delete:
-                            BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesListView.newInstance("tesy", "test")).commit();
-                            BLEService.removeThermometer(thermometer);
-                            break;
-
-                        default:
-
-                            break;
-                    }
-                    return true;
                 }
             });
+            holder.btnReload.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    thermometer.resetValues();
+                    holder.textViewMaximumTemperature.setText("-,-");
+                    holder.textViewIntermediateTemperature.setText("-,-");
+                    holder.textViewMinimumTemperature.setText("-,-");
+                    holder.chronometer.setBase(thermometer.measureTime);
+                }
+            });
+
+//            holder.topToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//                @Override
+//                public boolean onMenuItemClick(MenuItem menuItem) {
+//                    int id = menuItem.getItemId();
+//                    switch (id) {
+//                        case R.id.action_disconnect:
+//                            holder.chronometer.stop();
+//                            holder.chronometer.setBase(SystemClock.elapsedRealtime());
+//                            //      thermometer.measureTime = holder.chronometer.getBase(); //save basetime when disconnect
+//                            thermometer.shutdown();
+//                            holder.textViewIntermediateTemperature.setText("-,-");
+//                            break;
+//                        case R.id.action_reset:
+//                            thermometer.resetValues();
+//                            holder.textViewMaximumTemperature.setText("-,-");
+//                            holder.textViewIntermediateTemperature.setText("-,-");
+//                            holder.textViewMinimumTemperature.setText("-,-");
+//                            holder.chronometer.setBase(thermometer.measureTime);
+//                            break;
+//                        case R.id.action_delete:
+//                            BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesListView.newInstance("tesy", "test")).commit();
+//                            BLEService.removeThermometer(thermometer);
+//                            break;
+//
+//                        default:
+//
+//                            break;
+//                    }
+//                    return true;
+//                }
+//            });
         }
     }
 
@@ -143,31 +160,31 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         TextView textViewName;
-        TextView textViewMac;
+        TextView textViewSerial;
         TextView textViewIntermediateTemperature;
         TextView textViewMaximumTemperature;
         TextView textViewMinimumTemperature;
         com.github.lzyzsd.circleprogress.DonutProgress battery_level;
-        TextView textDeviceSerial;
-        Toolbar topToolBar;
+        //TextView textDeviceSerial;
+        // Toolbar topToolBar;
         Chronometer chronometer;
-
-        ImageButton mSettingsButton;
+        ImageButton btnSettings;
+        ImageButton btnReload;
+        ImageButton btnShutdown;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             this.textViewName = (TextView) itemView.findViewById(R.id.textViewName);
-            this.textViewMac = (TextView) itemView.findViewById(R.id.textViewMac);
+            this.textViewSerial = (TextView) itemView.findViewById(R.id.textDeviceSerial);
             this.textViewIntermediateTemperature = (TextView) itemView.findViewById(R.id.intermediateTemperature);
             this.textViewMaximumTemperature = (TextView) itemView.findViewById(R.id.MaximumTemperature);
             this.textViewMinimumTemperature = (TextView) itemView.findViewById(R.id.minimumTemperature);
             this.battery_level = (com.github.lzyzsd.circleprogress.DonutProgress) itemView.findViewById(R.id.device_battery);
-            //  this.textDeviceSerial = (TextView) itemView.findViewById(R.id.device_serial);
-            this.topToolBar = (Toolbar) itemView.findViewById(R.id.card_toolbar);
             this.chronometer = (Chronometer) itemView.findViewById(R.id.chronometer);
-            // this.deviceBatteryText = (TextView) itemView.findViewById(R.id.deviceBatteryText);
-            this.mSettingsButton = (ImageButton) itemView.findViewById(R.id.settingsButton);
-            topToolBar.inflateMenu(R.menu.card_toolbar_menu);
+            this.btnSettings = (ImageButton) itemView.findViewById(R.id.btnSettings);
+            this.btnReload = (ImageButton) itemView.findViewById(R.id.btnReload);
+            this.btnShutdown = (ImageButton) itemView.findViewById(R.id.btnShutdown);
+            //topToolBar.inflateMenu(R.menu.card_toolbar_menu);
 
         }
 

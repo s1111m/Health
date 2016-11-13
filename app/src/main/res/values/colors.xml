@@ -4,9 +4,25 @@
     <color name="colorPrimaryDark">#dc582a</color>
     <color name="colorAccent">#d8453c</color>
     <color name="transparent">#00000000</color>
-    <color name="red" type="color">#FFFF4444</color>
+    <color name="red" type="color">#fff44336</color>
+    <color name="orange" type="color">#ffff9800</color>
+    <color name="yellow" type="color">#ffffeb3b</color>
+    <color name="green" type="color">#ff4caf50</color>
+    <color name="cyan" type="color">#ff03a9f4</color>
+    <color name="blue" type="color">#ff3f51b5</color>
+    <color name="violet" type="color">#ff9c27b0</color>
     <!-- color="#009ada" blue
     color="#dc582a"
     color="#d8453c"
     -->
+
+    <array name="color_choices">
+        <item>@color/red</item>
+        <item>@color/orange</item>
+        <item>@color/yellow</item>
+        <item>@color/green</item>
+        <item>@color/cyan</item>
+        <item>@color/blue</item>
+        <item>@color/violet</item>
+    </array>
 </resources>

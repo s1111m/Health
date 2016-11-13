@@ -22,8 +22,7 @@ import android.view.View;
 import com.relsib.helper.FontsOverride;
 
 
-public class MainActivityView extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivityView extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final static String TAG = MainActivityView.class.getSimpleName();
     public static BLEService mBLEService;
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -34,15 +33,13 @@ public class MainActivityView extends AppCompatActivity
             if (!mBLEService.initialize(MainActivityView.this)) {
                 //  Log.e(TAG, "Unable to initialize Bluetooth");
             }
-
             //Log.e(TAG, "onService connected");
             mBLEService.loadMyThermometers();
-
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            mBLEService = null;
+            // mBLEService = null;
         }
     };
     Fragment currentFragment;
@@ -60,12 +57,12 @@ public class MainActivityView extends AppCompatActivity
 
         //register service
         Log.e(TAG, "APP_START");
-        new Thread(new Runnable() {
-            public void run() {
+//        new Thread(new Runnable() {
+//            public void run() {
                 Intent gattServiceIntent = new Intent(getApplicationContext(), BLEService.class);
                 bindService(gattServiceIntent, mServiceConnection, Activity.BIND_AUTO_CREATE);
-            }
-        }).start();
+        //       }
+//        }).start();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

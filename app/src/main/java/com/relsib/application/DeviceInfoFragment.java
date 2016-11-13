@@ -10,8 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.relsib.application.dummy.DummyContent.DummyItem;
-
 import static android.content.ContentValues.TAG;
 
 /**
@@ -49,7 +47,7 @@ public class DeviceInfoFragment extends Fragment {
         if (getArguments() != null) {
             idTag = getArguments().getString(TAG);
         }
-        SmartThermometer = BLEService.findThermometerByMac(idTag);
+        //SmartThermometer = BLEService.findThermometerByMac(idTag);
 
     }
 
@@ -104,6 +102,6 @@ public class DeviceInfoFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        //void onListFragmentInteraction(DummyItem item);
     }
 }

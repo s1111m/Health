@@ -41,9 +41,6 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
     String currentMeasureUnits;
     int minAlarmTresholdBound;
     int maxAlarmTresholdBound;
-
-
-    // SharedPreferences.OnSharedPreferenceChangeListener listener;
     String idTag;
     EditTextPreference thermometer_name;
     ListPreference list;
@@ -95,12 +92,14 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
         thermometer_name.setDialogTitle("Введите новое имя термометра");
         rootCategory.addPreference(thermometer_name);
 
-        final com.kizitonwose.colorpreference.ColorPreference thermometer_color_label = new com.kizitonwose.colorpreference.ColorPreference(BLEService.mActivityContext);
 
+        de.mrapp.android.preference.ColorPalettePreference thermometer_color_label = new de.mrapp.android.preference.ColorPalettePreference(BLEService.mActivityContext);
+        //  thermometer_color_label = new com.kizitonwose.colorpreference.ColorPreference(BLEService.mActivityContext);
         thermometer_color_label.setKey(idTag + KEY_COLOR_LABEL);
+        thermometer_color_label.setColorPalette(R.array.color_choices);
         thermometer_color_label.setTitle("Цветовая метка");
         thermometer_color_label.setSummary("Установить цветовую метку в программе");
-        thermometer_color_label.setDefaultValue(Color.BLACK);
+        thermometer_color_label.setDefaultValue(Color.RED);
         rootCategory.addPreference(thermometer_color_label);
 
         final com.rarepebble.colorpicker.ColorPreference thermometer_background_color = new com.rarepebble.colorpicker.ColorPreference(BLEService.mActivityContext);

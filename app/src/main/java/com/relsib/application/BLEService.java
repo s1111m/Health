@@ -191,10 +191,21 @@ public class BLEService extends Service {
             public void run() {
                 for (int i = 0; i < thermometers.size(); i++) {
                     SmartThermometer tempThermometer = thermometers.get(i);
-                    if (tempThermometer.mConnectionState == BLEService.STATE_DISCONNECTED) {
-                        // new ConnectThread(tempThermometer).start();
-                        if (tempThermometer.mDeviceMacAddress != "aa:aa:aa:aa:aa")
-                            tempThermometer.connect(true);
+                    if (!BLEService.mBluetoothAdapter.isEnabled()) {
+                        Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                        enableBtIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(enableBtIntent);
+                    }
+                    if (tempThermometer != null) {
+                        if (!tempThermometer.mDeviceMacAddress.equals("aa:aa:aa:aa:aa")) {
+                            //if (tempThermometer.mConnectionState == BLEService.STATE_CONNECTED){
+                            tempThermometer.refreshRssi();
+                            //}
+                            if (tempThermometer.mConnectionState == BLEService.STATE_DISCONNECTED) {
+                                // new ConnectThread(tempThermometer).start();
+                                tempThermometer.connect(true);
+                            }
+                        }
                     }
                 }
             }

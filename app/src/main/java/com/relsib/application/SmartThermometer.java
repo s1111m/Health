@@ -36,7 +36,7 @@ public class SmartThermometer {
     public static final String TEMP_CURR = "TEMP_CURR";
     private static final String TAG = SmartThermometer.class.getSimpleName();
     public long _ID = DbModel.UNSAVED_ID;
-    public int mDeviceRssi;
+    public int mDeviceRssi = 0;
     public String mDeviceMacAddress;
     public String mDeviceName;
     public String mDeviceModelNumber;
@@ -48,7 +48,7 @@ public class SmartThermometer {
     public String mDeviceMeasureUnits;
     public int mDeviceBatteryLevel;
     public long measureTime;// = -1;
-    public int mDeviceColorLabel = Color.BLACK;
+    public int mDeviceColorLabel = Color.WHITE;
     public int mDeviceBackgroundColor = Color.WHITE;
     public float intermediateTemperature = 1000f;
     public float maxTemperature = -1000f;
@@ -81,6 +81,7 @@ public class SmartThermometer {
                 intentAction = BLEService.ACTION_GATT_DISCONNECTED;
                 mConnectionState = BLEService.STATE_DISCONNECTED;
                 intermediateTemperature = 1000f;
+                mDeviceRssi = 0;
                 isNotifyEnabled = false;
                 Log.e(TAG, "Disconnected from GATT server.");
                 broadcastUpdate(intentAction);
@@ -93,7 +94,6 @@ public class SmartThermometer {
                 Log.e(TAG, "Services discovered");
                 getTemperatureByNotify(true);
                 broadcastUpdate(BLEService.ACTION_GATT_SERVICES_DISCOVERED);
-                //readInfoTypes();
                 if (mDeviceSerialNumber == null) { //
                     readInfoTypes();
                 } //else {
@@ -222,6 +222,7 @@ public class SmartThermometer {
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
             super.onReadRemoteRssi(gatt, rssi, status);
             mDeviceRssi = rssi;
+            broadcastUpdate(BLEService.EXTRA_DATA);
         }
     };
     public SmartThermometer(String mDeviceMacAddress, String mDeviceName) {
@@ -229,7 +230,7 @@ public class SmartThermometer {
         this.preferences = BLEService.mActivityContext.getSharedPreferences(mDeviceMacAddress + SettingsViewCommon.FILE_NAME, MODE_PRIVATE);
         // Log.e(TAG,"calling from constructor");
         setmDeviceName(preferences.getString(this.mDeviceMacAddress + SettingsViewCommon.KEY_NAME, mDeviceName));
-        setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_COLOR_LABEL, Color.BLACK));
+        setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_COLOR_LABEL, Color.WHITE));
         setmDeviceBackgroundColor(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_BACKGROUND_COLOR, Color.WHITE));
         setmDeviceMeasureUnits(preferences.getString(mDeviceMacAddress + SettingsViewCommon.KEY_MEASURE_UNITS, MeasureUnits.Celsium));
         minAlarm = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
@@ -258,6 +259,12 @@ public class SmartThermometer {
         thermomether.mDeviceBatteryLevel = mDeviceBatteryLevel;
         return thermomether;
 
+    }
+
+    public void refreshRssi() {
+        if (mBluetoothGatt != null) {
+            mBluetoothGatt.readRemoteRssi();
+        }
     }
 
     public String getmDeviceName() {
@@ -425,7 +432,7 @@ public class SmartThermometer {
     public void setmDeviceSerialNumber(String mDeviceSerialNumber) {
         this.mDeviceSerialNumber = mDeviceSerialNumber;
         //setmDeviceName(preferences.getString(mDeviceMacAddress + SettingsViewCommon.KEY_NAME, "WT-50"));
-        setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_COLOR_LABEL, Color.BLACK));
+        setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_COLOR_LABEL, Color.WHITE));
         setmDeviceBackgroundColor(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_BACKGROUND_COLOR, Color.WHITE));
         setmDeviceMeasureUnits(preferences.getString(mDeviceMacAddress + SettingsViewCommon.KEY_MEASURE_UNITS, MeasureUnits.Celsium));
         //minAlarm = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);

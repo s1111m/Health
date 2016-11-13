@@ -16,31 +16,30 @@
         android:orientation="vertical"
         android:padding="5dp">
 
-        <View
-            android:id="@+id/divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_above="@+id/card_toolbar"
-            android:layout_marginBottom="0dp"
-            android:alpha="0.12"
-            android:background="@android:color/black" />
+        <!--<View-->
+        <!--android:id="@+id/divider"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1dp"-->
+        <!--android:layout_above="@+id/card_toolbar"-->
+        <!--android:layout_marginBottom="0dp"-->
+        <!--android:alpha="0.12"-->
+        <!--android:background="@android:color/black" />-->
 
-        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/card_toolbar"
-            style="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
-            android:layout_width="match_parent"
-            android:layout_height="28dp"
-            android:layout_alignParentBottom="false"
-            android:layout_below="@+id/chronometer"
-            android:layout_centerVertical="false"
-            android:elevation="0dp"
-            android:minHeight="1dp"
-            card_view:buttonGravity="top|bottom"
-            card_view:contentInsetStart="1dp"
-            card_view:subtitleTextAppearance="@style/TextAppearance.AppCompat.Small"
-            card_view:titleTextAppearance="@android:style/TextAppearance.DeviceDefault.Widget.ActionMode.Title">
+        <!--<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--android:id="@+id/card_toolbar"-->
+        <!--style="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="28dp"-->
+        <!--android:layout_alignParentBottom="false"-->
+        <!--android:layout_below="@+id/chronometer"-->
+        <!--android:layout_centerVertical="false"-->
+        <!--android:minHeight="1dp"-->
+        <!--card_view:buttonGravity="top|bottom"-->
+        <!--card_view:contentInsetStart="1dp"-->
+        <!--card_view:subtitleTextAppearance="@style/TextAppearance.AppCompat.Small"-->
+        <!--card_view:titleTextAppearance="@android:style/TextAppearance.DeviceDefault.Widget.ActionMode.Title">-->
 
-        </android.support.v7.widget.Toolbar>
+        <!--</android.support.v7.widget.Toolbar>-->
 
 
         <TextView
@@ -49,6 +48,8 @@
             android:layout_height="wrap_content"
 
             android:layout_below="@+id/textViewName"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="60dp"
             android:gravity="center"
             android:text="Максимальная"
             android:textSize="28sp" />
@@ -57,8 +58,8 @@
             android:id="@+id/intermediateTemperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/MaximumTemperature"
-            android:layout_alignTop="@+id/textLabelCurrent"
+            android:layout_below="@+id/textLabelCurrent"
+            android:layout_centerHorizontal="true"
             android:gravity="center"
             android:text="-,-"
             android:textSize="30sp" />
@@ -67,17 +68,20 @@
             android:id="@+id/MaximumTemperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/textLabelMaximum"
+            android:layout_below="@+id/textLabelMaximum"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="false"
             android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@+id/textLabelMaximum"
             android:text="-,-"
             android:textSize="30sp" />
 
         <com.github.lzyzsd.circleprogress.DonutProgress
             android:id="@+id/device_battery"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/textViewName"
             card_view:donut_finished_stroke_width="2dp"
             card_view:donut_text_size="7sp"
             card_view:donut_unfinished_color="@color/red"
@@ -87,9 +91,8 @@
             android:id="@+id/minimumTemperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/textLabelMinimum"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@+id/textLabelMaximum"
+            android:layout_below="@+id/textLabelMinimum"
+            android:layout_centerHorizontal="true"
             android:text="-,-"
             android:textSize="30sp" />
 
@@ -97,15 +100,16 @@
             android:id="@+id/chronometer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/time"
-            android:layout_toRightOf="@+id/time"
+            android:layout_below="@+id/time"
+            android:layout_centerInParent="true"
             android:textSize="24sp" />
 
         <TextView
             android:id="@+id/textLabelMinimum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textLabelCurrent"
+            android:layout_below="@+id/intermediateTemperature"
+            android:layout_centerHorizontal="true"
             android:text="Минимальная"
             android:textSize="28sp" />
 
@@ -113,26 +117,28 @@
             android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/textLabelMinimum"
-            android:text="t="
+            android:layout_alignParentStart="false"
+            android:layout_below="@+id/textViewName"
+            android:layout_centerHorizontal="true"
+            android:text="Время:"
             android:textSize="24sp" />
 
         <ImageButton
-            android:id="@+id/settingsButton"
+            android:id="@+id/btnSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_above="@+id/textDeviceSerial"
+            android:layout_alignParentBottom="false"
             android:layout_alignParentEnd="true"
-            android:layout_alignStart="@+id/device_battery"
-            android:layout_below="@+id/device_battery"
             android:background="@null"
-            card_view:srcCompat="@android:drawable/ic_menu_preferences" />
+            card_view:srcCompat="@drawable/settings" />
 
         <TextView
             android:id="@+id/textLabelCurrent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textLabelMaximum"
+            android:layout_below="@+id/MaximumTemperature"
+            android:layout_centerHorizontal="true"
             android:gravity="center"
             android:text="Текущая"
             android:textSize="28sp" />
@@ -141,32 +147,58 @@
             android:id="@+id/textViewName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="false"
-            android:layout_marginTop="-15dp"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="false"
             android:elegantTextHeight="false"
             android:fontFamily="sans-serif"
-            android:gravity="top"
+            android:gravity="center_horizontal"
             android:lineSpacingExtra="0sp"
             android:lineSpacingMultiplier="0"
             android:lines="1"
             android:maxLines="1"
             android:padding="0dp"
-            android:singleLine="true"
-            android:text="name"
+            android:text="Alexander"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="55sp" />
+            android:textSize="40sp" />
 
         <TextView
-            android:id="@+id/textViewMac"
+            android:id="@+id/textDeviceSerial"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="64dp"
-            android:gravity="right"
+            android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="8sp"
-            tools:text="mac" />
+            android:textSize="24sp"
+            tools:text="SN:" />
+
+        <ImageView
+            android:id="@+id/rssi"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/textViewName"
+            card_view:srcCompat="@drawable/wifi_0" />
+
+        <ImageButton
+            android:id="@+id/btnShutdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/textDeviceSerial"
+            android:background="@null"
+            card_view:srcCompat="@drawable/shutdown" />
+
+        <ImageButton
+            android:id="@+id/btnReload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/textDeviceSerial"
+            android:layout_centerHorizontal="true"
+            android:background="@null"
+            card_view:srcCompat="@drawable/rel" />
 
 
     </RelativeLayout>
