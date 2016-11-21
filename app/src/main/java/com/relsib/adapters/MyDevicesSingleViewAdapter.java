@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.relsib.application.BLEService;
@@ -58,6 +59,7 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
             //holder.topToolBar.setTitle(thermometer.mDeviceName);// + " SN:" + thermometer.mDeviceSerialNumber);
             // Log.e(TAG, "measure time " + String.valueOf(thermometer.measureTime));
             //  if (thermometer.measureTime != -1) {// if  gettempbynotify set's timer
+            holder.itemView.setBackgroundColor(thermometer.mDeviceBackgroundColor);
 
             if (thermometer.mConnectionState == BLEService.STATE_CONNECTED && thermometer.isNotifyEnabled) {
                 holder.chronometer.setBase(thermometer.measureTime);
@@ -171,6 +173,7 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
         ImageButton btnSettings;
         ImageButton btnReload;
         ImageButton btnShutdown;
+        ImageView color_label;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -184,6 +187,7 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
             this.btnSettings = (ImageButton) itemView.findViewById(R.id.btnSettings);
             this.btnReload = (ImageButton) itemView.findViewById(R.id.btnReload);
             this.btnShutdown = (ImageButton) itemView.findViewById(R.id.btnShutdown);
+            this.color_label = (ImageView) itemView.findViewById(R.id.color_label);
             //topToolBar.inflateMenu(R.menu.card_toolbar_menu);
 
         }

@@ -16,6 +16,16 @@
         android:orientation="vertical"
         android:padding="5dp">
 
+        <ImageView
+            android:id="@+id/color_label"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/textViewName"
+            android:layout_centerHorizontal="false"
+            android:layout_centerVertical="false"
+            android:layout_marginBottom="7dp"
+            android:background="@drawable/marker" />
+
         <!--<View-->
         <!--android:id="@+id/divider"-->
         <!--android:layout_width="match_parent"-->
