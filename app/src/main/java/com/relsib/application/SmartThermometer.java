@@ -59,6 +59,13 @@ public class SmartThermometer {
     public boolean isNotifyEnabled = false;
     public float minAlarm = -1000f;
     public float maxAlarm = -1000f;
+    public boolean minAlarmEnabled;
+    public boolean maxAlarmEnabled;
+    public boolean minAlarmVibrateEnabled;
+    public boolean maxAlarmVibrareEnabled;
+    public boolean minAlarmGraphicEnabled;
+    public boolean maxAlarmGraphicEnabled;
+
     SharedPreferences preferences;
     private long adapterPosition;
     private BluetoothGatt mBluetoothGatt;
@@ -235,6 +242,12 @@ public class SmartThermometer {
         setmDeviceMeasureUnits(preferences.getString(mDeviceMacAddress + SettingsViewCommon.KEY_MEASURE_UNITS, MeasureUnits.Celsium));
         minAlarm = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
         maxAlarm = preferences.getFloat(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_VALUE, 70f);
+        minAlarmEnabled = preferences.getBoolean(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_ENABLED, false);
+        maxAlarmEnabled = preferences.getBoolean(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_ENABLED, false);
+        minAlarmVibrateEnabled = preferences.getBoolean(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_VIBRATE, false);
+        maxAlarmVibrareEnabled = preferences.getBoolean(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_VIBRATE, false);
+        minAlarmGraphicEnabled = preferences.getBoolean(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MIN_GRAPHIC, false);
+        maxAlarmGraphicEnabled = preferences.getBoolean(mDeviceMacAddress + SettingsViewCommon.KEY_ALARMS_MAX_GRAPHIC, false);
         //setmDeviceName(mDeviceName);
     }
 
