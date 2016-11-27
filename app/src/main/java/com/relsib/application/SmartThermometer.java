@@ -14,6 +14,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.util.Log;
 
 import com.relsib.bluetooth.RelsibBluetoothProfile;
@@ -193,7 +194,7 @@ public class SmartThermometer {
                     setMaxTemperature(intermediateTemperature);
                 }
                 if (minTemperature >= intermediateTemperature) {
-                    minTemperature = intermediateTemperature;
+                    setMinTemperature(intermediateTemperature);
                 }
                 broadcastUpdate(BLEService.ACTION_DATA_AVAILABLE, characteristic);
                 //getBatteryByNotify(true);
@@ -385,15 +386,32 @@ public class SmartThermometer {
         Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         Ringtone ringtoneSound = RingtoneManager.getRingtone(BLEService.mServiceContext, ringtoneUri);
 
-        if (maxTemperature > 35) {
+        if (maxAlarmEnabled && maxTemperature >= maxAlarm) {
 
-
+            if (maxAlarmVibrareEnabled) {
+                ((Vibrator) BLEService.mServiceContext.getSystemService(BLEService.VIBRATOR_SERVICE)).vibrate(800);
+            }
             if (ringtoneSound != null) {
-                //   ((Vibrator) BLEService.mServiceContext.getSystemService(BLEService.VIBRATOR_SERVICE)).vibrate(800);
-                //   ringtoneSound.play();
+                ringtoneSound.play();
             }
         } else {
-            // ringtoneSound.stop();
+            ringtoneSound.stop();
+        }
+    }
+
+    public void setMinTemperature(Float minTemperature) {
+        this.minTemperature = minTemperature;
+        Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        Ringtone ringtoneSound = RingtoneManager.getRingtone(BLEService.mServiceContext, ringtoneUri);
+        if (minAlarmEnabled && minTemperature <= minAlarm) {
+            if (minAlarmVibrateEnabled) {
+                ((Vibrator) BLEService.mServiceContext.getSystemService(BLEService.VIBRATOR_SERVICE)).vibrate(800);
+            }
+            if (ringtoneSound != null) {
+                ringtoneSound.play();
+            }
+        } else {
+            ringtoneSound.stop();
         }
         //Log.e(TAG, mDeviceMacAddress + " setting " + maxTemperature);
     }
@@ -408,7 +426,7 @@ public class SmartThermometer {
 
     public void resetValues() {
         setMaxTemperature(-1000F);
-        minTemperature = 1000F;
+        setMinTemperature(1000F);
         intermediateTemperature = 1000f;
         measureTime = SystemClock.elapsedRealtime();
 
@@ -424,8 +442,8 @@ public class SmartThermometer {
 
     }
 
-    public void broadcastUpdate(final String action,
-                                final BluetoothGattCharacteristic characteristic) {
+    private void broadcastUpdate(final String action,
+                                 final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
         //     Log.e(TAG, "mac " + mDeviceMacAddress + " SENDING adapter position  " + adapterPosition);
@@ -442,7 +460,7 @@ public class SmartThermometer {
         return mDeviceSerialNumber;
     }
 
-    public void setmDeviceSerialNumber(String mDeviceSerialNumber) {
+    private void setmDeviceSerialNumber(String mDeviceSerialNumber) {
         this.mDeviceSerialNumber = mDeviceSerialNumber;
         //setmDeviceName(preferences.getString(mDeviceMacAddress + SettingsViewCommon.KEY_NAME, "WT-50"));
         setmDeviceColorLabel(preferences.getInt(mDeviceMacAddress + SettingsViewCommon.KEY_COLOR_LABEL, Color.WHITE));
@@ -527,7 +545,7 @@ public class SmartThermometer {
         Log.e(TAG, "KILL connection");
     }
 
-    public void readCharacteristic(UUID serviceUUID, UUID characteristicUUID) {
+    private void readCharacteristic(UUID serviceUUID, UUID characteristicUUID) {
         if (BLEService.mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.e(TAG, "BluetoothAdapter not initialized or gatt null");
             return;
@@ -550,7 +568,7 @@ public class SmartThermometer {
 
     }
 
-    public boolean getTemperatureByNotify(boolean enabled) {
+    private boolean getTemperatureByNotify(boolean enabled) {
         setCharacteristicNotify(RelsibBluetoothProfile.HEALTH_THERMOMETER_SERVICE, RelsibBluetoothProfile.INTERMEDIATE_TEMPERATURE, enabled);
         measureTime = SystemClock.elapsedRealtime();
         isNotifyEnabled = enabled;
@@ -558,12 +576,12 @@ public class SmartThermometer {
         return true;
     }
 
-    public void getBatteryByNotify(boolean enabled) {
+    private void getBatteryByNotify(boolean enabled) {
         setCharacteristicNotify(RelsibBluetoothProfile.BATTERY_SERVICE, RelsibBluetoothProfile.BATTERY_LEVEL, enabled);
         Log.e(TAG, "call get battery by notify + isnotify " + enabled);
     }
 
-    public boolean setCharacteristicNotify(UUID mServiceName, UUID mCharacteristicName, boolean enabled) {
+    private boolean setCharacteristicNotify(UUID mServiceName, UUID mCharacteristicName, boolean enabled) {
 
         Log.e(TAG, "CALL setCharacteristicNotify " + mCharacteristicName.toString() + " " + mDeviceMacAddress);
         if (BLEService.mBluetoothAdapter == null) {

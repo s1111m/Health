@@ -1,6 +1,5 @@
 package com.relsib.application;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -20,6 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.relsib.helper.FontsOverride;
+
+//import android.support
 
 
 public class MainActivityView extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {

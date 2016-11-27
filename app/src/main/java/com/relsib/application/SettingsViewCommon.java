@@ -138,8 +138,8 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
         thermometer_alarms_screen.addPreference(minCategory);
 
         currentMeasureUnits = getPreferenceManager().getSharedPreferences().getString(idTag + KEY_MEASURE_UNITS, SmartThermometer.MeasureUnits.Celsium);
-        if (currentMeasureUnits == null)
-            currentMeasureUnits = SmartThermometer.MeasureUnits.Celsium;
+//        if (currentMeasureUnits == null)
+//            currentMeasureUnits = SmartThermometer.MeasureUnits.Celsium;
 
         minAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(-20, SmartThermometer.MeasureUnits.Celsium, currentMeasureUnits);
         maxAlarmTresholdBound = (int) SmartThermometer.MeasureUnits.convertMeasureUnits(70, SmartThermometer.MeasureUnits.Celsium, currentMeasureUnits);
