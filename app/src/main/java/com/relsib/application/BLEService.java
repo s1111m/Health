@@ -212,7 +212,9 @@ public class BLEService extends Service {
 
             ;
         }, 0L, 60L * 100); // интервал - 60000 миллисекунд, 0 миллисекунд до первого запуска.
-        thermometers.add(new SmartThermometer("aa:aa:aa:aa:aa", "TEST DEVICE"));
+        SmartThermometer stubThermometer = new SmartThermometer("aa:aa:aa:aa:aa", "TEST DEVICE");
+        stubThermometer.initPreferences();
+        thermometers.add(stubThermometer);
     }
 
     public void addSmartThermometer(String mDeviceAddress, String deviceName) {
@@ -227,6 +229,7 @@ public class BLEService extends Service {
             if (tempThermometer.selected) {
                 if (thermometers.size() < MAX_BLE_DEVICES) {
                     thermometers.add(tempThermometer);
+                    tempThermometer.initPreferences();
                     new ConnectThread(tempThermometer).start();
                 } else {
                     Toast.makeText(mActivityContext, "Протокол BLE не поддерживает больше " + MAX_BLE_DEVICES + " устройств", Toast.LENGTH_LONG).show();

@@ -1,5 +1,6 @@
 package com.relsib.application;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -72,20 +73,20 @@ public class MainActivityView extends AppCompatActivity implements NavigationVie
         //getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         getFragmentManager().beginTransaction().replace(R.id.frgmCont, MyDevicesListView.newInstance("tesy", "test")).commit();
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mBLEService.pushUnknownToMyDevices();
-                getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesListView.newInstance("tesy", "test")).commit();
-                //    for (int i = 0; i < BLEService.thermometers.size(); i++) {
-                //   BLEService.thermometers.get(i).connect(true);
-                    //   mBLEService.thermometers.get(i).getTemperatureByNotify(true);
-                // }
-
-
-            }
-        });
+//        fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                mBLEService.pushUnknownToMyDevices();
+//                getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesListView.newInstance("tesy", "test")).commit();
+//                //    for (int i = 0; i < BLEService.thermometers.size(); i++) {
+//                //   BLEService.thermometers.get(i).connect(true);
+//                    //   mBLEService.thermometers.get(i).getTemperatureByNotify(true);
+//                // }
+//
+//
+//            }
+//        });
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);

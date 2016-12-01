@@ -1,5 +1,6 @@
 package com.relsib.adapters;
 
+import android.graphics.drawable.GradientDrawable;
 import android.os.SystemClock;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -48,19 +49,9 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
 
             holder.textViewName.setText(thermometer.mDeviceName);
             holder.textViewSerial.setText("SN: " + thermometer.mDeviceSerialNumber);
-
             holder.battery_level.setProgress(thermometer.mDeviceBatteryLevel);
-            //holder.deviceBatteryText.setText(thermometer.mDeviceBatteryLevel + "%");
-
-            // holder.textDeviceSerial.setText("SN: " + thermometer.getmDeviceSerialNumber());
-
             holder.itemView.setBackgroundColor(thermometer.mDeviceBackgroundColor);
-            //holder.textViewName.setTextColor(thermometer.mDeviceColorLabel);
-            //holder.topToolBar.setTitle(thermometer.mDeviceName);// + " SN:" + thermometer.mDeviceSerialNumber);
-            // Log.e(TAG, "measure time " + String.valueOf(thermometer.measureTime));
-            //  if (thermometer.measureTime != -1) {// if  gettempbynotify set's timer
-            holder.itemView.setBackgroundColor(thermometer.mDeviceBackgroundColor);
-
+            ((GradientDrawable) holder.color_label.getBackground()).setColor(thermometer.mDeviceColorLabel);
             if (thermometer.mConnectionState == BLEService.STATE_CONNECTED && thermometer.isNotifyEnabled) {
                 holder.chronometer.setBase(thermometer.measureTime);
                 holder.chronometer.start();
@@ -69,11 +60,6 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
                 //  Log.e(TAG, String.valueOf(thermometer.measureTime) + " " +String.valueOf(SystemClock.elapsedRealtime()));
                 holder.chronometer.setBase(SystemClock.elapsedRealtime()); //saved basetime
             }
-
-            //  }
-
-            // thermometer.setAdapterPosition(holder.getAdapterPosition());
-
             if (thermometer.intermediateTemperature != 1000f && thermometer.mConnectionState == BLEService.STATE_CONNECTED)
                 holder.textViewIntermediateTemperature.setText(String.valueOf(thermometer.intermediateTemperature) + " " + thermometer.mDeviceMeasureUnits);
             else holder.textViewIntermediateTemperature.setText("-,-");

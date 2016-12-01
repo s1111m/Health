@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.relsib.application.MainActivityView.mBLEService;
+
 public class DeviceSearchView extends Fragment {
     public static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 1 seconds.
@@ -41,6 +44,7 @@ public class DeviceSearchView extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView recyclerView;
+    private FloatingActionButton fab;
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
 
@@ -209,7 +213,7 @@ public class DeviceSearchView extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        mLeDeviceListAdapter = new BLEDevicesViewAdapter(MainActivityView.mBLEService);
+        mLeDeviceListAdapter = new BLEDevicesViewAdapter(mBLEService);
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
         if (BLEService.unknownThermometers != null) swipeRefreshLayout.setRefreshing(true);
         scanLeDevice(true);
@@ -220,6 +224,18 @@ public class DeviceSearchView extends Fragment {
                 mLeDeviceListAdapter.clear();
                 mLeDeviceListAdapter.notifyDataSetChanged();
                 scanLeDevice(true);
+            }
+        });
+        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mBLEService.pushUnknownToMyDevices();
+                getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, MyDevicesListView.newInstance("tesy", "test")).commit();
+                //    for (int i = 0; i < BLEService.thermometers.size(); i++) {
+                //   BLEService.thermometers.get(i).connect(true);
+                    //   mBLEService.thermometers.get(i).getTemperatureByNotify(true);
+                // }
             }
         });
         return rootView;
