@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -60,8 +62,21 @@ public class MyDevicesSingleViewAdapter extends RecyclerView.Adapter<MyDevicesSi
                 //  Log.e(TAG, String.valueOf(thermometer.measureTime) + " " +String.valueOf(SystemClock.elapsedRealtime()));
                 holder.chronometer.setBase(SystemClock.elapsedRealtime()); //saved basetime
             }
-            if (thermometer.intermediateTemperature != 1000f && thermometer.mConnectionState == BLEService.STATE_CONNECTED)
+            if (thermometer.intermediateTemperature != 1000f && thermometer.mConnectionState == BLEService.STATE_CONNECTED) {
                 holder.textViewIntermediateTemperature.setText(String.valueOf(thermometer.intermediateTemperature) + " " + thermometer.mDeviceMeasureUnits);
+                Animation anim = new AlphaAnimation(0.0f, 1.0f);
+                anim.setDuration(900); //You can manage the time of the blink with this parameter
+                anim.setStartOffset(20);
+                anim.setRepeatMode(Animation.REVERSE);
+                anim.setRepeatCount(Animation.INFINITE);
+                if (thermometer.isBlinking){
+                    //  holder.textViewIntermediateTemperature.clearAnimation(); // cancel blink animation
+                    holder.textViewIntermediateTemperature.startAnimation(anim);
+                } else {
+                    holder.textViewIntermediateTemperature.clearAnimation(); // cancel blink animation
+                    //holder.textViewIntermediateTemperature.setAlpha(1.0f); // restore original alpha
+                }
+            }
             else holder.textViewIntermediateTemperature.setText("-,-");
 
             if (thermometer.maxTemperature != -1000f)

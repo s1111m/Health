@@ -20,7 +20,6 @@ import android.util.Log;
 import com.relsib.bluetooth.RelsibBluetoothProfile;
 import com.relsib.dao.DbModel;
 
-import java.net.URI;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.UUID;
@@ -59,12 +58,12 @@ public class SmartThermometer {
     public boolean autoconnect = true;
     public int mConnectionState = BLEService.STATE_DISCONNECTED;
     public boolean isNotifyEnabled = false;
-    public float minAlarm = -1000f;
+    public float minAlarmTemperature = -1000f;
     public float maxAlarmTemperature = -1000f;
     public boolean minAlarmEnabled;
     public boolean maxAlarmEnabled;
     public boolean minAlarmVibrateEnabled;
-    public boolean maxAlarmVibrareEnabled;
+    public boolean maxAlarmVibrateEnabled;
     public boolean minAlarmGraphicEnabled;
     public boolean maxAlarmGraphicEnabled;
     private final Vibrator vibroService = ((Vibrator) BLEService.mServiceContext.getSystemService(BLEService.VIBRATOR_SERVICE));
@@ -72,6 +71,8 @@ public class SmartThermometer {
     private long adapterPosition;
     Ringtone maxRingtone;
     Ringtone minRingtone;
+    public boolean isBlinking;
+
     private BluetoothGatt mBluetoothGatt;
     private Queue<BluetoothGattDescriptor> descriptorWriteQueue = new LinkedList<BluetoothGattDescriptor>();
     private Queue<BluetoothGattCharacteristic> characteristicReadQueue = new LinkedList<BluetoothGattCharacteristic>();
@@ -193,24 +194,40 @@ public class SmartThermometer {
                     default:
                         break;
                 }
-                if (maxAlarmEnabled && intermediateTemperature>=maxAlarmTemperature){
-                    //if (maxAlarmEnabled && maxTemperature>=maxAlarmTemperature) {
-                        Log.e(TAG,"maxTemperature = " + maxTemperature + " maxAlarmTemperature = " + maxAlarmTemperature);
-                        // внести в условие, если есть звук
 
-                        ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-                        ringtoneSound = RingtoneManager.getRingtone(BLEService.mServiceContext, ringtoneUri);
-                        if (maxAlarmVibrareEnabled) {
+                if (maxAlarmEnabled && intermediateTemperature>=maxAlarmTemperature){
+                        Log.e(TAG,"maxTemperature = " + maxTemperature + " maxAlarmTemperature = " + maxAlarmTemperature);
+                    minRingtone.stop();
+                    isBlinking=false;
+                        if (maxAlarmVibrateEnabled) {
                             Log.e(TAG, "Vibrate");
                             vibroService.vibrate(800);
                         }
-                        //if (ringtoneSound != null) {
+                        if (maxAlarmGraphicEnabled){
+                            isBlinking=true;
+                            Log.e(TAG,"BLINK");
+                        }
                         Log.e(TAG, "ringtone");
-                        ringtoneSound.play();
-
-                }else if (intermediateTemperature<=minAlarm){
-
+                        maxRingtone.play();
+                }else if (minAlarmEnabled && intermediateTemperature<= minAlarmTemperature){
+                    Log.e(TAG,"minTemperature = " + minTemperature + " minAlarmTemperature = " + minAlarmTemperature);
+                    maxRingtone.stop();
+                    isBlinking=false;
+                    if (minAlarmVibrateEnabled) {
+                        Log.e(TAG, "Vibrate");
+                        vibroService.vibrate(800);
+                    }
+                    if (minAlarmGraphicEnabled){
+                        isBlinking=true;
+                    }
+                    Log.e(TAG, "ringtone");
+                    minRingtone.play();
+                } else {
+                    maxRingtone.stop();
+                    minRingtone.stop();
+                    isBlinking=false;
                 }
+                Log.e(TAG,"END_ALARM_BLOCK");
                 if (maxTemperature <= intermediateTemperature) {
                     setMaxTemperature(intermediateTemperature);
                  } else if (minTemperature >= intermediateTemperature) {
@@ -254,9 +271,6 @@ public class SmartThermometer {
             broadcastUpdate(BLEService.EXTRA_DATA);
         }
     };
-    private Uri ringtoneUri;
-    private Ringtone ringtoneSound;
-
     public SmartThermometer(String mDeviceMacAddress, String mDeviceName) {
         this.mDeviceMacAddress = mDeviceMacAddress;
         this.preferences = BLEService.mActivityContext.getSharedPreferences(this.mDeviceMacAddress + SettingsViewCommon.FILE_NAME, MODE_PRIVATE);
@@ -267,12 +281,12 @@ public class SmartThermometer {
         setmDeviceColorLabel(preferences.getInt(SettingsViewCommon.KEY_COLOR_LABEL, Color.WHITE));
         setmDeviceBackgroundColor(preferences.getInt(SettingsViewCommon.KEY_BACKGROUND_COLOR, Color.WHITE));
         setmDeviceMeasureUnits(preferences.getString(SettingsViewCommon.KEY_MEASURE_UNITS, MeasureUnits.Celsium));
-        minAlarm = preferences.getFloat(SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
+        minAlarmTemperature = preferences.getFloat(SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
         maxAlarmTemperature = preferences.getFloat(SettingsViewCommon.KEY_ALARMS_MAX_VALUE, 70f);
         minAlarmEnabled = preferences.getBoolean(SettingsViewCommon.KEY_ALARMS_MIN_ENABLED, false);
         maxAlarmEnabled = preferences.getBoolean(SettingsViewCommon.KEY_ALARMS_MAX_ENABLED, false);
         minAlarmVibrateEnabled = preferences.getBoolean(SettingsViewCommon.KEY_ALARMS_MIN_VIBRATE, false);
-        maxAlarmVibrareEnabled = preferences.getBoolean(SettingsViewCommon.KEY_ALARMS_MAX_VIBRATE, false);
+        maxAlarmVibrateEnabled = preferences.getBoolean(SettingsViewCommon.KEY_ALARMS_MAX_VIBRATE, false);
         minAlarmGraphicEnabled = preferences.getBoolean(SettingsViewCommon.KEY_ALARMS_MIN_GRAPHIC, false);
         maxAlarmGraphicEnabled = preferences.getBoolean(SettingsViewCommon.KEY_ALARMS_MAX_GRAPHIC, false);
         maxRingtone = RingtoneManager.getRingtone(BLEService.mServiceContext,Uri.parse(preferences.getString(SettingsViewCommon.KEY_ALARMS_MAX_SOUND,"default ringtone")));
@@ -323,7 +337,7 @@ public class SmartThermometer {
         maxTemperature = MeasureUnits.convertMeasureUnits(maxTemperature, mDeviceMeasureUnits, to);
         minTemperature = MeasureUnits.convertMeasureUnits(minTemperature, mDeviceMeasureUnits, to);
         intermediateTemperature = MeasureUnits.convertMeasureUnits(intermediateTemperature, mDeviceMeasureUnits, to);
-        minAlarm = MeasureUnits.convertMeasureUnits(minAlarm, mDeviceMeasureUnits, to);
+        minAlarmTemperature = MeasureUnits.convertMeasureUnits(minAlarmTemperature, mDeviceMeasureUnits, to);
         maxAlarmTemperature = MeasureUnits.convertMeasureUnits(maxAlarmTemperature, mDeviceMeasureUnits, to);
 
         broadcastUpdate(BLEService.EXTRA_DATA);
@@ -372,7 +386,7 @@ public class SmartThermometer {
         this.minTemperature = minTemperature;
 //        ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 //        ringtoneSound = RingtoneManager.getRingtone(BLEService.mServiceContext, ringtoneUri);
-//        if (minAlarmEnabled && minTemperature <= minAlarm) {
+//        if (minAlarmEnabled && minTemperature <= minAlarmTemperature) {
 //            if (minAlarmVibrateEnabled) {
 //                ((Vibrator) BLEService.mServiceContext.getSystemService(BLEService.VIBRATOR_SERVICE)).vibrate(800);
 //            }
@@ -397,6 +411,9 @@ public class SmartThermometer {
         setMaxTemperature(-1000F);
         setMinTemperature(1000F);
         intermediateTemperature = 1000f;
+        maxRingtone.stop();
+        minRingtone.stop();
+        isBlinking=false;
         measureTime = SystemClock.elapsedRealtime();
 
     }
@@ -435,7 +452,7 @@ public class SmartThermometer {
         setmDeviceColorLabel(preferences.getInt(SettingsViewCommon.KEY_COLOR_LABEL, Color.WHITE));
         setmDeviceBackgroundColor(preferences.getInt(SettingsViewCommon.KEY_BACKGROUND_COLOR, Color.WHITE));
         setmDeviceMeasureUnits(preferences.getString(SettingsViewCommon.KEY_MEASURE_UNITS, MeasureUnits.Celsium));
-        //minAlarm = preferences.getFloat(SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
+        //minAlarmTemperature = preferences.getFloat(SettingsViewCommon.KEY_ALARMS_MIN_VALUE, -20f);
         //maxAlarmTemperature = preferences.getFloat(SettingsViewCommon.KEY_ALARMS_MAX_VALUE, 70f);
     }
 

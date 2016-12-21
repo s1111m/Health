@@ -52,11 +52,10 @@ public class MainActivityView extends AppCompatActivity implements NavigationVie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        FontsOverride.setDefaultFont(this, "SERIF", "fonts/Roboto-Bold.ttf");
-
+        //getFragmentManager().beginTransaction().addToBackStack(null).add(R.id.frgmCont, MyDevicesListView.newInstance("test", "test")).commit();
         setContentView(R.layout.activity_main);
-
+        getFragmentManager().beginTransaction().addToBackStack(null).add(R.id.frgmCont, MyDevicesListView.newInstance("test", "test")).commit();
+        FontsOverride.setDefaultFont(this, "SERIF", "fonts/Roboto-Bold.ttf");
         //register service
         Log.e(TAG, "APP_START");
 //        new Thread(new Runnable() {
@@ -72,7 +71,8 @@ public class MainActivityView extends AppCompatActivity implements NavigationVie
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        getFragmentManager().beginTransaction().replace(R.id.frgmCont, MyDevicesListView.newInstance("tesy", "test")).commit();
+//        getFragmentManager().beginTransaction().replace(R.id.frgmCont, MyDevicesListView.newInstance("tesy", "test")).commit();
+        //getFragmentManager().beginTransaction().addToBackStack(null).add(R.id.frgmCont, MyDevicesListView.newInstance("test", "test")).commit();
 //        fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
 //            @Override

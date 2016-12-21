@@ -121,7 +121,7 @@ public class MyDevicesListView extends Fragment {
 //            }
 //        });
 
-
+        adapter.notifyDataSetChanged();
         return rootView;
     }
     @Override

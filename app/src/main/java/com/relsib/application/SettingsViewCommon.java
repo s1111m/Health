@@ -14,6 +14,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.RingtonePreference;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 
@@ -119,18 +120,17 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
         thermometer_alarms_screen.setSummary("Установка режимов уведомлений");
         thermometer_alarms_screen.setKey(KEY_ALARMS_SCREEN);
         rootCategory.addPreference(thermometer_alarms_screen);
-        // thermometer_alarms_screen.setFragment(com.relsib.application.SettingsViewAlarm.class.getName());
-//thermometer_alarms_screen.
+        thermometer_alarms_screen.setFragment(com.relsib.application.SettingsViewAlarm.class.getName());
         thermometer_alarms_screen.setOnPreferenceClickListener(new PreferenceScreen.OnPreferenceClickListener() {
 
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 Log.e(TAG, "clicked 3" + SettingsViewCommon.class.getName());
                 //preference.
-                // setPreferenceScreen(thermometer_alarms_screen);
+                 setPreferenceScreen(thermometer_alarms_screen);
                 //BLEService.mActivityContext.getFragmentManager().beginTransaction().replace(R.id.frgmCont, SettingsViewAlarm.newInstance(idTag)).commit();
-                BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsViewCommon.newInstance(idTag)).commit();
-                return true;
+              //  BLEService.mActivityContext.getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgmCont, SettingsViewCommon.newInstance(idTag)).commit();
+                return false;
             }
         });
 
@@ -169,7 +169,7 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
         final CheckBoxPreference thermometer_alarms_min_graphic = new CheckBoxPreference(activityContext);
         thermometer_alarms_min_graphic.setTitle("Мерцание индикатора");
         thermometer_alarms_min_graphic.setDefaultValue(false);
-        thermometer_alarms_min_graphic.setKey(KEY_ALARMS_MIN_ENABLED);
+        thermometer_alarms_min_graphic.setKey(KEY_ALARMS_MIN_GRAPHIC);
 
         minCategory.addPreference(thermometer_alarms_min_graphic);
         thermometer_alarms_min_graphic.setDependency(KEY_ALARMS_MIN_ENABLED);
@@ -215,7 +215,7 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
         final CheckBoxPreference thermometer_alarms_max_graphic = new CheckBoxPreference(activityContext);
         thermometer_alarms_max_graphic.setTitle("Мерцание индикатора");
         thermometer_alarms_max_graphic.setDefaultValue(false);
-        thermometer_alarms_max_graphic.setKey(KEY_ALARMS_MIN_GRAPHIC);
+        thermometer_alarms_max_graphic.setKey(KEY_ALARMS_MAX_GRAPHIC);
         maxCategory.addPreference(thermometer_alarms_max_graphic);
         thermometer_alarms_max_graphic.setDependency(KEY_ALARMS_MAX_ENABLED);
 
@@ -288,10 +288,10 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
                 case SettingsViewCommon.KEY_MEASURE_UNITS:
                     String newMeasureUnits = sharedPreferences.getString(s, SmartThermometer.MeasureUnits.Celsium);
 
-                    Log.e(TAG, "Values in object " + whoChanged.minAlarm + " " + whoChanged.maxAlarmTemperature + " " + whoChanged.mDeviceMeasureUnits);
+                    Log.e(TAG, "Values in object " + whoChanged.minAlarmTemperature + " " + whoChanged.maxAlarmTemperature + " " + whoChanged.mDeviceMeasureUnits);
                     whoChanged.setmDeviceMeasureUnits(newMeasureUnits);
 
-                    Log.e(TAG, "Values in object after converting " + whoChanged.minAlarm + " " + whoChanged.maxAlarmTemperature + " " + whoChanged.mDeviceMeasureUnits);
+                    Log.e(TAG, "Values in object after converting " + whoChanged.minAlarmTemperature + " " + whoChanged.maxAlarmTemperature + " " + whoChanged.mDeviceMeasureUnits);
 
                     list.setSummary(whoChanged.mDeviceMeasureUnits);
 
@@ -301,13 +301,13 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
                     Log.e(TAG, " bounds " + minAlarmTresholdBound + " max " + maxAlarmTresholdBound);
 
 
-                    Log.e(TAG, "Saving min values" + whoChanged.minAlarm + "  bounds " + minAlarmTresholdBound + " max " + maxAlarmTresholdBound);
+                    Log.e(TAG, "Saving min values" + whoChanged.minAlarmTemperature + "  bounds " + minAlarmTresholdBound + " max " + maxAlarmTresholdBound);
                     thermometer_alarms_min_treshold.setMinValue(-1000);
                     thermometer_alarms_min_treshold.setMaxValue(1000);
                     //thermometer_alarms_min_treshold.setDefaultValue((float) minAlarmTresholdBound);
                     thermometer_alarms_min_treshold.setUnit(whoChanged.mDeviceMeasureUnits);
-                    getPreferenceManager().getSharedPreferences().edit().putFloat(KEY_ALARMS_MIN_VALUE, whoChanged.minAlarm).apply();
-                    thermometer_alarms_min_treshold.setValue(whoChanged.minAlarm);
+                    getPreferenceManager().getSharedPreferences().edit().putFloat(KEY_ALARMS_MIN_VALUE, whoChanged.minAlarmTemperature).apply();
+                    thermometer_alarms_min_treshold.setValue(whoChanged.minAlarmTemperature);
                     thermometer_alarms_min_treshold.setMinValue(minAlarmTresholdBound);
                     thermometer_alarms_min_treshold.setMaxValue(maxAlarmTresholdBound);
                     Log.e(TAG, "get setted min value " + thermometer_alarms_min_treshold.getValue());
@@ -328,33 +328,37 @@ public class SettingsViewCommon extends PreferenceFragment implements SharedPref
                 case SettingsViewCommon.KEY_ALARMS_MIN_VALUE:
                     Log.e(TAG, "Calling onChange min");
                     Log.e(TAG, "min current form value " + thermometer_alarms_min_treshold.getValue());
-                    whoChanged.minAlarm = getPreferenceManager().getSharedPreferences().getFloat(KEY_ALARMS_MIN_VALUE, minAlarmTresholdBound);
-                    Log.e(TAG, "min read from file " + whoChanged.minAlarm);
-                    thermometer_alarms_min_treshold.setSummary(String.valueOf(whoChanged.minAlarm) + " " + whoChanged.mDeviceMeasureUnits);
+                    whoChanged.minAlarmTemperature = getPreferenceManager().getSharedPreferences().getFloat(KEY_ALARMS_MIN_VALUE, minAlarmTresholdBound);
+                    Log.e(TAG, "min read from file " + whoChanged.minAlarmTemperature);
+                    thermometer_alarms_min_treshold.setSummary(String.valueOf(whoChanged.minAlarmTemperature) + " " + whoChanged.mDeviceMeasureUnits);
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MIN_ENABLED:
                     whoChanged.minAlarmEnabled = getPreferenceManager().getSharedPreferences().getBoolean(KEY_ALARMS_MIN_ENABLED, false);
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MIN_VIBRATE:
-                    whoChanged.minAlarmEnabled = getPreferenceManager().getSharedPreferences().getBoolean(KEY_ALARMS_MIN_VIBRATE, false);
+                    whoChanged.minAlarmVibrateEnabled = getPreferenceManager().getSharedPreferences().getBoolean(KEY_ALARMS_MIN_VIBRATE, false);
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MIN_GRAPHIC:
-                    whoChanged.minAlarmEnabled = getPreferenceManager().getSharedPreferences().getBoolean(KEY_ALARMS_MIN_GRAPHIC, false);
+                    whoChanged.minAlarmGraphicEnabled = getPreferenceManager().getSharedPreferences().getBoolean(KEY_ALARMS_MIN_GRAPHIC, false);
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MIN_SOUND:
+                    whoChanged.minRingtone.stop();
                     whoChanged.minRingtone = RingtoneManager.getRingtone(BLEService.mServiceContext, Uri.parse(getPreferenceManager().getSharedPreferences().getString(idTag+ SettingsViewCommon.KEY_ALARMS_MIN_SOUND,"default ringtone")));
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MAX_ENABLED:
                     whoChanged.maxAlarmEnabled = getPreferenceManager().getSharedPreferences().getBoolean(KEY_ALARMS_MAX_ENABLED, false);
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MAX_VIBRATE:
-                    whoChanged.maxAlarmEnabled = getPreferenceManager().getSharedPreferences().getBoolean(KEY_ALARMS_MAX_VIBRATE, false);
+                    whoChanged.maxAlarmVibrateEnabled = getPreferenceManager().getSharedPreferences().getBoolean(KEY_ALARMS_MAX_VIBRATE, false);
+                    Log.e(TAG, String.valueOf(whoChanged.maxAlarmVibrateEnabled));
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MAX_GRAPHIC:
-                    whoChanged.maxAlarmEnabled = getPreferenceManager().getSharedPreferences().getBoolean(KEY_ALARMS_MAX_GRAPHIC, false);
+                    whoChanged.maxAlarmGraphicEnabled = getPreferenceManager().getSharedPreferences().getBoolean(KEY_ALARMS_MAX_GRAPHIC, false);
+                    Log.e(TAG, String.valueOf(whoChanged.maxAlarmGraphicEnabled));
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MAX_SOUND:
-                    whoChanged.maxRingtone = RingtoneManager.getRingtone(BLEService.mServiceContext, Uri.parse(getPreferenceManager().getSharedPreferences().getString(SettingsViewCommon.KEY_ALARMS_MIN_SOUND,"default ringtone")));
+                    whoChanged.maxRingtone.stop();
+                    whoChanged.maxRingtone = RingtoneManager.getRingtone(BLEService.mServiceContext, Uri.parse(getPreferenceManager().getSharedPreferences().getString(SettingsViewCommon.KEY_ALARMS_MAX_SOUND,"default ringtone")));
                     break;
                 case SettingsViewCommon.KEY_ALARMS_MAX_VALUE:
                     Log.e(TAG, "Calling onChange max");

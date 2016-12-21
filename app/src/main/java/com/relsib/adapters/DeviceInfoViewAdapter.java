@@ -13,13 +13,14 @@ import android.widget.TextView;
 import com.relsib.application.BLEService;
 import com.relsib.application.R;
 import com.relsib.application.SmartThermometer;
+import com.relsib.bluetooth.RelsibBluetoothProfile;
 
 
 public class DeviceInfoViewAdapter extends RecyclerView.Adapter<DeviceInfoViewAdapter.MyViewHolder> {
-    String[][] arr = new String[4][2];
+    SmartThermometer thermometer;
 
-    public DeviceInfoViewAdapter(BLEService service) {
-        //this.service = service;
+    public DeviceInfoViewAdapter(String deviceMacAddress) {
+        thermometer=BLEService.findThermometerByMac(deviceMacAddress);
     }
 
     public void addDevice(BluetoothDevice device, int rssi) {
@@ -41,59 +42,36 @@ public class DeviceInfoViewAdapter extends RecyclerView.Adapter<DeviceInfoViewAd
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int listPosition) {
 
-        SmartThermometer currentThermometer = BLEService.unknownThermometers.get(listPosition);
-        holder.mDeviceName.setText(currentThermometer.mDeviceName);
-        holder.mDeviceMac.setText(currentThermometer.mDeviceMacAddress);
-        holder.mDeviceSerialNumber.setText(currentThermometer.getmDeviceSerialNumber());
-        holder.mDeviceRssi.setText(String.valueOf(currentThermometer.mDeviceRssi) + " " + "dB");
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.mDeviceSelected.setChecked(!holder.mDeviceSelected.isChecked());
-                BLEService.unknownThermometers.get(listPosition).selected = holder.mDeviceSelected.isChecked();
-            }
 
-        });
-        holder.mDeviceSelected.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                BLEService.unknownThermometers.get(listPosition).selected = holder.mDeviceSelected.isChecked();
-            }
-        });
     }
 
     @Override
     public int getItemCount() {
-        return BLEService.unknownThermometers.size();
+        return (thermometer==null)?0:1;
     }
 
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    public void clear() {
-        // for (int i=0;i<service.unknownThermometers.size();i++){
-        //   service.unknownThermometers.get(i).close();
-        //  }
-        BLEService.unknownThermometers.clear();
-
-    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView mDeviceName;
-        TextView mDeviceMac;
+        TextView mDeviceModelNumber;
         TextView mDeviceSerialNumber;
-        CheckBox mDeviceSelected;
+        TextView mDeviceManufacturer;
+        TextView mDeviceBatteryLevel;
         TextView mDeviceRssi;
+
+        /*
+        readCharacteristic(RelsibBluetoothProfile.GENERIC_ACCESS_SERVICE, RelsibBluetoothProfile.DEVICE_NAME);
+        readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.MODEL_NUMBER_UUID);
+        readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.SERIAL_NUMBER_UUID);
+        //readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.FIRMWARE_REVISION_UUID);
+        //readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.HARDWARE_REVISION_UUID);
+        //readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.SOFTWARE_REVISION_UUID);
+        readCharacteristic(RelsibBluetoothProfile.DEVICE_INFORMATION_SERVICE, RelsibBluetoothProfile.MANUFACTURER_NAME_UUID);
+        readCharacteristic(RelsibBluetoothProfile.BATTERY_SERVICE, RelsibBluetoothProfile.BATTERY_LEVEL);
+        */
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            this.mDeviceName = (TextView) itemView.findViewById(R.id.device_name);
-            this.mDeviceSerialNumber = (TextView) itemView.findViewById(R.id.device_serial);
-            this.mDeviceMac = (TextView) itemView.findViewById(R.id.device_mac);
-            this.mDeviceSelected = (CheckBox) itemView.findViewById(R.id.device_selected);
-            this.mDeviceRssi = (TextView) itemView.findViewById(R.id.device_rssi);
 
         }
     }

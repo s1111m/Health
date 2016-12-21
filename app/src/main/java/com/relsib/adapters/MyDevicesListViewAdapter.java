@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -55,6 +57,22 @@ public class MyDevicesListViewAdapter extends RecyclerView.Adapter<MyDevicesList
             // holder.textViewMac.setText(tempThermometer.mDeviceMacAddress);
             holder.battery_level.setProgress(tempThermometer.mDeviceBatteryLevel);
             holder.itemView.setBackgroundColor(tempThermometer.mDeviceBackgroundColor);
+            Animation anim = new AlphaAnimation(0.0f, 1.0f);
+            anim.setDuration(900); //You can manage the time of the blink with this parameter
+            anim.setStartOffset(20);
+            anim.setRepeatMode(Animation.REVERSE);
+            anim.setRepeatCount(Animation.INFINITE);
+            if (tempThermometer.isBlinking){
+              //  holder.textViewIntermediateTemperature.clearAnimation(); // cancel blink animation
+                holder.textViewIntermediateTemperature.startAnimation(anim);
+            } else {
+                holder.textViewIntermediateTemperature.clearAnimation(); // cancel blink animation
+                //holder.textViewIntermediateTemperature.setAlpha(1.0f); // restore original alpha
+            }
+            //mBlinking = false;
+
+
+
             //  holder.textViewName.setTextColor(tempThermometer.mDeviceColorLabel);
 
 //            if (tempThermometer.mConnectionState == BLEService.STATE_CONNECTED && tempThermometer.isNotifyEnabled) {
